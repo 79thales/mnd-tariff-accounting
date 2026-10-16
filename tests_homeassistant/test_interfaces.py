@@ -67,7 +67,7 @@ async def test_non_admin_cannot_download_or_upload_documents(
     hass, hass_client, hass_read_only_access_token, route, method
 ):
     selected = await ready(hass)
-    client = await hass_client(hass, access_token=hass_read_only_access_token)
+    client = await hass_client(access_token=hass_read_only_access_token)
     url = f"/api/{DOMAIN}/{route}/{selected.entry_id}/{PLACE}"
     if route == "artifact":
         url += "/" + "0" * 64
@@ -90,7 +90,8 @@ async def test_admin_summary_and_unknown_entry_are_separate(hass, hass_ws_client
     response = await client.receive_json()
     assert response["success"]
     assert response["result"]["places"] == [{"id": PLACE, "name": "Synthetic"}]
-    assert response["result"]["results"][PLACE]["current_meter"] is None
+    assert response["result"]["results"][PLACE]["status"] == "needs_configuration"
+    assert response["result"]["results"][PLACE].get("current_meter") is None
     await client.send_json(
         {
             "id": 2,
