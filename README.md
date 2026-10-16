@@ -1,5 +1,8 @@
 # MND Tariff & Accounting for Home Assistant
 
+[![Přidat integraci MND do Home Assistantu](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=mnd_tariff_accounting)
+[![Otevřít repozitář MND v HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=79thales&repository=mnd-tariff-accounting&category=integration)
+
 Samostatná integrace plynu podle [úplného zadání](ZADANI_MND_SOL_6_1.md).
 Runtime je Python, přibalený frontend JavaScript bez externí Lovelace
 závislosti. Nepotřebuje WPF, WebView2 ani REST token k vlastnímu HA.
@@ -25,6 +28,12 @@ Vydání instalátoru je oddělené od zveřejnění zdrojů.
   historie. [Autentizace a hranice ověření](docs/AUTENTIZACE.md).
 
 ## Použití vývojové verze
+
+Tlačítko **Přidat integraci** nahoře otevře přímo konfiguraci MND ve vašem
+Home Assistantu. Nejdříve nainstalujte integrační soubory a restartujte HA.
+Tlačítko **HACS** otevře tento repozitář jako integraci, stejně jako u ČEZ.
+Současná alpha je pouze draft; dokud není vydání zveřejněné, použijte ruční
+instalaci ZIP níže.
 
 Quality, HACS a Hassfest prošly. Skutečná HA matice ověřila 16 testů na
 **2026.3.1 / plugin 0.13.317** i **2026.10.1 / plugin 0.13.372**.
@@ -73,6 +82,12 @@ Vydání začíná draftem, publikované tagy/assets jsou neměnné.
 [changelog](CHANGELOG.md), [návrh značky](NAVRH_LOGA.md), [vzhled MND](docs/VZHLED_MND.md).
 
 ## English
+
+[Add MND integration](https://my.home-assistant.io/redirect/config_flow_start/?domain=mnd_tariff_accounting) · [Open in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=79thales&repository=mnd-tariff-accounting&category=integration)
+
+Install the integration files and restart HA before using **Add integration**.
+The current alpha remains a draft; use the manual ZIP installation until a
+release is published for HACS.
 
 Independent community Home Assistant gas accounting integration. It imports
 MND XLSX and the C# v1 archive, keeps auditable readings, tariffs, actual

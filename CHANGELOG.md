@@ -1,5 +1,19 @@
 # Changelog
 
+## Nevydáno / Unreleased
+
+### Čeština
+
+- README obsahuje stejná oficiální tlačítka My Home Assistant jako ČEZ:
+  přidání integrace MND a otevření repozitáře v HACS, včetně pořadí instalace
+  a konfigurace. Existující alpha tag ani instalátor se nemění.
+
+### English
+
+- Added the same official My Home Assistant buttons used by ČEZ: configure
+  the MND integration and open its HACS repository, with installation and
+  restart prerequisites. The existing alpha tag and installer are unchanged.
+
 ## 0.1.0-alpha.1 — vývojová verze
 
 ### Čeština
