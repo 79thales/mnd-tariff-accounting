@@ -1,0 +1,129 @@
+"""Lifecycle, Store, registry a formuláře proti skutečné verzi HA z CI matice.
+
+Pouze syntetická data v dočasné konfiguraci. Nespouští zákaznické MND ani
+neinstaluje integraci do provozního HA. Mockovaný je jen síťový portál.
+"""
+
+from unittest.mock import patch
+
+import pytest
+from homeassistant.data_entry_flow import FlowResultType
+from pytest_homeassistant_custom_component.common import MockConfigEntry
+
+from custom_components.mnd_tariff_accounting.const import DOMAIN
+from custom_components.mnd_tariff_accounting.core.common import DataError
+
+PLACE = "27ZG000Z0000000X"
+
+
+def entry():
+    return MockConfigEntry(
+        domain=DOMAIN,
+        title="Synthetic MND",
+        unique_id="synthetic-profile",
+        data={
+            "account_id": "synthetic-account",
+            "mode": "import",
+            "places": [{"id": PLACE, "name": "Synthetic"}],
+        },
+    )
+
+
+async def test_import_config_flow_and_duplicate(hass):
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": "user"})
+    assert result["type"] == FlowResultType.MENU
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {"next_step_id": "import_profile"}
+    )
+    assert result["step_id"] == "import_profile"
+    with patch("custom_components.mnd_tariff_accounting.async_setup_entry", return_value=True):
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            {"name": "Synthetic", "profile_id": "profile-1", "supply_point": PLACE},
+        )
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["data"]["mode"] == "import"
+
+
+async def test_setup_entities_store_reload_and_unload(hass):
+    selected = entry()
+    selected.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(selected.entry_id)
+    await hass.async_block_till_done()
+    coordinator = selected.runtime_data
+    assert coordinator.repository.data["places"][PLACE]["readings"] == []
+    assert coordinator.data[PLACE]["latest_mnd"] is None
+    revision = coordinator.repository.data["revision"]
+    await coordinator.async_edit(
+        PLACE,
+        "readings",
+        {
+            "id": "manual-1",
+            "meter": "0001",
+            "value": "1000.5",
+            "observed_at": "2026-01-01T12:00:00+01:00",
+        },
+        revision,
+    )
+    assert coordinator.repository.data["places"][PLACE]["readings"][0]["value"] == "1000.5"
+    assert await hass.config_entries.async_reload(selected.entry_id)
+    await hass.async_block_till_done()
+    assert len(selected.runtime_data.repository.data["places"][PLACE]["readings"]) == 1
+    assert await hass.config_entries.async_unload(selected.entry_id)
+    assert selected.runtime_data._closed
+
+
+async def test_store_failure_is_not_successful_commit(hass):
+    selected = entry()
+    selected.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(selected.entry_id)
+    coordinator = selected.runtime_data
+    before = coordinator.repository.data["revision"]
+    with patch.object(
+        coordinator.store, "_write_data", side_effect=OSError("synthetic disk failure")
+    ):
+        with pytest.raises(OSError):
+            await coordinator.repository.transact(lambda data: data.update(marker=True))
+    assert coordinator.repository.data["revision"] == before
+    assert "marker" not in coordinator.repository.data
+    await hass.config_entries.async_unload(selected.entry_id)
+
+
+async def test_unknown_archive_version_refuses_setup_without_erasing(hass):
+    selected = entry()
+    selected.add_to_hass(hass)
+    with patch(
+        "custom_components.mnd_tariff_accounting.coordinator.ConfirmedStore.async_load",
+        return_value={"schema_version": 999},
+    ):
+        assert not await hass.config_entries.async_setup(selected.entry_id)
+
+
+async def test_invalid_grid_is_atomic_and_does_not_emit_source_states(hass):
+    selected = entry()
+    selected.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(selected.entry_id)
+    coordinator = selected.runtime_data
+    await coordinator.async_edit(
+        PLACE,
+        "settings",
+        {"period_from": "2026-01-01", "period_to": "2026-03-01"},
+        coordinator.repository.data["revision"],
+    )
+    before = coordinator.repository.data["revision"]
+    with pytest.raises(DataError):
+        await coordinator.async_edit(
+            PLACE,
+            "advance_grid",
+            {
+                "id": "grid-op",
+                "rows": [
+                    {"month": "2026-01", "prescribed": "500"},
+                    {"month": "2026-02", "prescribed": "-1"},
+                ],
+            },
+            before,
+        )
+    assert coordinator.repository.data["revision"] == before
+    assert coordinator.repository.data["places"][PLACE]["events"] == []
+    await hass.config_entries.async_unload(selected.entry_id)

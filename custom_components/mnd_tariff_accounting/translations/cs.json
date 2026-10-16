@@ -1,0 +1,146 @@
+{
+  "title": "MND Tariff & Accounting",
+  "issues": {
+    "cloud_unavailable": {
+      "title": "Připojení MND vyžaduje pozornost",
+      "description": "Důvod: {reason}. Poslední přijatá data zůstávají v archivu. Otevřete panel MND, zkontrolujte historii a případně obnovte přihlášení v nastavení integrace."
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "MND",
+        "menu_options": {
+          "import_profile": "Importní profil",
+          "cloud": "Připojit účet MND"
+        }
+      },
+      "import_profile": {
+        "title": "Importní profil",
+        "description": "Profil je místní identita. EIC zadávejte jako text; přístup k MND není vyžadován.",
+        "data": {
+          "name": "Název",
+          "profile_id": "Jedinečný název profilu",
+          "supply_point": "EIC odběrného místa"
+        }
+      },
+      "cloud": {
+        "title": "Přihlášení MND",
+        "description": "Cloudový klient vychází z veřejného rozhraní portálu; živé ověření této verze ještě nebylo dokončeno. Bez uložení hesla je po restartu nutné nové přihlášení. Úložiště konfigurace HA není šifrovaný trezor.",
+        "data": {
+          "username": "Přihlašovací e-mail",
+          "password": "Heslo",
+          "remember": "Uložit heslo do konfigurace HA"
+        }
+      },
+      "places": {
+        "title": "Odběrná místa",
+        "data": {
+          "places": "Vybraná plynová místa"
+        }
+      }
+    },
+    "error": {
+      "invalid_supply_point": "Neplatný textový EIC.",
+      "invalid_auth": "Přihlášení vyžaduje správné údaje nebo další ověření v portálu.",
+      "cannot_connect": "Portál není dostupný nebo změnil datový kontrakt."
+    },
+    "abort": {
+      "already_configured": "Tento účet/profil už existuje.",
+      "wrong_account": "Přihlášení patří jinému účtu.",
+      "reauth_successful": "Přihlášení obnoveno."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Nastavení MND",
+        "description": "[Otevřít účetní panel a Generate dashboard]({panel_url}). Úpravy mění pouze místní evidenci v HA."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "latest_mnd": {
+        "name": "Poslední odečet MND"
+      },
+      "latest_mnd_date": {
+        "name": "Datum odečtu MND"
+      },
+      "current_meter": {
+        "name": "Odvozený stav plynoměru"
+      },
+      "volume_m3": {
+        "name": "Spotřeba vyhodnoceného období"
+      },
+      "energy_mwh": {
+        "name": "Energie vyhodnoceného období"
+      },
+      "known_cost_czk": {
+        "name": "Známé průběžné náklady"
+      },
+      "paid_czk": {
+        "name": "Skutečně zaplaceno"
+      },
+      "prescribed_czk": {
+        "name": "Předpis záloh"
+      },
+      "assumed_paid_czk": {
+        "name": "Předpokládané úhrady"
+      },
+      "balance_czk": {
+        "name": "Průběžné saldo"
+      },
+      "surplus_czk": {
+        "name": "Průběžný přebytek"
+      },
+      "deficit_czk": {
+        "name": "Průběžný deficit"
+      },
+      "status": {
+        "name": "Kvalita účetnictví"
+      },
+      "cloud_status": {
+        "name": "Stav připojení MND"
+      },
+      "current_deposit_czk": {
+        "name": "Předpis zálohy MND"
+      },
+      "recommended_deposit_czk": {
+        "name": "Doporučená záloha MND"
+      },
+      "mnd_assessment": {
+        "name": "Hodnocení záloh MND"
+      },
+      "mnd_payment_status": {
+        "name": "Platební stav podle MND"
+      },
+      "mnd_forecast_mwh": {
+        "name": "Celkový výhled MND"
+      },
+      "mnd_readings_mwh": {
+        "name": "Graf MND podle odečtů"
+      },
+      "mnd_past_estimate_mwh": {
+        "name": "Graf MND odhad minulosti"
+      },
+      "mnd_future_estimate_mwh": {
+        "name": "Graf MND odhad budoucnosti"
+      },
+      "invoice_result_czk": {
+        "name": "Potvrzený výsledek vyúčtování"
+      },
+      "invoice_remaining_czk": {
+        "name": "Zbývá vypořádat vyúčtování"
+      }
+    },
+    "button": {
+      "recompute": {
+        "name": "Přepočítat účetnictví"
+      },
+      "generate_dashboard": {
+        "name": "Generate dashboard"
+      }
+    }
+  }
+}

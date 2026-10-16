@@ -1,0 +1,7 @@
+# Samostatné doménové testy používají unittest; HA plugin určuje zvlášť CI.
+ruff==0.17.1
+coverage==7.16.2
+aiohttp==3.14.5
+voluptuous==0.16.0
+pypdf==6.19.0
+tzdata==2026.5

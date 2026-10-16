@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <!-- Originální značka komunitní integrace: dům, plyn a účetní přehled.
+       Dvě plné barvy palety MND, žádné písmo, cizí logo ani vložený bitmapový obraz.
+       Široké tahy zůstávají čitelné při 32 px; pozadí je průhledné.
+       Export světlé i tmavé varianty zajišťuje scripts/render_brand.cjs. -->
+  <g stroke="#2b6e33" stroke-width="13" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M121 54V34H137V69"/>
+    <path d="M32 81L90 29L148 81H139V145H41V81Z"/>
+  </g>
+  <g fill="#2b6e33">
+    <rect x="103" y="127" width="12" height="19" rx="4"/>
+    <rect x="116" y="115" width="12" height="31" rx="4"/>
+    <rect x="129" y="102" width="12" height="44" rx="4"/>
+  </g>
+  <path fill="#a8be32" d="M80 60C87 77 64 84 64 101C64 115 74 124 86 124C101 124 111 112 107 99C105 90 99 84 100 76C96 83 93 88 91 91C92 78 86 67 80 60Z"/>
+  <path fill="#2b6e33" d="M83 99C84 107 75 109 79 116C81 121 87 122 91 117C95 111 87 107 87 104L84 109Z"/>
+</svg>

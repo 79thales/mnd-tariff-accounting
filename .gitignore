@@ -1,0 +1,21 @@
+# Soukromé běhové údaje a prostředí nejsou součást distribuovaného zdroje.
+.venv*/
+.test-deps/
+.runtime/
+node_modules/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+.coverage*
+htmlcov/
+output/
+dist/
+private/
+*.log
+.env*
+# Syntetické fixtures v tests/ lze verzovat; skutečné exporty patří do private/.
+*.xlsx
+*.pdf
+!tests/fixtures/*.xlsx
+!tests/fixtures/*.pdf

@@ -1,0 +1,320 @@
+{
+  "views": [
+    {
+      "title": "{{TITLE}}",
+      "path": "{{PATH}}",
+      "icon": "mdi:fire",
+      "panel": true,
+      "cards": [
+        {
+          "type": "custom:mnd-accounting-card",
+          "entry_id": "{{ENTRY}}",
+          "place": "{{PLACE}}",
+          "title": "{{TITLE}}",
+          "tab": "overview",
+          "entities": {
+            "latest_mnd": "{{entity:latest_mnd}}",
+            "latest_mnd_date": "{{entity:latest_mnd_date}}",
+            "current_meter": "{{entity:current_meter}}",
+            "status": "{{entity:status}}",
+            "volume_m3": "{{entity:volume_m3}}",
+            "known_cost_czk": "{{entity:known_cost_czk}}",
+            "paid_czk": "{{entity:paid_czk}}",
+            "balance_czk": "{{entity:balance_czk}}"
+          },
+          "navigation": [
+            {
+              "tab": "overview",
+              "path": "/lovelace/{{PATH}}"
+            },
+            {
+              "tab": "readings",
+              "path": "/lovelace/{{PATH}}-spotreba"
+            },
+            {
+              "tab": "accounting",
+              "path": "/lovelace/{{PATH}}-ucetnictvi"
+            },
+            {
+              "tab": "forecasts",
+              "path": "/lovelace/{{PATH}}-prognozy"
+            },
+            {
+              "tab": "editor",
+              "path": "/lovelace/{{PATH}}-editor"
+            },
+            {
+              "tab": "history",
+              "path": "/lovelace/{{PATH}}-historie"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Spotřeba",
+      "path": "{{PATH}}-spotreba",
+      "icon": "mdi:chart-line",
+      "panel": true,
+      "subview": true,
+      "back_path": "/lovelace/{{PATH}}",
+      "cards": [
+        {
+          "type": "custom:mnd-accounting-card",
+          "entry_id": "{{ENTRY}}",
+          "place": "{{PLACE}}",
+          "title": "{{TITLE}}",
+          "tab": "readings",
+          "entities": {
+            "latest_mnd": "{{entity:latest_mnd}}",
+            "latest_mnd_date": "{{entity:latest_mnd_date}}",
+            "current_meter": "{{entity:current_meter}}",
+            "status": "{{entity:status}}",
+            "volume_m3": "{{entity:volume_m3}}",
+            "known_cost_czk": "{{entity:known_cost_czk}}",
+            "paid_czk": "{{entity:paid_czk}}",
+            "balance_czk": "{{entity:balance_czk}}"
+          },
+          "navigation": [
+            {
+              "tab": "overview",
+              "path": "/lovelace/{{PATH}}"
+            },
+            {
+              "tab": "readings",
+              "path": "/lovelace/{{PATH}}-spotreba"
+            },
+            {
+              "tab": "accounting",
+              "path": "/lovelace/{{PATH}}-ucetnictvi"
+            },
+            {
+              "tab": "forecasts",
+              "path": "/lovelace/{{PATH}}-prognozy"
+            },
+            {
+              "tab": "editor",
+              "path": "/lovelace/{{PATH}}-editor"
+            },
+            {
+              "tab": "history",
+              "path": "/lovelace/{{PATH}}-historie"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Účetnictví",
+      "path": "{{PATH}}-ucetnictvi",
+      "icon": "mdi:calculator",
+      "panel": true,
+      "subview": true,
+      "back_path": "/lovelace/{{PATH}}",
+      "cards": [
+        {
+          "type": "custom:mnd-accounting-card",
+          "entry_id": "{{ENTRY}}",
+          "place": "{{PLACE}}",
+          "title": "{{TITLE}}",
+          "tab": "accounting",
+          "entities": {
+            "latest_mnd": "{{entity:latest_mnd}}",
+            "latest_mnd_date": "{{entity:latest_mnd_date}}",
+            "current_meter": "{{entity:current_meter}}",
+            "status": "{{entity:status}}",
+            "volume_m3": "{{entity:volume_m3}}",
+            "known_cost_czk": "{{entity:known_cost_czk}}",
+            "paid_czk": "{{entity:paid_czk}}",
+            "balance_czk": "{{entity:balance_czk}}"
+          },
+          "navigation": [
+            {
+              "tab": "overview",
+              "path": "/lovelace/{{PATH}}"
+            },
+            {
+              "tab": "readings",
+              "path": "/lovelace/{{PATH}}-spotreba"
+            },
+            {
+              "tab": "accounting",
+              "path": "/lovelace/{{PATH}}-ucetnictvi"
+            },
+            {
+              "tab": "forecasts",
+              "path": "/lovelace/{{PATH}}-prognozy"
+            },
+            {
+              "tab": "editor",
+              "path": "/lovelace/{{PATH}}-editor"
+            },
+            {
+              "tab": "history",
+              "path": "/lovelace/{{PATH}}-historie"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Prognózy",
+      "path": "{{PATH}}-prognozy",
+      "icon": "mdi:chart-timeline-variant",
+      "panel": true,
+      "subview": true,
+      "back_path": "/lovelace/{{PATH}}",
+      "cards": [
+        {
+          "type": "custom:mnd-accounting-card",
+          "entry_id": "{{ENTRY}}",
+          "place": "{{PLACE}}",
+          "title": "{{TITLE}}",
+          "tab": "forecasts",
+          "entities": {
+            "latest_mnd": "{{entity:latest_mnd}}",
+            "latest_mnd_date": "{{entity:latest_mnd_date}}",
+            "current_meter": "{{entity:current_meter}}",
+            "status": "{{entity:status}}",
+            "volume_m3": "{{entity:volume_m3}}",
+            "known_cost_czk": "{{entity:known_cost_czk}}",
+            "paid_czk": "{{entity:paid_czk}}",
+            "balance_czk": "{{entity:balance_czk}}"
+          },
+          "navigation": [
+            {
+              "tab": "overview",
+              "path": "/lovelace/{{PATH}}"
+            },
+            {
+              "tab": "readings",
+              "path": "/lovelace/{{PATH}}-spotreba"
+            },
+            {
+              "tab": "accounting",
+              "path": "/lovelace/{{PATH}}-ucetnictvi"
+            },
+            {
+              "tab": "forecasts",
+              "path": "/lovelace/{{PATH}}-prognozy"
+            },
+            {
+              "tab": "editor",
+              "path": "/lovelace/{{PATH}}-editor"
+            },
+            {
+              "tab": "history",
+              "path": "/lovelace/{{PATH}}-historie"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Editor",
+      "path": "{{PATH}}-editor",
+      "icon": "mdi:pencil",
+      "panel": true,
+      "subview": true,
+      "back_path": "/lovelace/{{PATH}}",
+      "cards": [
+        {
+          "type": "custom:mnd-accounting-card",
+          "entry_id": "{{ENTRY}}",
+          "place": "{{PLACE}}",
+          "title": "{{TITLE}}",
+          "tab": "editor",
+          "entities": {
+            "latest_mnd": "{{entity:latest_mnd}}",
+            "latest_mnd_date": "{{entity:latest_mnd_date}}",
+            "current_meter": "{{entity:current_meter}}",
+            "status": "{{entity:status}}",
+            "volume_m3": "{{entity:volume_m3}}",
+            "known_cost_czk": "{{entity:known_cost_czk}}",
+            "paid_czk": "{{entity:paid_czk}}",
+            "balance_czk": "{{entity:balance_czk}}"
+          },
+          "navigation": [
+            {
+              "tab": "overview",
+              "path": "/lovelace/{{PATH}}"
+            },
+            {
+              "tab": "readings",
+              "path": "/lovelace/{{PATH}}-spotreba"
+            },
+            {
+              "tab": "accounting",
+              "path": "/lovelace/{{PATH}}-ucetnictvi"
+            },
+            {
+              "tab": "forecasts",
+              "path": "/lovelace/{{PATH}}-prognozy"
+            },
+            {
+              "tab": "editor",
+              "path": "/lovelace/{{PATH}}-editor"
+            },
+            {
+              "tab": "history",
+              "path": "/lovelace/{{PATH}}-historie"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Historie a doklady",
+      "path": "{{PATH}}-historie",
+      "icon": "mdi:file-document",
+      "panel": true,
+      "subview": true,
+      "back_path": "/lovelace/{{PATH}}",
+      "cards": [
+        {
+          "type": "custom:mnd-accounting-card",
+          "entry_id": "{{ENTRY}}",
+          "place": "{{PLACE}}",
+          "title": "{{TITLE}}",
+          "tab": "history",
+          "entities": {
+            "latest_mnd": "{{entity:latest_mnd}}",
+            "latest_mnd_date": "{{entity:latest_mnd_date}}",
+            "current_meter": "{{entity:current_meter}}",
+            "status": "{{entity:status}}",
+            "volume_m3": "{{entity:volume_m3}}",
+            "known_cost_czk": "{{entity:known_cost_czk}}",
+            "paid_czk": "{{entity:paid_czk}}",
+            "balance_czk": "{{entity:balance_czk}}"
+          },
+          "navigation": [
+            {
+              "tab": "overview",
+              "path": "/lovelace/{{PATH}}"
+            },
+            {
+              "tab": "readings",
+              "path": "/lovelace/{{PATH}}-spotreba"
+            },
+            {
+              "tab": "accounting",
+              "path": "/lovelace/{{PATH}}-ucetnictvi"
+            },
+            {
+              "tab": "forecasts",
+              "path": "/lovelace/{{PATH}}-prognozy"
+            },
+            {
+              "tab": "editor",
+              "path": "/lovelace/{{PATH}}-editor"
+            },
+            {
+              "tab": "history",
+              "path": "/lovelace/{{PATH}}-historie"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

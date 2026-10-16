@@ -1,0 +1,732 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:mnd:tariff-accounting:archive:1",
+  "title": "MND Tariff and Accounting archive version 1",
+  "type": "object",
+  "properties": {
+    "SchemaVersion": {
+      "const": 1
+    },
+    "Place": {
+      "$ref": "#/$defs/Place"
+    },
+    "ExportedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "Readings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Reading"
+      }
+    },
+    "Coverage": {
+      "$ref": "#/$defs/Coverage"
+    },
+    "Actual": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Actual"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Accounting": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Accounting"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Tariffs": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/Tariff"
+      }
+    },
+    "Payments": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/Payment"
+      }
+    },
+    "Documents": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/Document"
+      }
+    },
+    "PricingEvidence": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/Pricing"
+      }
+    },
+    "PortalRetrievedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "Deposit": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Deposit"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ConsumptionPeriods": {
+      "items": {
+        "$ref": "#/$defs/ConsumptionPeriod"
+      },
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "ConsumptionSnapshots": {
+      "items": {
+        "$ref": "#/$defs/ConsumptionSnapshot"
+      },
+      "type": [
+        "array",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "SchemaVersion",
+    "Place",
+    "ExportedAt",
+    "Readings",
+    "Coverage",
+    "Actual",
+    "Accounting",
+    "Tariffs",
+    "Payments",
+    "Documents",
+    "PricingEvidence",
+    "PortalRetrievedAt",
+    "Deposit",
+    "ConsumptionPeriods",
+    "ConsumptionSnapshots"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "Place": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "type": "string"
+        },
+        "Address": {
+          "type": "string"
+        },
+        "Commodity": {
+          "type": "string"
+        },
+        "DisplayName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Id",
+        "Address",
+        "Commodity"
+      ],
+      "additionalProperties": false
+    },
+    "Reading": {
+      "type": "object",
+      "properties": {
+        "SupplyPointId": {
+          "type": "string"
+        },
+        "Date": {
+          "type": "string",
+          "format": "date"
+        },
+        "MeterStateM3": {
+          "type": "number",
+          "minimum": 0
+        },
+        "MeterNumber": {
+          "type": "string"
+        },
+        "Method": {
+          "type": "string"
+        },
+        "Status": {
+          "type": "string"
+        },
+        "SourceFile": {
+          "type": "string"
+        },
+        "SourceRow": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "SupplyPointId",
+        "Date",
+        "MeterStateM3",
+        "MeterNumber",
+        "Method",
+        "Status",
+        "SourceFile",
+        "SourceRow"
+      ],
+      "additionalProperties": false
+    },
+    "Segment": {
+      "type": "object",
+      "properties": {
+        "From": {
+          "type": "string",
+          "format": "date"
+        },
+        "To": {
+          "type": "string",
+          "format": "date"
+        },
+        "RequestedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Succeeded": {
+          "type": "boolean"
+        },
+        "Rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "Sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ActualFrom": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "ActualTo": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "Error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "From",
+        "To",
+        "RequestedAt",
+        "Succeeded",
+        "Rows",
+        "Sha256",
+        "ActualFrom",
+        "ActualTo",
+        "Error"
+      ],
+      "additionalProperties": false
+    },
+    "Coverage": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "enum": [
+            "Unverified",
+            "Partial",
+            "Confirmed"
+          ]
+        },
+        "Evidence": {
+          "type": "string"
+        },
+        "Segments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Segment"
+          }
+        }
+      },
+      "required": [
+        "Status",
+        "Evidence",
+        "Segments"
+      ],
+      "additionalProperties": false
+    },
+    "Actual": {
+      "type": "object",
+      "properties": {
+        "SupplyPointId": {
+          "type": "string"
+        },
+        "MeterNumber": {
+          "type": "string"
+        },
+        "MeterStateM3": {
+          "type": "number",
+          "minimum": 0
+        },
+        "MeasuredAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "RetrievedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Source": {
+          "enum": [
+            "Manual",
+            "HomeAssistant"
+          ]
+        },
+        "Estimated": {
+          "type": "boolean"
+        },
+        "Note": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "SupplyPointId",
+        "MeterNumber",
+        "MeterStateM3",
+        "MeasuredAt",
+        "RetrievedAt",
+        "Source",
+        "Estimated",
+        "Note"
+      ],
+      "additionalProperties": false
+    },
+    "Tariff": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "From": {
+          "type": "string",
+          "format": "date"
+        },
+        "ToExclusive": {
+          "type": "string",
+          "format": "date"
+        },
+        "CommodityCzkPerMwh": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "OtherCzkPerMwh": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "FixedCzkPerMonth": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "PricesIncludeVat": {
+          "type": "boolean"
+        },
+        "VatRatePercent": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "AllComponentsKnown": {
+          "type": "boolean"
+        },
+        "ProrateFixedByCalendarDays": {
+          "type": "boolean"
+        },
+        "Role": {
+          "enum": [
+            "Current",
+            "Subsequent",
+            "Alternative"
+          ]
+        }
+      },
+      "required": [
+        "Name",
+        "From",
+        "ToExclusive",
+        "CommodityCzkPerMwh",
+        "OtherCzkPerMwh",
+        "FixedCzkPerMonth",
+        "PricesIncludeVat",
+        "VatRatePercent",
+        "AllComponentsKnown",
+        "ProrateFixedByCalendarDays",
+        "Role"
+      ],
+      "additionalProperties": false
+    },
+    "Payment": {
+      "type": "object",
+      "properties": {
+        "PaidOn": {
+          "type": "string",
+          "format": "date"
+        },
+        "AmountCzk": {
+          "type": "number"
+        },
+        "PeriodFrom": {
+          "type": "string",
+          "format": "date"
+        },
+        "PeriodToExclusive": {
+          "type": "string",
+          "format": "date"
+        },
+        "IsPaid": {
+          "type": "boolean"
+        },
+        "Source": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "PaidOn",
+        "AmountCzk",
+        "PeriodFrom",
+        "PeriodToExclusive",
+        "IsPaid",
+        "Source"
+      ],
+      "additionalProperties": false
+    },
+    "Document": {
+      "type": "object",
+      "properties": {
+        "Label": {
+          "type": "string"
+        },
+        "Kind": {
+          "type": "string"
+        },
+        "LocalPath": {
+          "type": "string"
+        },
+        "Sha256": {
+          "type": "string"
+        },
+        "DownloadedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "SupplyPointId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Label",
+        "Kind",
+        "LocalPath",
+        "Sha256",
+        "DownloadedAt",
+        "SupplyPointId"
+      ],
+      "additionalProperties": false
+    },
+    "Pricing": {
+      "type": "object",
+      "properties": {
+        "Role": {
+          "type": "string"
+        },
+        "OriginalText": {
+          "type": "string"
+        },
+        "GraphCzkPerKwh": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "IndividualCzkPerMwh": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "FixedCzkPerMonth": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "DiscountPercent": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ValidityText": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "IncludesVat": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "Role",
+        "OriginalText",
+        "GraphCzkPerKwh",
+        "IndividualCzkPerMwh",
+        "FixedCzkPerMonth",
+        "DiscountPercent",
+        "ValidityText",
+        "IncludesVat"
+      ],
+      "additionalProperties": false
+    },
+    "Accounting": {
+      "type": "object",
+      "properties": {
+        "ConsumptionM3": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "EnergyMwh": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "KnownCostCzk": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "PaidCzk": {
+          "type": "number"
+        },
+        "PrescribedCzk": {
+          "type": "number"
+        },
+        "BalanceCzk": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "Complete": {
+          "type": "boolean"
+        },
+        "Estimated": {
+          "type": "boolean"
+        },
+        "Warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "ConsumptionM3",
+        "EnergyMwh",
+        "KnownCostCzk",
+        "PaidCzk",
+        "PrescribedCzk",
+        "BalanceCzk",
+        "Complete",
+        "Estimated",
+        "Warnings"
+      ],
+      "additionalProperties": false
+    },
+    "Deposit": {
+      "type": "object",
+      "properties": {
+        "CurrentCzk": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "RecommendedCzk": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "Periodicity": {
+          "type": "string"
+        },
+        "Assessment": {
+          "type": "string"
+        },
+        "PaymentStatus": {
+          "type": "string"
+        },
+        "RetrievedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "CurrentCzk",
+        "RecommendedCzk",
+        "Periodicity",
+        "Assessment",
+        "PaymentStatus",
+        "RetrievedAt"
+      ],
+      "additionalProperties": false
+    },
+    "ConsumptionPeriod": {
+      "properties": {
+        "HasReadings": {
+          "type": "boolean"
+        },
+        "HasPastEstimate": {
+          "type": "boolean"
+        },
+        "Quality": {
+          "type": "string"
+        },
+        "From": {
+          "format": "date",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "PortalTotalMwh": {
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "HasFutureEstimate": {
+          "type": "boolean"
+        },
+        "OriginalLabel": {
+          "type": "string"
+        },
+        "To": {
+          "format": "date",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ReadingsMwh": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "PastEstimateMwh": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "FutureEstimateMwh": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "required": [
+        "From",
+        "To",
+        "PortalTotalMwh",
+        "HasReadings",
+        "HasPastEstimate",
+        "HasFutureEstimate",
+        "OriginalLabel",
+        "Quality",
+        "ReadingsMwh",
+        "PastEstimateMwh",
+        "FutureEstimateMwh"
+      ],
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ConsumptionSnapshot": {
+      "properties": {
+        "Periods": {
+          "items": {
+            "$ref": "#/$defs/ConsumptionPeriod"
+          },
+          "type": "array"
+        },
+        "RetrievedAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "RetrievedAt",
+        "Periods"
+      ],
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}

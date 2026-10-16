@@ -1,0 +1,71 @@
+name: Připravit draft release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existující neměnný tag vX.Y.Z
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: mnd-release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+jobs:
+  quality:
+    uses: ./.github/workflows/quality.yaml
+    with:
+      ref: ${{ inputs.tag || github.ref_name }}
+  hacs:
+    uses: ./.github/workflows/hacs.yaml
+    with:
+      ref: ${{ inputs.tag || github.ref_name }}
+  hassfest:
+    uses: ./.github/workflows/hassfest.yaml
+    with:
+      ref: ${{ inputs.tag || github.ref_name }}
+  build:
+    needs: [quality, hacs, hassfest]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+      - name: Ověřit a sestavit požadovaný tag
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: python scripts/build_release.py --ref "$RELEASE_TAG" --expected-tag "$RELEASE_TAG"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mnd-installer
+          path: dist/
+          retention-days: 7
+  draft:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+      - uses: actions/download-artifact@v4
+        with:
+          name: mnd-installer
+          path: dist/
+      - uses: actions/github-script@v8
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        with:
+          script: |
+            const {attachInstaller} = require('./scripts/attach_release_installer.cjs');
+            await attachInstaller({github, context, core, tag:process.env.RELEASE_TAG});

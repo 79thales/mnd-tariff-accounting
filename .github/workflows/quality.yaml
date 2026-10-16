@@ -1,0 +1,84 @@
+name: Quality
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: Revize testovaných zdrojů
+        required: false
+        type: string
+permissions:
+  contents: read
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.resolve.outputs.environment }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+      - id: resolve
+        name: Zjistit stabilní HA a přesný plugin
+        run: echo "environment=$(python scripts/resolve_latest_ha.py)" >> "$GITHUB_OUTPUT"
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+      - run: python -m pip install -r requirements-test.txt
+      - run: python -m compileall -q custom_components tests tests_homeassistant scripts
+      - run: ruff check custom_components tests tests_homeassistant scripts
+      - run: coverage run -m unittest discover -s tests -v
+      - run: coverage report
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.25.0
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: node --test tests/*.test.js
+  home-assistant:
+    needs: resolve
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # První přesná dvojice HA/plugin v řadě podporující místní brand assets.
+          - homeassistant: '2026.3.1'
+            test_plugin: '0.13.317'
+            python: '3.14'
+          - homeassistant: ${{ fromJSON(needs.resolve.outputs.environment).homeassistant }}
+            test_plugin: ${{ fromJSON(needs.resolve.outputs.environment).test_plugin }}
+            python: ${{ fromJSON(needs.resolve.outputs.environment).python }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Instalovat přesnou testovanou dvojici
+        run: python -m pip install homeassistant==${{ matrix.homeassistant }} pytest-homeassistant-custom-component==${{ matrix.test_plugin }} pytest-cov pypdf==6.19.0
+      - name: Instalovat odpovídající frontend HA
+        run: |
+          python - <<'PY'
+          import json, subprocess, sys
+          from pathlib import Path
+          import homeassistant.components.frontend as frontend
+          manifest = json.loads(Path(frontend.__file__).with_name('manifest.json').read_text())
+          subprocess.check_call([sys.executable, '-m', 'pip', 'install', *manifest['requirements']])
+          PY
+      - run: pytest tests_homeassistant -q --cov=custom_components.mnd_tariff_accounting --cov-report=term-missing

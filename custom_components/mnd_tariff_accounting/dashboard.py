@@ -1,0 +1,58 @@
+"""Společný zdroj složení hlavního MND view a detailních subviews.
+
+Šablona má pouze placeholdery a syntetické popisy. Entity se berou z registru
+entry, nikdy podle osobního názvu vývojáře. Pouhý náhled nic nezapisuje.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from pathlib import Path
+
+from .core.common import DataError
+
+TEMPLATE = Path(__file__).with_name("dashboard_template.json")
+
+
+def build_views(title, path, entities, entry_id, place_id):
+    """Vrátí MND panelové view a pět detailů z jediné přibalené šablony.
+
+    Vzhled vlastní karty sdílí hlavní panel i náhled; entity jsou odkazy na
+    skutečný registr, takže přejmenování senzoru nemění účetní identitu.
+    JSON je současně platný YAML. Chybějící entity dovolují export, ne zápis.
+    """
+    if (
+        not isinstance(title, str)
+        or not 1 <= len(title.strip()) <= 120
+        or not re.fullmatch(r"[a-z][a-z0-9-]{0,59}", path)
+    ):
+        raise DataError("invalid_dashboard_path")
+    config = json.loads(TEMPLATE.read_text(encoding="utf-8"))
+    missing = set()
+
+    def expand(value):
+        if isinstance(value, dict):
+            return {k: expand(v) for k, v in value.items()}
+        if isinstance(value, list):
+            return [expand(v) for v in value]
+        if not isinstance(value, str):
+            return value
+        replacements = {"TITLE": title.strip(), "PATH": path, "ENTRY": entry_id, "PLACE": place_id}
+        for key, replacement in replacements.items():
+            value = value.replace("{{" + key + "}}", replacement)
+
+        def entity(match):
+            key = match.group(1)
+            if key not in entities:
+                missing.add(key)
+            return entities.get(key, "sensor.mnd_missing_" + key)
+
+        return re.sub(r"\{\{entity:([a-z0-9_]+)\}\}", entity, value)
+
+    return {
+        "config": expand(config),
+        "missing_entities": sorted(missing),
+        "requirements": [],
+        "comments": "Vzhled Moje MND; hlavní view, pět detailů a navigace ze společné šablony.",
+    }

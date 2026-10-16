@@ -1,0 +1,146 @@
+{
+  "title": "MND Tariff & Accounting",
+  "issues": {
+    "cloud_unavailable": {
+      "title": "MND connection needs attention",
+      "description": "Reason: {reason}. Previously accepted data remain archived. Open the MND panel, check history and renew authentication in integration settings if needed."
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "MND",
+        "menu_options": {
+          "import_profile": "Import profile",
+          "cloud": "Connect MND account"
+        }
+      },
+      "import_profile": {
+        "title": "Import profile",
+        "description": "A local profile identity. Enter the EIC as text; MND access is not required.",
+        "data": {
+          "name": "Name",
+          "profile_id": "Unique profile identifier",
+          "supply_point": "Supply point EIC"
+        }
+      },
+      "cloud": {
+        "title": "MND sign in",
+        "description": "The cloud client follows the public portal interface; live verification of this version is pending. Without password storage, sign in again after restart. HA configuration storage is not an encrypted vault.",
+        "data": {
+          "username": "Login email",
+          "password": "Password",
+          "remember": "Store password in HA configuration"
+        }
+      },
+      "places": {
+        "title": "Supply points",
+        "data": {
+          "places": "Selected gas supply points"
+        }
+      }
+    },
+    "error": {
+      "invalid_supply_point": "Invalid text EIC.",
+      "invalid_auth": "Correct credentials or additional portal verification required.",
+      "cannot_connect": "The portal is unavailable or its data contract changed."
+    },
+    "abort": {
+      "already_configured": "This account/profile is already configured.",
+      "wrong_account": "The credentials belong to another account.",
+      "reauth_successful": "Authentication renewed."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "MND settings",
+        "description": "[Open accounting panel and Generate dashboard]({panel_url}). Changes affect local HA records only."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "latest_mnd": {
+        "name": "Last MND reading"
+      },
+      "latest_mnd_date": {
+        "name": "MND reading date"
+      },
+      "current_meter": {
+        "name": "Derived meter reading"
+      },
+      "volume_m3": {
+        "name": "Evaluated period consumption"
+      },
+      "energy_mwh": {
+        "name": "Evaluated period energy"
+      },
+      "known_cost_czk": {
+        "name": "Known running cost"
+      },
+      "paid_czk": {
+        "name": "Actual payments"
+      },
+      "prescribed_czk": {
+        "name": "Prescribed advances"
+      },
+      "assumed_paid_czk": {
+        "name": "Assumed payments"
+      },
+      "balance_czk": {
+        "name": "Running balance"
+      },
+      "surplus_czk": {
+        "name": "Running surplus"
+      },
+      "deficit_czk": {
+        "name": "Running deficit"
+      },
+      "status": {
+        "name": "Accounting quality"
+      },
+      "cloud_status": {
+        "name": "MND connection status"
+      },
+      "current_deposit_czk": {
+        "name": "MND current advance"
+      },
+      "recommended_deposit_czk": {
+        "name": "MND recommended advance"
+      },
+      "mnd_assessment": {
+        "name": "MND advance assessment"
+      },
+      "mnd_payment_status": {
+        "name": "MND reported payment status"
+      },
+      "mnd_forecast_mwh": {
+        "name": "MND expected period total"
+      },
+      "mnd_readings_mwh": {
+        "name": "MND graph actual readings"
+      },
+      "mnd_past_estimate_mwh": {
+        "name": "MND graph estimated past"
+      },
+      "mnd_future_estimate_mwh": {
+        "name": "MND graph estimated future"
+      },
+      "invoice_result_czk": {
+        "name": "Confirmed invoice result"
+      },
+      "invoice_remaining_czk": {
+        "name": "Remaining invoice settlement"
+      }
+    },
+    "button": {
+      "recompute": {
+        "name": "Recompute accounting"
+      },
+      "generate_dashboard": {
+        "name": "Generate dashboard"
+      }
+    }
+  }
+}

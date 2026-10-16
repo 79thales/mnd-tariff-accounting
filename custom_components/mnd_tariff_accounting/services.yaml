@@ -1,0 +1,106 @@
+# Akce zapisují výhradně místní účetní evidenci HA. Částky a m³ zadávejte
+# jako desetinné řetězce; stabilní ID dovolí bezpečně zopakovat stejné volání.
+recompute:
+  name: Přepočítat účetnictví
+  description: Přepočte archiv vybraného místa bez změny původních statistik. Neúplné podklady zůstanou označené.
+  fields: &identity_fields
+    entry_id:
+      name: Config entry ID
+      description: Přesná identita načteného účtu MND; při více účtech je povinná.
+      required: true
+      selector:
+        text:
+    place:
+      name: EIC odběrného místa
+      description: Textová identita místa tohoto účtu.
+      required: true
+      selector:
+        text:
+refresh:
+  name: Obnovit MND
+  description: Načte čtecí podklady přihlášené relace. Vypršení přihlášení vyžaduje reauth; účetní archiv se zachová.
+  fields: *identity_fields
+cancel_history:
+  name: Pozastavit stahování historie
+  description: Zastaví jedinou úlohu účtu, dokončí rozpracovaný atomický zápis a uchová kurzor. Restart ji automaticky neobnoví.
+  fields: *identity_fields
+backfill:
+  name: Stáhnout historii MND
+  description: Pokračuje zpět od kurzoru po úsecích nejvýše 366 dnů, nejvýše 15 minut. Prázdný export neprokazuje začátek historie.
+  fields:
+    <<: *identity_fields
+    max_segments:
+      name: Nejvýše úseků
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 100
+          mode: box
+record_reading:
+  name: Zapsat ruční odečet
+  description: Uloží novou místní fyzickou referenci v m³ a skutečný čas s pásmem. Neposílá samoodečet do MND. Oprava odkazuje na původní ID.
+  fields:
+    <<: *identity_fields
+    id:
+      name: Stabilní ID zápisu
+      description: Při opakování použijte stejné ID a obsah; změněný obsah vyžaduje nové ID a supersedes.
+      selector:
+        text:
+    meter:
+      name: Číslo plynoměru
+      required: true
+      selector:
+        text:
+    value:
+      name: Fyzický stav m³
+      required: true
+      selector:
+        text:
+    observed_at:
+      name: Čas ISO 8601 včetně UTC posunu
+      required: true
+      selector:
+        text:
+    segment:
+      name: Identita měřicího segmentu
+      selector:
+        text:
+    note:
+      name: Poznámka
+      selector:
+        text:
+    supersedes:
+      name: ID opravovaného zápisu
+      selector:
+        text:
+record_payment:
+  name: Zapsat platbu nebo předpis
+  description: Uloží oddělenou skutečnou úhradu, předpis, předpoklad nebo vratku v Kč. Stejné ID je idempotentní; datum nezastupuje přiřazení období.
+  fields:
+    <<: *identity_fields
+    record:
+      name: Strukturovaný účetní záznam
+      required: true
+      selector:
+        object:
+record_invoice:
+  name: Potvrdit vyúčtování
+  description: Uloží potvrzený dokladový výsledek a jeho revizi. Náklad nahrazuje předběžné ocenění stejného období a zálohy se nezapočtou podruhé.
+  fields:
+    <<: *identity_fields
+    record:
+      name: Strukturovaná potvrzená faktura
+      required: true
+      selector:
+        object:
+update_tariff:
+  name: Přidat smluvní cenový úsek
+  description: Uloží časově platné Kč/MWh a Kč/měsíc, režim DPH a důkaz. Alternativní nabídka se nepoužije jako smluvní tarif.
+  fields:
+    <<: *identity_fields
+    record:
+      name: Cenový úsek s ID a platností
+      required: true
+      selector:
+        object:
