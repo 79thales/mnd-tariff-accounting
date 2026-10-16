@@ -96,14 +96,13 @@ async def test_abandoned_cloud_flow_can_resume_after_authenticated_confirmation(
 
 async def test_device_configuration_and_hidden_admin_panel(hass):
     from homeassistant.components.frontend import DATA_PANELS
-    from homeassistant.helpers import device_registry as dr
+
+    from custom_components.mnd_tariff_accounting.api import _place_device
 
     selected = entry()
     selected.add_to_hass(hass)
     assert await hass.config_entries.async_setup(selected.entry_id)
-    device = dr.async_get(hass).async_get_device(
-        identifiers={(DOMAIN, f"synthetic-account:{PLACE}")}
-    )
+    device = _place_device(hass, selected, PLACE)
     assert device.configuration_url.startswith("homeassistant://mnd-tariff-accounting?")
     assert f"place={PLACE}" in device.configuration_url
     assert hass.data[DATA_PANELS]["mnd-tariff-accounting"].sidebar_title is None

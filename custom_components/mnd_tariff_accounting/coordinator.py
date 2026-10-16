@@ -435,7 +435,10 @@ class MndCoordinator(DataUpdateCoordinator):
                         attempts += 1
                         key = "ADVI_ID" if kind == "advances" else "IVA_ID"
                         try:
-                            raw = {**row, **await self.portal.finance_detail(kind, row[key])}
+                            fetched = await self.portal.finance_detail(kind, row[key])
+                            if str(fetched.get(key, row[key])) != str(row[key]):
+                                raise DataError("portal_finance_document_mismatch")
+                            raw = {**row, **fetched}
                         except AuthenticationRequired:
                             raise
                         except (PortalError, KeyError):

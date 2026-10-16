@@ -43,9 +43,14 @@ def finance_rows(kind, rows, source):
             raise DataError("portal_finance_duplicate_or_missing_id")
         seen.add(str(row[key]))
         payments = []
+        state = row.get("ADVI_STATE" if kind == "advances" else "STATE")
+        if state is not None and not isinstance(state, dict):
+            raise DataError("portal_finance_schema_changed")
         if row.get("PayInfo") is not None and not isinstance(row["PayInfo"], list):
             raise DataError("portal_finance_schema_changed")
         for index, payment in enumerate(row.get("PayInfo") or []):
+            if not isinstance(payment, dict):
+                raise DataError("portal_finance_schema_changed")
             # Každá položka představuje skutečně zaúčtovanou částku na
             # tomto dokladu. Identické položky zachováváme, nesléváme platby.
             amount = decimal(payment.get("PAY_AMOUNT"), nonnegative=True)
@@ -95,7 +100,20 @@ def merge_finance(previous, current):
     záznamy nejsou součást tohoto čtecího seznamu a nemohou se přepsat.
     """
     records = {r["id"]: r for r in previous}
-    records.update({r["id"]: r for r in current})
+    for row in current:
+        old = records.get(row["id"])
+        if old and old.get("payments_known") and not row.get("payments_known"):
+            # Změněný seznam s výpadkem detailu není důkaz vymazání úhrad.
+            # Zachováme poslední doložené platby s výslovným příznakem stáří.
+            row = {
+                **row,
+                "paid": old.get("paid"),
+                "payments": old["payments"],
+                "payments_known": True,
+                "payments_stale": True,
+            }
+            row["revision"] = fingerprint(row)
+        records[row["id"]] = row
     return sorted(records.values(), key=lambda r: (r.get("date") or "", r["id"]), reverse=True)
 
 
@@ -112,14 +130,16 @@ def accept_advances(place_id, place, now):
     existing = active_versions(place["events"])
     added = 0
     expected = set()
-    detailed = {r["id"] for r in records if r.get("payments_known")}
+    detailed = {r["id"] for r in records if r.get("payments_known") and not r.get("payments_stale")}
     for row in records:
         if not row.get("due") or not left <= day(row["due"]) < right:
             continue
         parts = [("prescribed", row["due"], row.get("prescribed"), "prescribed")]
-        parts += [
-            ("payment", p["date"], p["amount"], f"payment:{p['index']}") for p in row["payments"]
-        ]
+        parts += (
+            [("payment", p["date"], p["amount"], f"payment:{p['index']}") for p in row["payments"]]
+            if not row.get("payments_stale")
+            else []
+        )
         for role, date, amount, part in parts:
             if amount is None or (role == "payment" and day(date) > day(now)):
                 continue

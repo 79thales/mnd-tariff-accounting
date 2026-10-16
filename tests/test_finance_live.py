@@ -68,6 +68,13 @@ class FinanceTests(unittest.TestCase):
         self.assertEqual(len(merge_finance(old, new)), 2)
         self.assertEqual(old, before)
 
+    def test_failed_detail_does_not_erase_last_known_payments(self):
+        previous = self.normalized()
+        incomplete = self.normalized({k: v for k, v in self.row().items() if k != "PayInfo"})
+        merged = merge_finance(previous, incomplete)
+        self.assertEqual(merged[0]["paid"], "250")
+        self.assertTrue(merged[0]["payments_stale"])
+
     def test_equal_same_day_payments_are_not_deduplicated(self):
         row = self.row()
         row["PayInfo"] *= 2

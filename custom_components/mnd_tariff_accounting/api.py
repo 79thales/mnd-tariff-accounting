@@ -42,6 +42,21 @@ def _coordinator(hass, entry_id):
     return entry.runtime_data
 
 
+def _place_device(hass, entry, place_id):
+    """Rozliší zařízení podle účtu i config entry na novém i minimálním HA.
+
+    Novější registr dovoluje stejné identifikátory v různých konfiguracích
+    a má explicitně ohraničené hledání. Starší API použijeme pouze tam,
+    kde tato metoda ještě neexistuje; nevoláme deprecated cestu nového HA.
+    """
+    registry = dr.async_get(hass)
+    identifier = (DOMAIN, f"{entry.data['account_id']}:{place_id}")
+    scoped = getattr(registry, "async_get_device_by_identifier", None)
+    if scoped:
+        return scoped(identifier, entry.entry_id)
+    return registry.async_get_device(identifiers={identifier})
+
+
 async def async_setup_api(hass):
     """Jedna registrace i při souběžném setupu účtů; chyba dovolí pokračovat.
 
@@ -142,9 +157,7 @@ async def websocket_command(hass, connection, msg):
                     "place": copy.deepcopy(repo.data["places"][place_id]),
                     "result": coordinator.data.get(place_id, {}),
                 }
-                device = dr.async_get(hass).async_get_device(
-                    identifiers={(DOMAIN, f"{coordinator.entry.data['account_id']}:{place_id}")}
-                )
+                device = _place_device(hass, coordinator.entry, place_id)
                 result["device_url"] = (
                     f"/config/devices/device/{device.id}" if device else "/config/devices"
                 )
