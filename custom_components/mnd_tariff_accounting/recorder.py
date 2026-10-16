@@ -11,7 +11,7 @@ from homeassistant.components.recorder.history import get_significant_states
 from homeassistant.components.recorder.statistics import get_metadata, statistics_during_period
 from homeassistant.helpers import entity_registry as er
 
-from .core.common import DataError, day, fingerprint, wire
+from .core.common import DataError, day, decimal, fingerprint, wire
 from .core.statistics import daily_profile
 
 
@@ -24,7 +24,9 @@ async def async_read_history(coordinator, place_id, start, end, job_cursor=None)
     """
     hass = coordinator.hass
     settings = coordinator.repository.data["places"][place_id]["settings"]
-    source = er.async_get(hass).async_get(settings.get("source_registry_id", ""))
+    source = er.async_get(hass).async_get(
+        settings.get("history_registry_id") or settings.get("source_registry_id", "")
+    )
     if source is None:
         raise DataError("source_registry_missing")
     first, last = day(start), day(end)
@@ -37,11 +39,13 @@ async def async_read_history(coordinator, place_id, start, end, job_cursor=None)
     def read():
         metadata = get_metadata(hass, statistic_ids={source.entity_id})
         info = metadata.get(source.entity_id)
-        if (
-            not info
-            or info[1].get("unit_of_measurement") not in ("m³", "m3")
-            or not info[1].get("has_sum")
-        ):
+        unit = info[1].get("unit_of_measurement") if info else None
+        factor = None
+        if unit in ("m³", "m3"):
+            factor = decimal("1")
+        elif unit in ("pulse", "pulses", "imp") and settings.get("history_registry_id"):
+            factor = decimal(settings.get("history_unit_m3"), optional=True, nonnegative=True)
+        if not info or factor is None or factor <= 0 or not info[1].get("has_sum"):
             raise DataError("source_statistics_incompatible")
         statistics = statistics_during_period(
             hass,
@@ -73,9 +77,25 @@ async def async_read_history(coordinator, place_id, start, end, job_cursor=None)
                 "time_basis": "reported",
             }
             samples.append(sample)
-        return statistics.get(source.entity_id, []), samples
+        rows = statistics.get(source.entity_id, [])
+        if unit not in ("m³", "m3"):
+            # Přesný objemový faktor pochází z výslovné konfigurace měřidla.
+            # Původní Recorder se nemění a pulsní řada se nepřičítá k její
+            # odvozené m³ entitě. Čas hodinového agregátu nezíská přesnost vzorku.
+            for row in rows:
+                for key in ("state", "sum", "change"):
+                    if row.get(key) is not None:
+                        row[key] = str(decimal(str(row[key])) * factor)
+            for sample in samples:
+                sample["original_unit"] = sample["unit"]
+                sample["unit"] = "m³"
+                if sample["value"] is not None:
+                    sample["value"] = str(decimal(sample["value"]) * factor)
+        return rows, samples, unit, factor
 
-    rows, samples = await get_instance(hass).async_add_executor_job(partial(read))
+    rows, samples, original_unit, factor = await get_instance(hass).async_add_executor_job(
+        partial(read)
+    )
     profile = await hass.async_add_executor_job(daily_profile, rows, hass.config.time_zone)
 
     def commit(data):
@@ -84,11 +104,21 @@ async def async_read_history(coordinator, place_id, start, end, job_cursor=None)
         existing = {fingerprint([s["entity"], s["segment"], s["at"]]): s for s in place["samples"]}
         existing.update({fingerprint([s["entity"], s["segment"], s["at"]]): s for s in samples})
         place["samples"] = list(existing.values())
-        daily = {r["date"]: r for r in place.get("daily_profile", [])}
+        daily = {
+            (r["date"], r.get("entity"), r.get("segment")): r
+            for r in place.get("daily_profile", [])
+        }
         for row in profile:
             if first <= day(row["date"]) < last:
-                daily[row["date"]] = wire(
-                    {**row, "entity": source.id, "segment": settings["segment"]}
+                daily[(row["date"], source.id, settings["segment"])] = wire(
+                    {
+                        **row,
+                        "entity": source.id,
+                        "segment": settings["segment"],
+                        "source_statistic_id": source.entity_id,
+                        "original_unit": original_unit,
+                        "volume_per_unit_m3": factor,
+                    }
                 )
         place["daily_profile"] = list(daily.values())
         if job_cursor is not None:

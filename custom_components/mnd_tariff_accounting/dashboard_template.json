@@ -22,7 +22,15 @@
             "paid_czk": "{{entity:paid_czk}}",
             "balance_czk": "{{entity:balance_czk}}",
             "current_flow_m3h": "{{entity:current_flow_m3h}}",
-            "current_deposit_czk": "{{entity:current_deposit_czk}}"
+            "current_deposit_czk": "{{entity:current_deposit_czk}}",
+            "billing_paid_czk": "{{entity:billing_paid_czk}}",
+            "billing_plan_czk": "{{entity:billing_plan_czk}}",
+            "billing_cost_czk": "{{entity:billing_cost_czk}}",
+            "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
+            "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
+            "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
+            "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
+            "billing_volume_m3": "{{entity:billing_volume_m3}}"
           },
           "navigation": [
             {
@@ -46,7 +54,8 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 2
+          "layout_version": 3,
+          "billing_mode": "supplier"
         }
       ],
       "subview": false
@@ -75,7 +84,15 @@
             "paid_czk": "{{entity:paid_czk}}",
             "balance_czk": "{{entity:balance_czk}}",
             "current_flow_m3h": "{{entity:current_flow_m3h}}",
-            "current_deposit_czk": "{{entity:current_deposit_czk}}"
+            "current_deposit_czk": "{{entity:current_deposit_czk}}",
+            "billing_paid_czk": "{{entity:billing_paid_czk}}",
+            "billing_plan_czk": "{{entity:billing_plan_czk}}",
+            "billing_cost_czk": "{{entity:billing_cost_czk}}",
+            "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
+            "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
+            "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
+            "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
+            "billing_volume_m3": "{{entity:billing_volume_m3}}"
           },
           "navigation": [
             {
@@ -99,7 +116,8 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 2
+          "layout_version": 3,
+          "billing_mode": "supplier"
         }
       ]
     },
@@ -127,7 +145,15 @@
             "paid_czk": "{{entity:paid_czk}}",
             "balance_czk": "{{entity:balance_czk}}",
             "current_flow_m3h": "{{entity:current_flow_m3h}}",
-            "current_deposit_czk": "{{entity:current_deposit_czk}}"
+            "current_deposit_czk": "{{entity:current_deposit_czk}}",
+            "billing_paid_czk": "{{entity:billing_paid_czk}}",
+            "billing_plan_czk": "{{entity:billing_plan_czk}}",
+            "billing_cost_czk": "{{entity:billing_cost_czk}}",
+            "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
+            "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
+            "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
+            "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
+            "billing_volume_m3": "{{entity:billing_volume_m3}}"
           },
           "navigation": [
             {
@@ -151,7 +177,8 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 2
+          "layout_version": 3,
+          "billing_mode": "supplier"
         }
       ]
     },
@@ -179,7 +206,15 @@
             "paid_czk": "{{entity:paid_czk}}",
             "balance_czk": "{{entity:balance_czk}}",
             "current_flow_m3h": "{{entity:current_flow_m3h}}",
-            "current_deposit_czk": "{{entity:current_deposit_czk}}"
+            "current_deposit_czk": "{{entity:current_deposit_czk}}",
+            "billing_paid_czk": "{{entity:billing_paid_czk}}",
+            "billing_plan_czk": "{{entity:billing_plan_czk}}",
+            "billing_cost_czk": "{{entity:billing_cost_czk}}",
+            "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
+            "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
+            "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
+            "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
+            "billing_volume_m3": "{{entity:billing_volume_m3}}"
           },
           "navigation": [
             {
@@ -203,7 +238,8 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 2
+          "layout_version": 3,
+          "billing_mode": "supplier"
         }
       ]
     },
@@ -231,7 +267,15 @@
             "paid_czk": "{{entity:paid_czk}}",
             "balance_czk": "{{entity:balance_czk}}",
             "current_flow_m3h": "{{entity:current_flow_m3h}}",
-            "current_deposit_czk": "{{entity:current_deposit_czk}}"
+            "current_deposit_czk": "{{entity:current_deposit_czk}}",
+            "billing_paid_czk": "{{entity:billing_paid_czk}}",
+            "billing_plan_czk": "{{entity:billing_plan_czk}}",
+            "billing_cost_czk": "{{entity:billing_cost_czk}}",
+            "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
+            "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
+            "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
+            "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
+            "billing_volume_m3": "{{entity:billing_volume_m3}}"
           },
           "navigation": [
             {
@@ -255,8 +299,9 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 2,
-          "admin_link": true
+          "layout_version": 3,
+          "admin_link": true,
+          "billing_mode": "supplier"
         }
       ]
     },
@@ -284,7 +329,15 @@
             "paid_czk": "{{entity:paid_czk}}",
             "balance_czk": "{{entity:balance_czk}}",
             "current_flow_m3h": "{{entity:current_flow_m3h}}",
-            "current_deposit_czk": "{{entity:current_deposit_czk}}"
+            "current_deposit_czk": "{{entity:current_deposit_czk}}",
+            "billing_paid_czk": "{{entity:billing_paid_czk}}",
+            "billing_plan_czk": "{{entity:billing_plan_czk}}",
+            "billing_cost_czk": "{{entity:billing_cost_czk}}",
+            "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
+            "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
+            "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
+            "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
+            "billing_volume_m3": "{{entity:billing_volume_m3}}"
           },
           "navigation": [
             {
@@ -308,7 +361,8 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 2
+          "layout_version": 3,
+          "billing_mode": "supplier"
         }
       ]
     }

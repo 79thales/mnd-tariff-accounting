@@ -114,6 +114,14 @@ def daily_profile(rows: list[dict], zone: str) -> list[dict]:
             {
                 "date": current.isoformat(),
                 "m3": sum((item["change"] for item in items), Decimal(0)) if complete else None,
+                # I neúplný den může mít doložené přírůstky. Uchováváme je
+                # jako známou část, nikdy jako úplný den nebo nulu za mezeru.
+                "known_m3": sum(
+                    (item["change"] for item in items if not item["reason"]), Decimal(0)
+                )
+                if any(not item["reason"] for item in items)
+                else None,
+                "known_hours": sum(not item["reason"] for item in items),
                 "complete": complete,
                 "estimated": False,
                 "expected_hours": len(expected),

@@ -8,6 +8,7 @@ from datetime import datetime, time, timezone
 from zoneinfo import ZoneInfo
 
 from .accounting import active_versions, calculate, invoice_settlement
+from .billing import billing_view
 from .common import DataError, instant, local_day, wire
 from .live import anchor_comparisons
 from .metering import Reading, active_readings, consumption_intervals, current_state
@@ -39,6 +40,17 @@ def evaluate_place(place_id: str, place: dict, zone: str, now: datetime | None =
         "meter_comparisons": anchor_comparisons(place_id, place, zone),
         "forecast_comparisons": place.get("comparisons", []),
     }
+    # Čtecí dokladový přehled funguje i bez ručně vyplněné místní knihy.
+    # Jeho chyba nesmí vymazat odečty ani ukazovat neznámý náklad jako nulu.
+    try:
+        result["billing"] = billing_view(place, now, zone)
+    except DataError as error:
+        result["billing"] = {
+            "status": "incomplete",
+            "warnings": [str(error)],
+            "months": [],
+            "series": {},
+        }
     if (
         mnd
         and len(

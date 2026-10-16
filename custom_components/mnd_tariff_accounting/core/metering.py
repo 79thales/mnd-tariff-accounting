@@ -193,13 +193,19 @@ def validate_samples(samples: list[dict], *, entity: str, segment: str) -> list[
     for sample in samples:
         if sample.get("entity") != entity or sample.get("segment") != segment:
             raise DataError("sample_identity_mismatch")
-        if sample.get("unit") not in ("m³", "m3") or sample.get("state_class") not in (
-            "total",
-            "total_increasing",
+        value = decimal(sample.get("value"), optional=True, nonnegative=True)
+        if value is not None and (
+            sample.get("unit") not in ("m³", "m3")
+            or sample.get("state_class")
+            not in (
+                "total",
+                "total_increasing",
+            )
         ):
             raise DataError("incompatible_sensor")
         at = instant(sample["at"])
-        value = decimal(sample.get("value"), optional=True, nonnegative=True)
+        # Při restartu může HA dodat unavailable bez atributů. Není to
+        # číselný report s jinou jednotkou: zůstane zaznamenanou mezerou.
         item = {**sample, "at": at, "value": value}
         if at in parsed and parsed[at] != item:
             raise DataError("sample_conflict")

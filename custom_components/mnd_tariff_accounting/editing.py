@@ -131,6 +131,9 @@ def edit_place(data, *, place_id, section, record, now: datetime, zone: str):
             "flow_entity",
             "flow_registry_id",
             "flow_max_age",
+            "history_source_entity",
+            "history_registry_id",
+            "history_unit_m3",
             "segment",
         )
         _fields(record, allowed)
@@ -138,6 +141,11 @@ def edit_place(data, *, place_id, section, record, now: datetime, zone: str):
             record["flow_max_age"] = int(record["flow_max_age"])
             if not 30 <= record["flow_max_age"] <= 86400:
                 raise DataError("invalid_flow_max_age")
+        if "history_unit_m3" in record:
+            factor = decimal(record["history_unit_m3"], nonnegative=True)
+            if not 0 < factor <= 1000:
+                raise DataError("invalid_history_volume_factor")
+            record["history_unit_m3"] = factor
         merged = {**place["settings"], **record}
         if "name" in record:
             if not isinstance(record["name"], str) or len(record["name"].strip()) > 160:

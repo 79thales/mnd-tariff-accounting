@@ -149,6 +149,30 @@
       },
       "current_flow_m3h": {
         "name": "Aktuální průtok plynu"
+      },
+      "billing_paid_czk": {
+        "name": "Uhrazené zálohy za účetní období"
+      },
+      "billing_plan_czk": {
+        "name": "Plán záloh za účetní období"
+      },
+      "billing_cost_czk": {
+        "name": "Známé náklady k odečtu MND"
+      },
+      "billing_forecast_cost_czk": {
+        "name": "Odhad nákladů za účetní období"
+      },
+      "billing_forecast_balance_czk": {
+        "name": "Odhad výsledku vyúčtování"
+      },
+      "billing_actual_mwh": {
+        "name": "Odběr MND za účetní období"
+      },
+      "billing_forecast_mwh": {
+        "name": "Prognóza odběru za účetní období"
+      },
+      "billing_volume_m3": {
+        "name": "Doložený objem HA za účetní období"
       }
     },
     "button": {

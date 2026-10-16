@@ -21,6 +21,26 @@
   the MND integration and open its HACS repository, with installation and
   restart prerequisites. The existing alpha tag and installer are unchanged.
 
+## 0.1.0-alpha.4 — účetní období, náklady a měsíční měření
+
+### Čeština
+
+- Hlavní přehled používá skutečné účetní období z MND, včetně přechodu přes Nový rok. Souhrn odběru, nákladů, skutečných úhrad, plánu záloh a očekávaného výsledku funguje bez ručního přepisu finanční knihy.
+- Společný graf rozlišuje známé náklady, celkový výhled, zaplacené zálohy a předpisy podle skutečných dat. Měsíční sloupce m³ rozlišují úplné, neúplné a chybějící měření. Novější HA sloupce nepřepisují souhrnnou spotřebu MND.
+- Originální vyúčtování má přednost ve vlastním období; energie a stálé platby se neúčtují znovu. Nejednoznačné hranice nebo opravy nezískají odhadnutou skutečnost.
+- Ověření ceny z aktuálního originálního ceníku MND kontroluje pásmo, DPH, součty a doloženou individuální cenu. Budoucí regulované ceny a poměr měsíční platby podle dnů jsou výslovné předpoklady; neznámý formát nepředstírá nulu.
+- Historii lze připojit na původní pulsní senzor se zadaným objemem pulsu. Duplicitní odvozený senzor se nepřičítá. Poslední tři dny se obnovují po 10 minutách; soukromá záloha uchovává i ověřené cenové podklady.
+- Stejnou kompozici 3 používají frontend, Generate dashboard i přibalená šablona se šesti pohledy. Administrace zůstává v konfiguraci zařízení.
+
+### English
+
+- The main overview follows the actual MND billing period across calendar years. Consumption, costs, actual payments, planned advances and the expected result are available without manually copying the financial ledger.
+- A shared chart separates known costs, total forecast, paid advances and prescriptions by their actual dates. Monthly m³ bars distinguish complete, partial and missing measurements. HA bars do not replace MND total consumption.
+- Original invoices take precedence within their covered intervals, without charging the same energy or fixed fees twice. Ambiguous boundaries or corrections remain unresolved.
+- Current original MND tariff parsing checks the consumption band, VAT, column totals and documented personal price. Future regulated prices and calendar-day fixed-charge proration are explicit assumptions; unsupported formats remain unknown.
+- Historical pulse counters support an explicit volume-per-pulse factor without double counting derived volume sensors. The latest three days refresh every 10 minutes; private backups preserve verified pricing evidence.
+- Frontend, Generate dashboard and the bundled six-view template share composition 3. Administration remains in the device configuration.
+
 ## 0.1.0-alpha.3 — oprava stahování dokumentů MND
 
 ### Čeština

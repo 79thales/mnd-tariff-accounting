@@ -149,6 +149,30 @@
       },
       "current_flow_m3h": {
         "name": "Current gas flow"
+      },
+      "billing_paid_czk": {
+        "name": "Paid advances for billing period"
+      },
+      "billing_plan_czk": {
+        "name": "Planned advances for billing period"
+      },
+      "billing_cost_czk": {
+        "name": "Known cost at MND reading"
+      },
+      "billing_forecast_cost_czk": {
+        "name": "Forecast billing period cost"
+      },
+      "billing_forecast_balance_czk": {
+        "name": "Forecast billing result"
+      },
+      "billing_actual_mwh": {
+        "name": "MND billing period consumption"
+      },
+      "billing_forecast_mwh": {
+        "name": "Billing period consumption forecast"
+      },
+      "billing_volume_m3": {
+        "name": "Known HA billing period volume"
       }
     },
     "button": {

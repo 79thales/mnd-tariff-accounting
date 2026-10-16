@@ -106,3 +106,27 @@ test("čtecí zálohy zobrazí částečnou úhradu a detail bez administrační
   assert.equal(element.shadowRoot.getElementById("accept-advances"),null);
   assert.equal(element.shadowRoot.querySelector("[data-finance-export]"),null);
 });
+
+test("účetní přehled a obě SVG řady zachovají periodu MND a neznámé údaje",async()=>{
+  const data=detail();data.result.billing={from:'2026-03-31',to:'2027-04-08',today:'2026-10-16',actual_through:'2026-10-11',actual_mwh:'1.23',forecast_mwh:'5',known_cost_czk:null,paid_czk:'0',planned_czk:'2000',forecast_balance_czk:null,known_cost_complete:false,warnings:[],series:{known_cost:[],forecast_cost:[],paid:[{date:'2026-03-31',value:'0'}],planned:[{date:'2027-01-15',value:'2000'}]},months:[{month:'2026-04',m3:'2',complete:true},{month:'2026-05',m3:'1',complete:false},{month:'2026-06',m3:null,complete:false}]};
+  const {element}=await surface({config:{entry_id:'account-a',place:PLACE,tab:'overview'},data});
+  const root=element.shadowRoot;
+  assert.match(root.querySelector('.period').textContent,/31\. 3\. 2026.*8\. 4\. 2027/);
+  assert.equal(root.querySelectorAll('svg.billing-plot').length,2);
+  assert.equal(root.querySelectorAll('svg.billing-plot rect').length,2);
+  assert.match(root.querySelector('.billing-summary table').textContent,/Doložená část nákladů—/);
+  assert.match(root.querySelector('.billing-summary table').textContent,/Uhrazené zálohy0 Kč/);
+  assert.match(root.textContent,/Dnes/);assert.match(root.textContent,/Předpis není platba/);
+  assert.equal(root.querySelectorAll('form,input').length,0);
+  element.hass={...element._hass,language:'en'};element.render();
+  assert.match(root.textContent,/MND billing period/);assert.match(root.textContent,/Estimated total consumption/);
+});
+
+test("historický pulsní zdroj je dostupný pouze v konfiguraci zařízení",async()=>{
+  const {element}=await surface();
+  element._hass.states={'sensor.pulses':{entity_id:'sensor.pulses',state:'100',attributes:{unit_of_measurement:'pulse',state_class:'total_increasing'}}};
+  element._tab='editor';element.render();
+  assert.ok(element.shadowRoot.querySelector('[name=history_source_entity] option[value="sensor.pulses"]'));
+  assert.ok(element.shadowRoot.querySelector('[name=history_unit_m3]'));
+  assert.equal(element.shadowRoot.querySelector('[name=source_entity] option[value="sensor.pulses"]'),null);
+});

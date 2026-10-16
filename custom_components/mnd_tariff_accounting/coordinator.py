@@ -30,7 +30,7 @@ from homeassistant.util import dt as dt_util
 from .const import DOMAIN, POLL_HOURS, SOURCE_DEBOUNCE_SECONDS
 from .core.archive import Repository, apply_import, new_place
 from .core.backup import parse_native, parse_zip, restore_place
-from .core.common import DataError, decimal, fingerprint, identity, load_json, wire
+from .core.common import DataError, day, decimal, fingerprint, identity, load_json, local_day, wire
 from .core.finance import finance_rows, merge_finance
 from .core.forecast import add_snapshot
 from .core.importer import parse_v1
@@ -181,7 +181,42 @@ class MndCoordinator(DataUpdateCoordinator):
 
     async def _clock_recompute(self, _now):
         if not self._closed:
+            # Dotažení posledních hodin neprovádí síťový polling MND. Jedna
+            # úloha načte nejvýše tři místní dny a nezasahuje do probíhajícího
+            # úplného importu. Unload ji zruší před uzavřením archivu.
+            tick = asyncio.get_running_loop().time()
+            if (
+                "recorder" in self.hass.config.components
+                and tick - getattr(self, "_profile_last_tick", 0) >= 600
+                and not (self.history.task and not self.history.task.done())
+                and not (getattr(self, "_profile_task", None) and not self._profile_task.done())
+            ):
+                self._profile_last_tick = tick
+                self._profile_task = self.entry.async_create_background_task(
+                    self.hass, self._refresh_recent_profiles(), "mnd-local-profile-refresh"
+                )
             await self.async_recompute()
+
+    async def _refresh_recent_profiles(self):
+        """Po 10 minutách obnoví i neúplný dnešní sloupec; mezera není nula."""
+        from .recorder import async_read_history
+
+        today = dt_util.as_local(dt_util.utcnow()).date()
+        for place_id, place in self.repository.data["places"].items():
+            if not (
+                place["settings"].get("history_registry_id")
+                or place["settings"].get("source_registry_id")
+            ) or not place["settings"].get("segment"):
+                continue
+            try:
+                async with asyncio.timeout(45):
+                    await async_read_history(
+                        self, place_id, today - timedelta(days=2), today + timedelta(days=1)
+                    )
+            except (DataError, KeyError, TimeoutError):
+                # Předchozí profil zůstává. Neúspěšné čtení se nepřepíše
+                # prázdnými dny a další periodický běh může pokračovat.
+                continue
 
     @callback
     def _registry_changed(self, event):
@@ -379,12 +414,135 @@ class MndCoordinator(DataUpdateCoordinator):
                     # Finanční zdroje jsou nezávislé na grafu a odečtech.
                     # Chyba jednoho seznamu nesmaže starší platné doklady.
                     failures.extend(await self._refresh_finance(place_id, source))
+                    failures.extend(await self._refresh_billing_documents(place_id))
                 self.cloud_status = "partial" if failures else "connected"
             except AuthenticationRequired:
                 self.cloud_status = "reauth_required"
                 self.entry.async_start_reauth(self.hass)
             except (PortalError, DataError) as err:
                 self.cloud_status = str(err)
+
+    async def _refresh_billing_documents(self, place_id):
+        """Ověří originály pro aktuální období a aktuální ceník MND.
+
+        Poslední faktura poskytuje také doložený daňový kontext domácnosti.
+        Ostatní faktury se načítají jen při průniku s vybraným obdobím.
+        Nezměněné ověřené revize se neparsují znovu. Každý originál se uloží
+        samostatně, takže selhání pozdějšího dokumentu neztratí hotovou práci.
+        PDF zůstávají soukromá; čtení nepotvrzuje ruční účetní knihu.
+        """
+        from .core.billing import select_period
+        from .core.mnd_documents import current_price, invoice_from_text, pdf_text, tariff_from_text
+
+        place = self.repository.data["places"][place_id]
+        evidence = place.get("portal_evidence", {})
+        invoices = evidence.get("invoices", {}).get("rows", [])
+        documents = evidence.get("documents", [])
+        details = evidence.get("details", {})
+        if not invoices:
+            return []
+        latest = max(invoices, key=lambda r: r["to_inclusive"])
+        period = select_period(place, local_day(dt_util.utcnow(), self.hass.config.time_zone))
+        selected = [latest] + [
+            r
+            for r in invoices
+            if r["id"] != latest["id"]
+            and period
+            and day(r["from"]) < day(period["To"])
+            and day(period["From"]) <= day(r["to_inclusive"])
+        ]
+        current = [d for d in documents if d.get("TYPE") == "PRNOW"]
+        context = fingerprint(
+            [
+                [r["revision"] for r in selected],
+                current,
+                details.get("BusinessAlgorithm"),
+                details.get("CPE_CONS_AVE_YEAR"),
+            ]
+        )
+        if place.get("billing_documents_context") == context:
+            return []
+        at = dt_util.utcnow().isoformat()
+        try:
+            parsed_invoices = []
+            for row in selected:
+                cached = next(
+                    (
+                        i
+                        for i in place.get("invoice_evidence", [])
+                        if i["id"] == row["id"]
+                        and i.get("revision") == row["revision"]
+                        and i.get("verified")
+                    ),
+                    None,
+                )
+                if cached:
+                    parsed_invoices.append(cached)
+                    continue
+                content, name = await self.portal.invoice_pdf(row["id"])
+                text = await self.hass.async_add_executor_job(pdf_text, content)
+                invoice = await self.hass.async_add_executor_job(
+                    invoice_from_text, text, place_id, row
+                )
+                sha = await self.hass.async_add_executor_job(
+                    put_artifact, self.artifact_root, content
+                )
+                invoice.update(artifact=sha, revision=row["revision"])
+
+                def save_invoice(data):
+                    item = data["places"][place_id]
+                    item["invoice_evidence"] = [
+                        i for i in item.get("invoice_evidence", []) if i["id"] != invoice["id"]
+                    ] + [invoice]
+                    if not any(a["id"] == sha for a in item["artifacts"]):
+                        item["artifacts"].append(
+                            {"id": sha, "filename": name, "source": "mnd", "acquired_at": at}
+                        )
+
+                await self.repository.transact(save_invoice)
+                parsed_invoices.append(invoice)
+            if len(current) != 1 or not details.get("CPE_CONS_AVE_YEAR"):
+                raise DataError("mnd_current_tariff_unavailable")
+            source = place["settings"]["portal"]
+            content, name = await self.portal.download_contract(
+                source["cp_id"], source["contract_id"], current[0]
+            )
+            text = await self.hass.async_add_executor_job(pdf_text, content)
+            parsed = await self.hass.async_add_executor_job(
+                tariff_from_text, text, details["CPE_CONS_AVE_YEAR"]
+            )
+            price = await self.hass.async_add_executor_job(
+                current_price, details, current[0], parsed, parsed_invoices[0]
+            )
+            sha = await self.hass.async_add_executor_job(put_artifact, self.artifact_root, content)
+
+            def save_price(data):
+                item = data["places"][place_id]
+                item["price_evidence"] = {**price, "artifact": sha, "acquired_at": at}
+                item["billing_documents_context"] = context
+                if not any(a["id"] == sha for a in item["artifacts"]):
+                    item["artifacts"].append(
+                        {"id": sha, "filename": name, "source": "mnd", "acquired_at": at}
+                    )
+                item.setdefault("portal_evidence", {}).setdefault("errors", {}).pop(
+                    "billing_documents", None
+                )
+
+            await self.repository.transact(save_price)
+            return []
+        except AuthenticationRequired:
+            raise
+        except (PortalError, DataError) as error:
+            reason = str(error)
+            await self.repository.transact(
+                lambda data: (
+                    data["places"][place_id]
+                    .setdefault("portal_evidence", {})
+                    .setdefault("errors", {})
+                    .update(billing_documents={"reason": reason, "attempted_at": at})
+                )
+            )
+            return [reason]
 
     async def _refresh_finance(self, place_id, source):
         """Načte historii a detaily se skutečnými úhradami, nejvýše 120 s/druh.
@@ -509,6 +667,18 @@ class MndCoordinator(DataUpdateCoordinator):
                         "archive_revision": revision,
                         "cloud_status": self.cloud_status,
                     }
+                    billing = result.get("billing", {})
+                    for sensor, key in {
+                        "billing_paid_czk": "paid_czk",
+                        "billing_plan_czk": "planned_czk",
+                        "billing_cost_czk": "known_cost_czk",
+                        "billing_forecast_cost_czk": "forecast_cost_czk",
+                        "billing_forecast_balance_czk": "forecast_balance_czk",
+                        "billing_actual_mwh": "actual_mwh",
+                        "billing_forecast_mwh": "forecast_mwh",
+                        "billing_volume_m3": "known_volume_m3",
+                    }.items():
+                        results[place_id][sensor] = billing.get(key)
                     settings = place["settings"]
                     registry = er.async_get(self.hass)
                     flow = registry.async_get(
@@ -646,6 +816,12 @@ class MndCoordinator(DataUpdateCoordinator):
 
     async def async_close(self):
         self._closed = True
+        if getattr(self, "_profile_task", None) and not self._profile_task.done():
+            self._profile_task.cancel()
+            try:
+                await self._profile_task
+            except asyncio.CancelledError:
+                pass
         if getattr(self, "_clock_unsubscribe", None):
             self._clock_unsubscribe()
         if self._flow_debounce:

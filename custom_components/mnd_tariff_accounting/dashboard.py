@@ -16,7 +16,7 @@ TEMPLATE = Path(__file__).with_name("dashboard_template.json")
 
 
 def build_views(title, path, entities, entry_id, place_id):
-    """Vrátí MND panelové view a pět detailů z jediné přibalené šablony.
+    """Vrátí účetní přehled MND a pět detailů z jediné přibalené šablony.
 
     Vzhled vlastní karty sdílí hlavní panel i náhled; entity jsou odkazy na
     skutečný registr, takže přejmenování senzoru nemění účetní identitu.
@@ -54,5 +54,5 @@ def build_views(title, path, entities, entry_id, place_id):
         "config": expand(config),
         "missing_entities": sorted(missing),
         "requirements": [],
-        "comments": "Nativní horní lišta HA; čtecí hlavní view a detaily, správa z konkrétního zařízení. Aktualizace mění jen vlastní kartu stejného účtu a místa; před zápisem exportovat zálohu Overview.",
+        "comments": "Kompozice 3: skutečné účetní období MND, souhrn vyúčtování, průběh nákladů/záloh a měsíční měření HA. Originální faktura má přednost. Nativní horní lišta HA a čtecí detaily; správa z konkrétního zařízení. Aktualizace mění jen vlastní kartu stejného účtu a místa; před zápisem exportovat zálohu Overview.",
     }

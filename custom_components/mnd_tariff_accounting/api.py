@@ -187,6 +187,10 @@ async def websocket_command(hass, connection, msg):
                 flow = er.async_get(hass).async_get(flow_id) if flow_id else None
                 if flow:
                     visible["settings"]["flow_entity"] = flow.entity_id
+                history_id = visible["settings"].get("history_registry_id")
+                history_source = er.async_get(hass).async_get(history_id) if history_id else None
+                if history_source:
+                    visible["settings"]["history_source_entity"] = history_source.entity_id
                 result["settlements"] = [
                     {
                         "id": i["id"],
@@ -219,6 +223,28 @@ async def websocket_command(hass, connection, msg):
                     ):
                         raise DataError("incompatible_flow_sensor")
                     record["flow_registry_id"] = source.id if source else None
+                if payload["section"] == "settings" and "history_source_entity" in record:
+                    entity = record["history_source_entity"]
+                    source = er.async_get(hass).async_get(entity) if entity else None
+                    state = hass.states.get(entity) if entity else None
+                    if entity and (
+                        source is None
+                        or state is None
+                        or state.attributes.get("unit_of_measurement")
+                        not in ("m³", "m3", "pulse", "pulses", "imp")
+                        or state.attributes.get("state_class") not in ("total", "total_increasing")
+                    ):
+                        raise DataError("incompatible_history_sensor")
+                    record["history_registry_id"] = source.id if source else None
+                    if state and state.attributes.get("unit_of_measurement") not in ("m³", "m3"):
+                        from .core.common import decimal
+
+                        factor = record.get(
+                            "history_unit_m3",
+                            repo.data["places"][place_id]["settings"].get("history_unit_m3"),
+                        )
+                        if decimal(factor, optional=True, nonnegative=True) in (None, 0):
+                            raise DataError("history_volume_factor_required")
                 if payload["section"] == "settings" and record.get("source_mode") == "sensor":
                     source = er.async_get(hass).async_get(record.get("source_entity", ""))
                     state = hass.states.get(record.get("source_entity", ""))
@@ -307,7 +333,11 @@ async def websocket_command(hass, connection, msg):
                 profile = [
                     row
                     for row in place.get("daily_profile", [])
-                    if row.get("entity") == selected_settings.get("source_registry_id")
+                    if row.get("entity")
+                    == (
+                        selected_settings.get("history_registry_id")
+                        or selected_settings.get("source_registry_id")
+                    )
                     and row.get("segment") == selected_settings.get("segment")
                 ]
                 if selected_settings.get("source_mode", "manual") == "manual":

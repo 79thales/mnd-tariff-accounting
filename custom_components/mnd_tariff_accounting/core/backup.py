@@ -135,6 +135,9 @@ def restore_place(data: dict, parsed: dict):
         "local_forecasts",
         "comparisons",
         "portal_evidence",
+        "invoice_evidence",
+        "price_evidence",
+        "billing_documents_context",
         "last_successful_import",
     ):
         if section in restored:

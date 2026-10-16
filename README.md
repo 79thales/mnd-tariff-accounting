@@ -7,9 +7,10 @@ Samostatná integrace plynu podle [úplného zadání](ZADANI_MND_SOL_6_1.md).
 Runtime je Python, přibalený frontend JavaScript bez externí Lovelace
 závislosti. Nepotřebuje WPF, WebView2 ani REST token k vlastnímu HA.
 
-**Stav: vývojová verze 0.1.0-alpha.3.** Oprava stahování po živém testu je
-v [reportu alpha.3](docs/ALPHA_3.md); rozvržení, migrace a omezení popisuje
-[alpha.2](docs/ALPHA_2.md). [Původní report](IMPLEMENTACE.md) zachovává historii alpha.1.
+**Stav: vývojová verze 0.1.0-alpha.4.** Přehled pro skutečné účetní období MND,
+graf nákladů a záloh a měsíční měření popisuje [report alpha.4](docs/ALPHA_4.md).
+Historii oprav uchovávají [alpha.3](docs/ALPHA_3.md), [alpha.2](docs/ALPHA_2.md)
+a [původní report](IMPLEMENTACE.md).
 Zdroj je ve veřejném repozitáři [79thales/mnd-tariff-accounting](https://github.com/79thales/mnd-tariff-accounting).
 Vydání instalátoru je oddělené od zveřejnění zdrojů.
 
@@ -24,6 +25,7 @@ Vydání instalátoru je oddělené od zveřejnění zdrojů.
 - Vlastní sezonní odhad pouze při pokrytém předchozím roce měření.
 - Soukromé originály a JSON/ZIP zálohy, obnova a CSV export.
 - Jednoduchý čtecí přehled v horní liště HA, administrace z detailu zařízení MND.
+- Účetní období MND, náklady a zálohy ve společném grafu, měsíční HA sloupce m³.
 - Průtok m³/h, historie záloh a úhrad, fakturační detaily a oddělené exporty MND.
 - Formuláře a Generate dashboard pro horní lištu existujícího Overview.
 - Čtecí cloudový klient podle nalezeného veřejného JS MND, reauth a obnovitelná
@@ -34,19 +36,21 @@ Vydání instalátoru je oddělené od zveřejnění zdrojů.
 Tlačítko **Přidat integraci** nahoře otevře přímo konfiguraci MND ve vašem
 Home Assistantu. Nejdříve nainstalujte integrační soubory a restartujte HA.
 Tlačítko **HACS** otevře tento repozitář jako integraci, stejně jako u ČEZ.
-Testovací [vydání v0.1.0-alpha.3](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.3)
+Testovací [vydání v0.1.0-alpha.4](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.4)
 je dostupné jako **prerelease**. V HACS obnovte informace repozitáře, zapněte
-zobrazení beta verzí a při stahování vyberte **v0.1.0-alpha.3**. V dialogu má
+zobrazení beta verzí a při stahování vyberte **v0.1.0-alpha.4**. V dialogu má
 být uvedena tato verze, nikoli commit výchozí větve. Po instalaci restartujte HA.
 
-Pro ruční instalaci je dostupný [instalační ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v0.1.0-alpha.3/mnd_tariff_accounting.zip).
+Pro ruční instalaci je dostupný [instalační ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v0.1.0-alpha.4/mnd_tariff_accounting.zip).
 
 Quality, HACS a Hassfest se ověřují pro každý tag. Skutečné HA testy používají
 minimum 2026.3.1 a aktuální stabilní verzi s přesně odpovídajícím pluginem.
-Živý test alpha.3 potvrdil finanční seznamy, oba exporty a PDF faktury;
-podrobnosti jsou v [protokolu ověření](docs/ALPHA_3.md). DOM a protokolové
-testy nenahrazují mobilní vizuální kontrolu. Úplné automatické smluvní ceny zůstávají
-omezením; doložené tarify lze zadat nebo importovat. [Podrobnosti alpha.2](docs/ALPHA_2.md).
+Alpha.4 přidává čtecí finanční přehled z MND, původní faktury a aktuálního
+ověřeného ceníku. Náklady používají doložené ceny s DPH; orientační poměr
+stálých plateb a dosud neznámé budoucí regulované ceny jsou označené jako
+předpoklady. Nepodporovaný formát dokumentu zůstane neznámý, nikoli nulový.
+DOM a protokolové testy nenahrazují mobilní vizuální kontrolu.
+[Podrobnosti a omezení alpha.4](docs/ALPHA_4.md).
 
 Po schválené instalaci patří celý adresář `custom_components/mnd_tariff_accounting/`
 do konfigurace HA. ZIP z vydání obsahuje runtime přímo v kořeni; rozbalte
@@ -101,10 +105,10 @@ Vydání začíná draftem, publikované tagy/assets jsou neměnné.
 [Add MND integration](https://my.home-assistant.io/redirect/config_flow_start/?domain=mnd_tariff_accounting) · [Open in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=79thales&repository=mnd-tariff-accounting&category=integration)
 
 Install the integration files and restart HA before using **Add integration**.
-The [alpha prerelease](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.3)
+The [alpha prerelease](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.4)
 is now public. Refresh repository information in HACS, enable beta versions
-and select **v0.1.0-alpha.3** in the download dialog instead of a default-branch
-commit. Restart HA after installation. A [manual installer ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v0.1.0-alpha.3/mnd_tariff_accounting.zip)
+and select **v0.1.0-alpha.4** in the download dialog instead of a default-branch
+commit. Restart HA after installation. A [manual installer ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v0.1.0-alpha.4/mnd_tariff_accounting.zip)
 is also available.
 
 Independent community Home Assistant gas accounting integration. It imports
@@ -112,8 +116,8 @@ MND XLSX and the C# v1 archive, keeps auditable readings, tariffs, actual
 payments, invoices and historical forecast snapshots, and provides a bundled
 panel and an Overview dashboard generator.
 
-Development version 0.1.0-alpha.3 is not a verified production release.
-The corrective document download change is described in `docs/ALPHA_3.md`.
+Development version 0.1.0-alpha.4 is not a verified production release.
+The billing-period overview, original invoice precedence and measured monthly gas bars are described in `docs/ALPHA_4.md`. Unknown future regulated prices and calendar-day fixed-charge proration are explicit forecast assumptions.
 The normal Overview tab is read-only; supply point administration opens from
 its MND device configuration link. The generator and bundled template update
 existing MND cards while preserving unrelated cards, titles and view order.
@@ -122,10 +126,10 @@ allocated payment details, separate exports and invoice PDF downloads are availa
 Accepting advances into the local ledger requires an explicit period allocation.
 
 Quality, HACS and Hassfest run against each release tag, with real HA tests on
-the supported minimum and dynamically resolved stable version. Live alpha.3
-validation confirmed financial lists, both exports and an invoice PDF download;
-see `docs/ALPHA_3.md`. Mobile visual QA remains unverified. Complete automatic
-contract pricing is not implemented. See `docs/ALPHA_2.md` for migration and limits.
+the supported minimum and dynamically resolved stable version. Earlier live
+validation confirmed financial lists, exports and invoice downloads (`docs/ALPHA_3.md`).
+The new billing model and its pricing limits are documented in `docs/ALPHA_4.md`.
+Mobile visual QA remains unverified.
 
 Unknown values remain distinct from zero, planned advances from actual
 payments, and forecasts from confirmed invoices. Credentials, private

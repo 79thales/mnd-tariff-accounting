@@ -369,6 +369,14 @@ class DashboardTests(unittest.TestCase):
             "known_cost_czk",
             "paid_czk",
             "balance_czk",
+            "billing_paid_czk",
+            "billing_plan_czk",
+            "billing_cost_czk",
+            "billing_forecast_cost_czk",
+            "billing_forecast_balance_czk",
+            "billing_actual_mwh",
+            "billing_forecast_mwh",
+            "billing_volume_m3",
         )
         result = build_views(
             "Synthetic MND",
@@ -380,6 +388,7 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(result["missing_entities"], [])
         views = result["config"]["views"]
         self.assertEqual(len(views), 6)
+        self.assertTrue(all(v["cards"][0]["layout_version"] == 3 for v in views))
         self.assertTrue(
             all(v["subview"] and v["back_path"] == "/lovelace/synthetic-gas" for v in views[1:])
         )

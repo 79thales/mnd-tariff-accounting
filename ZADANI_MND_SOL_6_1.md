@@ -417,6 +417,13 @@ K odevzdání patří zdroje integrace a příslušné testy, mapování C# → 
 
 ## 16. Ověřené podklady versus dosud neověřený návrh
 
+Upřesnění uživatele 16. 10. 2026: hlavní finanční a spotřební přehled má
+používat **účetní období MND, nikoli kalendářní rok**. Originální vyúčtování
+má přednost ve vlastním rozsahu. Novější měření HA zůstává označeným
+navazujícím zdrojem; nesmí přepsat fakturu ani zdvojit její náklady.
+Podrobnosti čtecího přehledu, grafů a cenových předpokladů alpha.4 jsou
+v [docs/ALPHA_4.md](docs/ALPHA_4.md).
+
 Reference C# má doložené unit testy a řízený WPF test; živě bylo ověřeno přihlášení, technické údaje místa, dva exporty odečtů a odhlášení. Úplnost historie před nejstarším staženým obdobím potvrzená není. Číselné části živého grafu byly ověřeny samostatně v prohlížeči; programové otevření tooltipů po doplnění C# nebylo znovu živě testováno. Živý test C# neověřil smluvní PDF, profil ani platební přehled. Konkrétní HA senzor a jeho měřicí historie nebyly v referenčním testu k dispozici.
 
 Tato příprava neposkytuje důkaz, že přihlášení MND bude fungovat bez WebView2, že parser pokrývá všechny faktury nebo že nový dashboard běží v HA. Výše uvedené kroky a testy má teprve provést implementující Sol 6.1 v určeném projektu. Aktuální lokální úpravy ČEZ mohou obsahovat důležité opravy, které ještě nejsou v posledním commitu; jejich stav je zachycen v podkladech.

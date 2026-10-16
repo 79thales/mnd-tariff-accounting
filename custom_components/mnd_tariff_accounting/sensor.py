@@ -35,6 +35,14 @@ SENSORS = {
     "mnd_future_estimate_mwh": ("MWh", "energy", None),
     "invoice_result_czk": ("CZK", "monetary", None),
     "invoice_remaining_czk": ("CZK", "monetary", None),
+    "billing_paid_czk": ("CZK", "monetary", None),
+    "billing_plan_czk": ("CZK", "monetary", None),
+    "billing_cost_czk": ("CZK", "monetary", None),
+    "billing_forecast_cost_czk": ("CZK", "monetary", None),
+    "billing_forecast_balance_czk": ("CZK", "monetary", None),
+    "billing_actual_mwh": ("MWh", "energy", None),
+    "billing_forecast_mwh": ("MWh", "energy", None),
+    "billing_volume_m3": ("m³", "gas", None),
 }
 
 
@@ -84,6 +92,20 @@ class MndSensor(CoordinatorEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         data = (self.coordinator.data or {}).get(self.place_id, {})
+        if self.key.startswith("billing_"):
+            billing = data.get("billing", {})
+            return {
+                "period_from": billing.get("from"),
+                "period_to": billing.get("to"),
+                "source": billing.get("source"),
+                "confirmed_invoice": billing.get("confirmed_invoice"),
+                "estimated": ("forecast" in self.key and not billing.get("confirmed_invoice"))
+                or (self.key == "billing_cost_czk" and billing.get("known_cost_estimated", False)),
+                "complete": billing.get("known_cost_complete")
+                if self.key == "billing_cost_czk"
+                else None,
+                "meaning": "supplier_billing_period",
+            }
         if self.key.startswith("mnd_"):
             if self.key in ("mnd_assessment", "mnd_payment_status"):
                 return {
