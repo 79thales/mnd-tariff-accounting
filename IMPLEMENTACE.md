@@ -52,9 +52,10 @@ vývoji poslouchá pouze na `127.0.0.1:8766`. Náhled není emulace HA lifecycle
 4. Vizuální QA v HA na mobilu/desktopu a ověření dialogu brand obrázků.
    CUA nevrátil dostupný prohlížeč. DOM testy nejsou screenshotové ověření.
 5. Produkční vydání až po doplnění výše uvedených cloudových funkcí a živém
-   ověření. Verze `0.1.0-alpha.1` je určena pro draft a testování; nebyla
-   instalována do provozního HA. Její tag i ZIP vznikají až po úspěšném CI
-   konkrétní finální revize, finální stav draftu je v GitHub Releases.
+   ověření. Verze `0.1.0-alpha.1` byla po úspěšném CI a kontrole draftu
+   zveřejněna jako testovací prerelease. Anonymní download byl ověřen:
+   HTTP 200, 143 328 bajtů, stejný SHA-256 jako místní tagovaný ZIP.
+   Zde nebyla provedena instalace do provozního HA.
 
 Přidání do Overview používá kontrolu celé konfigurace těsně před jedním
 zápisem a následné čtení. Nativní HA save nemá CAS, proto nelze garantovat
@@ -138,7 +139,11 @@ Uváděné cesty modulů jsou relativní k `custom_components/mnd_tariff_account
 ## Způsob dokončení
 
 Zdrojový repozitář je po souhlasu veřejný a první skutečná matice CI prošla.
-Finální alpha revize musí projít stejnými kontrolami před tagem a draftem.
+Finální alpha revize prošla stejnými kontrolami před tagem a draftem.
+Po nahlášeném selhání HACS byl hotový draft zveřejněn jako prerelease:
+[v0.1.0-alpha.1](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.1).
+Původní asset ID 646873129 i tag zůstaly zachovány; veřejný ZIP má SHA-256
+`ee35999f9bbca4c41869dce8b28ac59888fab0d568e203d36f97cdcd31e73b40`.
 Automatická kontrola prvotní zveřejnění odmítla bez dalšího výslovného
 souhlasu. Po následném uživatelském „Ano“ byl repozitář založen a zdroj
 odeslán; předchozí blokace již neplatí. Výchozí větev je `master_HA`.

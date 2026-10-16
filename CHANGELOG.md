@@ -4,12 +4,19 @@
 
 ### Čeština
 
+- Opravena dostupnost instalace HACS: ověřená alpha.1 byla zveřejněna jako
+  prerelease s původním ZIPem. Doplněn výběr beta verze místo commitu větve;
+  anonymní stažení vrací HTTP 200 a odpovídá ověřenému SHA-256.
 - README obsahuje stejná oficiální tlačítka My Home Assistant jako ČEZ:
   přidání integrace MND a otevření repozitáře v HACS, včetně pořadí instalace
   a konfigurace. Existující alpha tag ani instalátor se nemění.
 
 ### English
 
+- Fixed HACS installer availability by publishing the verified alpha.1 as
+  a prerelease with its original ZIP. Documented beta-version selection
+  instead of a branch commit; anonymous download returns HTTP 200 and
+  matches the verified SHA-256.
 - Added the same official My Home Assistant buttons used by ČEZ: configure
   the MND integration and open its HACS repository, with installation and
   restart prerequisites. The existing alpha tag and installer are unchanged.

@@ -15,10 +15,18 @@ cílí 2026.2.3 a potom 2026.3.1. Obě zvolené varianty již prošly 16 skuteč
 HA testy v Linuxu; Quality obsahuje také 100 doménových/protokolových testů
 a 21 Node testů. Stejné kontroly jsou povinné i pro finální alpha revizi.
 
-První balíček má verzi `0.1.0-alpha.1`, tag `v0.1.0-alpha.1` a zůstává
-draftem s příznakem prerelease. Tento stav nepředstírá dokončené cloudové
-mapování ani živé ověření MND. Zveřejnění draftu není automatická součást
-build workflow; testovací ZIP lze předat místně bez instalace do HA.
+První balíček má verzi `0.1.0-alpha.1` a tag `v0.1.0-alpha.1`. Nejprve vznikl
+jako draft; 16. 10. 2026 byl po kontrole zveřejněn jako testovací prerelease,
+aby byl instalační ZIP dostupný pro HACS. Nejde o potvrzení dokončeného
+cloudového mapování ani živého ověření MND. Workflow nadále vytváří pouze
+draft, samostatná publikace nezměnila tag ani obsah původního assetu.
+
+U `zip_release: true` nestačí zelená validace HACS a veřejný zdrojový kód.
+Instalátor ve skrytém draftu není pro HACS ke stažení. Po publikaci ověřte
+anonymní GET veřejného release API i download URL: HTTP 200, správný název
+ZIP, velikost a SHA-256 přesného tagovaného buildu. Předběžné vydání se v HACS
+vybírá po zapnutí beta verzí; commit výchozí větve nemá release ZIP.
+Viz [zdroj stahování HACS](https://github.com/hacs/integration/blob/main/custom_components/hacs/repositories/base.py).
 
 ```text
 python scripts/build_release.py --ref vX.Y.Z --expected-tag vX.Y.Z

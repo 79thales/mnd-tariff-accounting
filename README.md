@@ -32,8 +32,12 @@ Vydání instalátoru je oddělené od zveřejnění zdrojů.
 Tlačítko **Přidat integraci** nahoře otevře přímo konfiguraci MND ve vašem
 Home Assistantu. Nejdříve nainstalujte integrační soubory a restartujte HA.
 Tlačítko **HACS** otevře tento repozitář jako integraci, stejně jako u ČEZ.
-Současná alpha je pouze draft; dokud není vydání zveřejněné, použijte ruční
-instalaci ZIP níže.
+Testovací [vydání v0.1.0-alpha.1](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.1)
+je dostupné jako **prerelease**. V HACS obnovte informace repozitáře, zapněte
+zobrazení beta verzí a při stahování vyberte **v0.1.0-alpha.1**. V dialogu má
+být uvedena tato verze, nikoli commit výchozí větve. Po instalaci restartujte HA.
+
+Pro ruční instalaci je dostupný [instalační ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v0.1.0-alpha.1/mnd_tariff_accounting.zip).
 
 Quality, HACS a Hassfest prošly. Skutečná HA matice ověřila 16 testů na
 **2026.3.1 / plugin 0.13.317** i **2026.10.1 / plugin 0.13.372**.
@@ -44,7 +48,7 @@ Pro původně navržené minimum 2026.3.0 přesný plugin nebyl nalezen, proto
 bylo minimum zvýšeno na ověřenou 2026.3.1.
 
 Po schválené instalaci patří celý adresář `custom_components/mnd_tariff_accounting/`
-do konfigurace HA. ZIP z draftu obsahuje runtime přímo v kořeni; rozbalte
+do konfigurace HA. ZIP z vydání obsahuje runtime přímo v kořeni; rozbalte
 jej do `config/custom_components/mnd_tariff_accounting/` a restartujte HA.
 V **Nastavení → Zařízení a služby → Přidat integraci → MND**
 zvolte importní profil nebo účet MND. EIC a číslo měřidla jsou text.
@@ -86,8 +90,11 @@ Vydání začíná draftem, publikované tagy/assets jsou neměnné.
 [Add MND integration](https://my.home-assistant.io/redirect/config_flow_start/?domain=mnd_tariff_accounting) · [Open in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=79thales&repository=mnd-tariff-accounting&category=integration)
 
 Install the integration files and restart HA before using **Add integration**.
-The current alpha remains a draft; use the manual ZIP installation until a
-release is published for HACS.
+The [alpha prerelease](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.1)
+is now public. Refresh repository information in HACS, enable beta versions
+and select **v0.1.0-alpha.1** in the download dialog instead of a default-branch
+commit. Restart HA after installation. A [manual installer ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v0.1.0-alpha.1/mnd_tariff_accounting.zip)
+is also available.
 
 Independent community Home Assistant gas accounting integration. It imports
 MND XLSX and the C# v1 archive, keeps auditable readings, tariffs, actual
