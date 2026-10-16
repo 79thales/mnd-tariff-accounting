@@ -1,5 +1,6 @@
 """Syntetická regrese nativního Recorder adaptéru a obnovy originálů."""
 
+from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
@@ -71,16 +72,43 @@ async def test_pulse_statistics_use_explicit_volume_and_preserve_two_source_seri
             PREFIX + "recorder.get_metadata",
             return_value={source.entity_id: (1, {"unit_of_measurement": "pulse", "has_sum": True})},
         ),
-        patch(PREFIX + "recorder.statistics_during_period", return_value={source.entity_id: rows}),
+        patch(
+            PREFIX + "recorder.statistics_during_period",
+            side_effect=lambda *args, **kwargs: {source.entity_id: deepcopy(rows)},
+        ),
         patch(PREFIX + "recorder.get_significant_states", return_value={}),
     ):
         result = await async_read_history(coordinator, PLACE, "2026-01-01", "2026-01-02")
+        await coordinator.history._run_local(
+            PLACE, first.date(), (first + timedelta(days=1)).date()
+        )
     assert result["complete_days"] == 1
     profile = coordinator.repository.data["places"][PLACE]["daily_profile"]
     assert profile[0]["m3"] == "0.24"
     assert profile[0]["entity"] == source.id
     assert profile[0]["original_unit"] == "pulse"
     assert profile[0]["volume_per_unit_m3"] == "0.01"
+    first_revision = coordinator.repository.data["job"]["source_revision"]
+    await coordinator.async_edit(
+        PLACE, "settings", {"history_unit_m3": "0.1"}, coordinator.repository.data["revision"]
+    )
+    with (
+        patch(PREFIX + "recorder.get_instance", return_value=recorder),
+        patch(
+            PREFIX + "recorder.get_metadata",
+            return_value={source.entity_id: (1, {"unit_of_measurement": "pulse", "has_sum": True})},
+        ),
+        patch(
+            PREFIX + "recorder.statistics_during_period",
+            side_effect=lambda *args, **kwargs: {source.entity_id: deepcopy(rows)},
+        ),
+        patch(PREFIX + "recorder.get_significant_states", return_value={}),
+    ):
+        await coordinator.history._run_local(
+            PLACE, first.date(), (first + timedelta(days=1)).date()
+        )
+    assert coordinator.repository.data["job"]["source_revision"] != first_revision
+    assert coordinator.repository.data["places"][PLACE]["daily_profile"][0]["m3"] == "2.4"
     await hass.config_entries.async_unload(entry.entry_id)
 
 

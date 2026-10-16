@@ -8,7 +8,7 @@ from datetime import timedelta
 from homeassistant.util import dt as dt_util
 
 from .core.archive import apply_import
-from .core.common import DataError, day
+from .core.common import DataError, day, fingerprint
 from .core.xlsx import parse_workbook
 from .portal import plan_history
 from .storage import put_artifact
@@ -69,12 +69,27 @@ class HistoryRunner:
 
         repo = self.coordinator.repository
         previous = repo.data["job"]
+
+        def source_context():
+            settings = repo.data["places"][place_id]["settings"]
+            return fingerprint(
+                [
+                    settings.get("history_registry_id") or settings.get("source_registry_id"),
+                    settings.get("history_unit_m3"),
+                    settings.get("segment"),
+                ]
+            )
+
+        # Kurzor lze převzít jen pro stejný fyzický zdroj a objem pulsu.
+        # Po změně konfigurace se stejný interval načte znovu od začátku.
+        source_revision = source_context()
         cursor = (
             day(previous["cursor"])
             if previous.get("kind") == "recorder"
             and previous.get("place") == place_id
             and previous.get("start") == start.isoformat()
             and previous.get("end") == end.isoformat()
+            and previous.get("source_revision") == source_revision
             else start
         )
         await repo.transact(
@@ -87,12 +102,15 @@ class HistoryRunner:
                     "end": end.isoformat(),
                     "cursor": cursor.isoformat(),
                     "completed_blocks": 0,
+                    "source_revision": source_revision,
                 }
             )
         )
         try:
             async with asyncio.timeout(15 * 60):
                 while cursor < end:
+                    if source_context() != source_revision:
+                        raise DataError("history_source_changed")
                     right = min(cursor + timedelta(days=7), end)
                     await async_read_history(
                         self.coordinator, place_id, cursor, right, right.isoformat()
