@@ -18,6 +18,7 @@
 
 - Odečet MND má přednost pro příslušné místo, měřidlo a hranici. Novější lokální data na něj navazují; původ, nejistotu a opravy uchovej. Odhad nikdy neoznačuj jako fyzicky změřenou skutečnost.
 - Neznámé údaje nejsou nuly. Před návrhem prognózy ověř relevantní historii, pokrytí, jednotky a časové pásmo.
+- Nové instalace a nově přidané účty mají dotáhnout nejdelší skutečně dostupnou historii po obnovitelných dávkách až k doložené nejstarší hranici. Limit jedné dávky/API není důkaz úplnosti. Omezení hledání HA měření od ledna 2026 platí pouze pro ověřování aktuální alfy na výslovný pokyn uživatele; není obecným limitem integrace.
 - Pro práci s živým HA nejprve zkontroluj přímé konektory a použij je, když danou operaci podporují. UI použij pro ostatní kroky. Samotné vytvoření integrace není autorizací k upgradu nebo zápisu do živého HA.
 - Změnu dashboardu proveď současně v Generate dashboard i přibalené šabloně; zachovej hlavní view, detaily a navigaci. Po zápisu ověř uložené komentáře a skutečný stav.
 - Ověř deklarované minimum a aktuální stabilní HA zjištěný v okamžiku testování, s přesně odpovídajícím testovacím pluginem. Nezaměňuj beta či starší verzi za aktuální stable.

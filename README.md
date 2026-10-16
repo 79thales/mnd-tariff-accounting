@@ -43,8 +43,9 @@ Pro ruční instalaci je dostupný [instalační ZIP](https://github.com/79thale
 
 Quality, HACS a Hassfest se ověřují pro každý tag. Skutečné HA testy používají
 minimum 2026.3.1 a aktuální stabilní verzi s přesně odpovídajícím pluginem.
-DOM a protokolové testy nenahrazují zákaznické ověření nových finančních
-endpointů a mobilní vizuální kontrolu. Úplné automatické smluvní ceny zůstávají
+Živý test alpha.3 potvrdil finanční seznamy, oba exporty a PDF faktury;
+podrobnosti jsou v [protokolu ověření](docs/ALPHA_3.md). DOM a protokolové
+testy nenahrazují mobilní vizuální kontrolu. Úplné automatické smluvní ceny zůstávají
 omezením; doložené tarify lze zadat nebo importovat. [Podrobnosti alpha.2](docs/ALPHA_2.md).
 
 Po schválené instalaci patří celý adresář `custom_components/mnd_tariff_accounting/`
@@ -121,8 +122,9 @@ allocated payment details, separate exports and invoice PDF downloads are availa
 Accepting advances into the local ledger requires an explicit period allocation.
 
 Quality, HACS and Hassfest run against each release tag, with real HA tests on
-the supported minimum and dynamically resolved stable version. New financial
-endpoints and mobile visual QA still need customer validation. Complete automatic
+the supported minimum and dynamically resolved stable version. Live alpha.3
+validation confirmed financial lists, both exports and an invoice PDF download;
+see `docs/ALPHA_3.md`. Mobile visual QA remains unverified. Complete automatic
 contract pricing is not implemented. See `docs/ALPHA_2.md` for migration and limits.
 
 Unknown values remain distinct from zero, planned advances from actual

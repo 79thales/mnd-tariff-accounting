@@ -28,3 +28,29 @@ historie se ověřují soukromě v daném HA; zákaznické hodnoty nepatří do 
 Zdroj datového kontraktu: [veřejný klient Moje MND](https://moje.mnd.cz/_next/static/chunks/pages/_app-d4693e13afff6e1f.js),
 modul 22856 (konfigurace bází) a metody Documents/GetByGuid, AdvanceExport,
 InvoiceExport a InvoicePdf. Kontrola provedena 16. 10. 2026.
+
+## Dodatečné ověření vydaného balíčku
+
+Po zveřejnění neměnného tagu `v0.1.0-alpha.3` dne 16. 10. 2026 proběhlo
+anonymní stažení a porovnání s draftem i lokálním sestavením z téhož tagu:
+157 236 bajtů, 45 runtime souborů, SHA-256
+`be56045d9ca387de04a3d2c0f0dfa83892f265fb3cf5fe4df7e28ad3fa9d289c`.
+Quality, HACS, Hassfest a release workflow prošly. Ověřeno 114 Python testů,
+24 Node testů a po 20 integračních testech na HA 2026.3.1/plugin 0.13.317
+a HA 2026.10.1/plugin 0.13.372, s Pythonem 3.14 v HA matici.
+
+Schválené nasazení přes HACS a restart potvrdily runtime alpha.3 v HA
+2026.10.1. Živě prošly oba finanční Exporty i stažení konkrétního PDF
+vyúčtování, včetně porovnání SHA-256 uloženého originálu. Finanční seznamy,
+detaily a platby byly načtené bez zdrojové chyby; původní odečty a místní
+účetní záznamy zůstaly zachované. Pět detailních subviews a hlavní MND view
+odpovídají generátoru a šabloně, ostatní Overview se obsahově nezměnilo.
+Statické JS poskytované HA přesně odpovídá ověřenému vydanému zdroji.
+
+Potvrzený pár senzorů byl připojen, průtok je dostupný. Souběžná kalibrace
+plynoměru a účetní období tohoto místa dosud nejsou nastavené; ověření
+čtecích finančních podkladů není potvrzením úplného účetního výsledku.
+V historii jsou mezery. Žádné chybějící měření ani platba se nedoplnily nulou.
+Mobilní vizuální test na skutečném iPhonu nebyl proveden; ověření konfigurace
+a DOM testy za něj nejsou vydávány. Soukromé protokoly, hodnoty a soubory
+zůstávají mimo Git a mimo instalační ZIP.

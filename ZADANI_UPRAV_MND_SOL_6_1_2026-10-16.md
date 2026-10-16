@@ -136,6 +136,22 @@ Vzhled zůstává odvozený od MND. Nepřebírej elektrické tarify, HDO ani ent
   a energii v kWh/MWh drž odděleně, dokud není doložen platný přepočet.
   Nedostatek historie zobraz jako chybějící podklad, nikoli jako nulový rok
   nebo rovnou čáru odhadu. Uchovej původní prognózu pro pozdější porovnání.
+- Uživatel následně upřesnil, že jediné místní měření zajišťuje Shelly
+  od začátku roku 2026. Při ověřování této alfy nehledej HA měření před lednem
+  2026 a nevytvářej z něj neexistující loňské srovnání. Začátek vyhledávání
+  není důkaz úplného pokrytí od 1. ledna. Později vzniklé entity objemu
+  a průtoku jsou odvozené veličiny téhož měření, nikoli další nezávislé
+  plynoměry. Jejich pozdější začátek statistik nesmí automaticky oříznout
+  doloženou starší historii původního čítače. Převod z impulzů vyžaduje
+  doložený faktor měřidla a původní zdroj; původní i odvozenou řadu nesčítej.
+  Starší doklady/odečty MND zůstávají samostatným zdrojem. Omezení tohoto
+  ověřování nezakóduj jako pevnou časovou hranici pro všechny uživatele integrace.
+  Uživatel výslovně upřesnil, že nové instalace a nově přidané účty mají
+  dotáhnout nejdelší skutečně dostupnou historii. Obnovitelný import musí
+  pokračovat po stránkách/časových blocích až k doložené nejstarší hranici;
+  limit jedné dávky, poslední tři roky API ani aktuální název entity nesmějí
+  být vydávané za úplnou historii. Zachovej původ, pokrytí a detekci duplicit;
+  nedostupnost nebo ochranný limit mají přiznaný stav a možnost pokračování.
 - Změna musí současně upravit vykreslení, Generate dashboard, přibalenou
   šablonu i existující MND views. Mobilní grafy musí zůstat čitelné a ponechat
   nativní horní navigaci HA. Volba období smí být čtecím filtrem; nesmí
