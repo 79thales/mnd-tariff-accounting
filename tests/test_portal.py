@@ -84,7 +84,34 @@ class PortalTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(name, "zaloha.xlsx")
         self.assertEqual(session.calls[0][2]["json"], [1, 2])
         self.assertTrue(session.calls[0][1].endswith("/Documents/AdvanceExport"))
+        self.assertEqual(session.calls[1][1], "https://moje.mnd.cz/api/Documents/GetByGuid")
         self.assertNotIn("Inatoken", session.calls[1][2]["headers"])
+
+    async def test_invoice_and_contract_pdf_use_api_document_download_without_token(self):
+        """Regrese živé 404: oba druhy PDF musí použít /api, ne /data.
+
+        Syntetické odpovědi ověřují i návaznost GUID, binární výsledek
+        a oddělení autentizované žádosti o PDF od jeho stažení.
+        """
+        session = Session(
+            [
+                Response({"DocumentGuid": "synthetic-invoice", "FileName": "invoice.pdf"}),
+                Response(raw=b"%PDF-synthetic-invoice"),
+                Response(raw=b"%PDF-synthetic-contract"),
+            ]
+        )
+        portal = PortalClient(session)
+        portal._token = "synthetic"
+        invoice, _ = await portal.invoice_pdf(11)
+        contract, _ = await portal.download_contract(
+            7, 8, {"DOC_GUID": "synthetic-contract", "DOC_NAME": "contract.pdf"}
+        )
+        self.assertTrue(invoice.startswith(b"%PDF-"))
+        self.assertTrue(contract.startswith(b"%PDF-"))
+        for call, guid in ((session.calls[1], "synthetic-invoice"), (session.calls[2], "synthetic-contract")):
+            self.assertEqual(call[1], "https://moje.mnd.cz/api/Documents/GetByGuid")
+            self.assertEqual(call[2]["params"], {"docGuid": guid})
+            self.assertNotIn("Inatoken", call[2]["headers"])
 
     async def test_http_date_and_long_retry_after_are_respected(self):
         now = datetime(2026, 10, 16, 12, 0, tzinfo=timezone.utc)
@@ -146,6 +173,7 @@ class PortalTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(name, "synthetic.xlsx")
         self.assertTrue(content.startswith(b"PK"))
         self.assertEqual(session.calls[0][2]["json"]["DO"], "2026-01-31 23:59:00")
+        self.assertEqual(session.calls[1][1], "https://moje.mnd.cz/api/Documents/GetByGuid")
         self.assertNotIn("Inatoken", session.calls[1][2]["headers"])
 
     def test_three_graph_parts_are_numeric_not_css(self):

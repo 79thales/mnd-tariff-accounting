@@ -21,6 +21,22 @@
   the MND integration and open its HACS repository, with installation and
   restart prerequisites. The existing alpha tag and installer are unchanged.
 
+## 0.1.0-alpha.3 — oprava stahování dokumentů MND
+
+### Čeština
+
+- Živé ověření alpha.2 potvrdilo načtení předpisů, vyúčtování a plateb i zachování odečtů; odhalilo ale HTTP 404 při stahování exportu.
+- Opravena společná cesta stahování dokumentů na `/api/Documents/GetByGuid` podle veřejného klienta MND. Stejnou kontrolu používají exporty záloh, vyúčtování, odečtů, PDF faktur a smluvní dokumenty.
+- Doplněna regrese přesné cesty a stahování bez přihlašovacího tokenu; kontrola názvu, binárního formátu a soukromého úložiště zůstává zachována.
+- Nové požadavky na graf nákladů a záloh, loňské a topné/netopné srovnání jsou zaznamenané v zadání. Tato opravná verze je zatím neimplementuje.
+
+### English
+
+- Live alpha.2 validation confirmed advance, invoice and payment retrieval and preserved meter readings, but exposed HTTP 404 while downloading an export.
+- Corrected the shared document download route to `/api/Documents/GetByGuid`, matching the public MND client. Advance, invoice and reading exports, invoice PDFs and contract documents use the same validated path.
+- Added regression coverage for the exact route and token-free document download while preserving filename, binary format and private storage validation.
+- Additional cost/advance charts, year-over-year and heating/non-heating comparisons have been recorded in the specification and are not implemented by this corrective release.
+
 ## 0.1.0-alpha.2 — přehled a konfigurace odběrného místa
 
 ### Čeština

@@ -97,6 +97,55 @@ Do konfigurace místa přesuň zejména:
 
 Běžný dashboard nesmí trvale vykreslovat editor, importní formuláře, konfiguraci cloudu nebo generátor pod každou stránkou. Zobrazení a stažení vlastního fakturačního dokladu může zůstat čtecí funkcí detailu vyúčtování. Veškeré zápisy musí dále ověřovat oprávnění na serveru.
 
+### 3.4 Doplnění z hlasového rozhovoru a snímků ČEZ dne 16. 10. 2026
+
+Uživatel požaduje podobně srozumitelný přehled jako účetnictví ČEZ Dynamic Tariff.
+Tři nově dodané mobilní snímky jsou vzorem kompozice a významu grafů; osobní
+částky, identifikátory a samotné snímky se do veřejného projektu nepřenášejí.
+Vzhled zůstává odvozený od MND. Nepřebírej elektrické tarify, HDO ani entity ČEZ.
+
+- Hlavní stránka má ukázat hlavní ukazatele, aktuální průtok a spotřebu,
+  spotřebu za srovnatelnou část loňského období a vývoj odběru plynu.
+  Ostatní tabulky, doklady, úplné grafy a rozbory patří do čtecích detailů.
+  Administrace nadále patří do konfigurace konkrétního odběrného místa.
+- Umožni srovnání aktuálního období, topné a netopné sezóny s předchozím
+  rokem. Definici sezón zobraz a nastavuj pouze v konfiguraci místa;
+  přesné hranice dosud uživatel neurčil. Neprezentuj svévolně zvolené měsíce
+  jako skutečně zjištěný začátek vytápění. Srovnávej shodné časové rozsahy,
+  včetně dosavadní části rozběhnuté sezóny; zohledni sezónu přes přelom roku,
+  přestupný den a místní čas Europe/Prague.
+- Graf **Měsíční odběr podle měření HA** má mít sloupce, jednotku a zřetelně
+  odlišený úplný a neúplný měsíc. Chybějící měsíc není nulová spotřeba.
+  Pouhý souhrnný odečet MND neposkytuje měsíční rozpis; bez důkazu ho
+  nerozděluj do měřených sloupců. Vysvětli případný rozdíl mezi součtem HA
+  sloupců a fakturačním součtem potvrzeným MND.
+- Graf **Náklady a zálohy za zúčtovací období** má na společné časové ose
+  rozlišit známé náklady, odhad nákladů, zaplacené zálohy a plán záloh.
+  Použij srozumitelnou legendu, odlišné čáry/bodování a značku Dnes.
+  Skutečné platby jsou schodový průběh podle doloženého data úhrady;
+  plánovaný předpis nesmí navyšovat zaplaceno. Budoucí odhad má odlišné
+  zobrazení a začíná na doložené hranici, ne zpětně v již změřené historii.
+- Přehled vyúčtování má ukázat období, očekávaný přeplatek/nedoplatek,
+  skutečný odběr dosud, odhad odběru celkem, náklady dosud, odhad nákladů
+  celkem, zaplacené zálohy a plán záloh celkem. Uveď datum poslední MND
+  kotvy, návaznost HA měření a zdroj či nedostatek podkladů odhadu.
+  Částku přeplatku nepočítej z neúplných nákladů nebo nepotvrzených plateb
+  tak, aby působila jako potvrzené vyúčtování.
+- Před návrhem sezónního/ročního odhadu načti reprezentativní historii
+  a ověř její pokrytí, jednotky, reset měřidla a časové hranice. Objem v m³
+  a energii v kWh/MWh drž odděleně, dokud není doložen platný přepočet.
+  Nedostatek historie zobraz jako chybějící podklad, nikoli jako nulový rok
+  nebo rovnou čáru odhadu. Uchovej původní prognózu pro pozdější porovnání.
+- Změna musí současně upravit vykreslení, Generate dashboard, přibalenou
+  šablonu i existující MND views. Mobilní grafy musí zůstat čitelné a ponechat
+  nativní horní navigaci HA. Volba období smí být čtecím filtrem; nesmí
+  nepozorovaně přepisovat účetní období nebo nastavení místa.
+
+Toto doplnění zachycuje nový požadavek během dokončování alpha.2. Není
+prohlášením, že alpha.2 již obsahuje všechny uvedené grafy a roční/sezónní
+srovnání. Alpha.2 má jednodušší graf spotřeby a prognóz; uvedené rozšíření
+se musí ověřit samostatně a vydat v nové verzi bez přepisování alpha.2.
+
 ## 4. Oprava záloh, úhrad a vyúčtování
 
 ### 4.1 Nejdříve doložit datový tok
@@ -199,6 +248,12 @@ Protokolové chyby mají mít neosobní kód a srozumitelné vysvětlení v admi
 | R02 | Přerušené přihlášení a opakovaný průvodce mají srozumitelné zotavení bez duplicitního účtu. |
 | G01 | Nově generovaný dashboard a přibalená šablona odpovídají zjednodušenému návrhu. |
 | G02 | Aktualizace stávajících MND views zachová ostatní Overview a ověří uložený výsledek. |
+| V01 | Hlavní přehled obsahuje hlavní ukazatele a srovnatelnou loňskou spotřebu; podrobnosti mají čtecí subviews. |
+| V02 | Měsíční sloupce odlišují úplný/neúplný měsíc a mezeru; měsíční měření HA se nezamění se souhrnným odečtem MND. |
+| V03 | Časový graf nákladů a záloh rozlišuje čtyři série, značku Dnes, skutečné datum úhrady a oddělenou budoucí predikci. |
+| V04 | Přehled přeplatku a šest souhrnných hodnot zachovají rozdíl mezi doloženou skutečností, plánem a odhadem; chybějící podklady nejsou nula. |
+| V05 | Roční, topné a netopné srovnání používá uvedené hranice a stejnou dosavadní část období; přelom roku a přestupný den nezkreslí výsledek. |
+| V06 | Nové grafy jsou stejné v generátoru, šabloně i aktualizovaném Overview a čitelné na úzkém mobilu s navigací HA. |
 | S01 | Neoprávněný uživatel nemůže zapisovat nebo stahovat soukromé dokumenty pouhým skrytím/obejitím UI. |
 | S02 | Testy a release neobsahují skutečné zákaznické hodnoty, přístupy, screenshoty ani exporty. |
 

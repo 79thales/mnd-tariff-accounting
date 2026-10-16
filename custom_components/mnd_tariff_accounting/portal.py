@@ -234,20 +234,7 @@ class PortalClient:
                     "PERIOD": "R",
                 },
             )
-            if (
-                not isinstance(result, dict)
-                or not isinstance(result.get("DocumentGuid"), str)
-                or not isinstance(result.get("FileName"), str)
-            ):
-                raise PortalError("portal_schema_changed")
-            content = await self._request(
-                "GET",
-                "/data/Documents/GetByGuid",
-                params={"docGuid": result["DocumentGuid"]},
-                authenticated=False,
-                binary=True,
-            )
-            return content, result["FileName"]
+            return await self._download_generated(result)
 
     async def profile(self, partner_id):
         """Soukromé údaje jen na výslovné vyžádání, nikoli při běžném pollingu."""
@@ -278,14 +265,7 @@ class PortalClient:
                 guid, name = generated.get("DocumentGuid"), generated.get("FileName")
             if not isinstance(guid, str) or not isinstance(name, str) or not name:
                 raise PortalError("portal_document_unavailable")
-            content = await self._request(
-                "GET",
-                "/data/Documents/GetByGuid",
-                params={"docGuid": guid},
-                authenticated=False,
-                binary=True,
-            )
-            return content, name
+            return await self._download_generated({"DocumentGuid": guid, "FileName": name})
 
     async def payments(self, partner_id, customer_id, cp_id, *, offset=0, limit=100):
         """Přijaté platby za 365 dní jako veřejný getPayments, ne předpisy.
@@ -386,6 +366,13 @@ class PortalClient:
             return await self._download_generated(result)
 
     async def _download_generated(self, result):
+        """Stáhne ověřený dokument stejným API jako veřejný klient MND.
+
+        Veřejné Documents/GetByGuid používá axios ZP s bází /api, nikoli
+        datový klient VD s bází /data. Chybná báze vracela HTTP 404 u exportů,
+        PDF i smluv. Jediná cesta sdílí kontrolu názvu a binárního podpisu;
+        GUID se bere z předchozí odpovědi, token se tomuto GET neposílá.
+        """
         if (
             not isinstance(result, dict)
             or not isinstance(result.get("DocumentGuid"), str)
@@ -395,7 +382,7 @@ class PortalClient:
             raise PortalError("portal_schema_changed")
         content = await self._request(
             "GET",
-            "/data/Documents/GetByGuid",
+            "/api/Documents/GetByGuid",
             params={"docGuid": result["DocumentGuid"]},
             authenticated=False,
             binary=True,

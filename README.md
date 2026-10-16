@@ -7,8 +7,9 @@ Samostatná integrace plynu podle [úplného zadání](ZADANI_MND_SOL_6_1.md).
 Runtime je Python, přibalený frontend JavaScript bez externí Lovelace
 závislosti. Nepotřebuje WPF, WebView2 ani REST token k vlastnímu HA.
 
-**Stav: vývojová verze 0.1.0-alpha.2.** Jednotkové testy nepotvrzují funkci na
-zákaznickém účtu. Aktuální změny a omezení jsou v [reportu alpha.2](docs/ALPHA_2.md); [původní report](IMPLEMENTACE.md) zachovává historii alpha.1.
+**Stav: vývojová verze 0.1.0-alpha.3.** Oprava stahování po živém testu je
+v [reportu alpha.3](docs/ALPHA_3.md); rozvržení, migrace a omezení popisuje
+[alpha.2](docs/ALPHA_2.md). [Původní report](IMPLEMENTACE.md) zachovává historii alpha.1.
 Zdroj je ve veřejném repozitáři [79thales/mnd-tariff-accounting](https://github.com/79thales/mnd-tariff-accounting).
 Vydání instalátoru je oddělené od zveřejnění zdrojů.
 
@@ -33,12 +34,12 @@ Vydání instalátoru je oddělené od zveřejnění zdrojů.
 Tlačítko **Přidat integraci** nahoře otevře přímo konfiguraci MND ve vašem
 Home Assistantu. Nejdříve nainstalujte integrační soubory a restartujte HA.
 Tlačítko **HACS** otevře tento repozitář jako integraci, stejně jako u ČEZ.
-Testovací [vydání v0.1.0-alpha.2](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.2)
+Testovací [vydání v0.1.0-alpha.3](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.3)
 je dostupné jako **prerelease**. V HACS obnovte informace repozitáře, zapněte
-zobrazení beta verzí a při stahování vyberte **v0.1.0-alpha.2**. V dialogu má
+zobrazení beta verzí a při stahování vyberte **v0.1.0-alpha.3**. V dialogu má
 být uvedena tato verze, nikoli commit výchozí větve. Po instalaci restartujte HA.
 
-Pro ruční instalaci je dostupný [instalační ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v0.1.0-alpha.2/mnd_tariff_accounting.zip).
+Pro ruční instalaci je dostupný [instalační ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v0.1.0-alpha.3/mnd_tariff_accounting.zip).
 
 Quality, HACS a Hassfest se ověřují pro každý tag. Skutečné HA testy používají
 minimum 2026.3.1 a aktuální stabilní verzi s přesně odpovídajícím pluginem.
@@ -99,10 +100,10 @@ Vydání začíná draftem, publikované tagy/assets jsou neměnné.
 [Add MND integration](https://my.home-assistant.io/redirect/config_flow_start/?domain=mnd_tariff_accounting) · [Open in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=79thales&repository=mnd-tariff-accounting&category=integration)
 
 Install the integration files and restart HA before using **Add integration**.
-The [alpha prerelease](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.2)
+The [alpha prerelease](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.3)
 is now public. Refresh repository information in HACS, enable beta versions
-and select **v0.1.0-alpha.2** in the download dialog instead of a default-branch
-commit. Restart HA after installation. A [manual installer ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v0.1.0-alpha.2/mnd_tariff_accounting.zip)
+and select **v0.1.0-alpha.3** in the download dialog instead of a default-branch
+commit. Restart HA after installation. A [manual installer ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v0.1.0-alpha.3/mnd_tariff_accounting.zip)
 is also available.
 
 Independent community Home Assistant gas accounting integration. It imports
@@ -110,7 +111,8 @@ MND XLSX and the C# v1 archive, keeps auditable readings, tariffs, actual
 payments, invoices and historical forecast snapshots, and provides a bundled
 panel and an Overview dashboard generator.
 
-Development version 0.1.0-alpha.2 is not a verified production release.
+Development version 0.1.0-alpha.3 is not a verified production release.
+The corrective document download change is described in `docs/ALPHA_3.md`.
 The normal Overview tab is read-only; supply point administration opens from
 its MND device configuration link. The generator and bundled template update
 existing MND cards while preserving unrelated cards, titles and view order.
