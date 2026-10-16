@@ -19,13 +19,14 @@ from homeassistant.components import websocket_api
 from homeassistant.components.http import HomeAssistantView, StaticPathConfig
 from homeassistant.components.panel_custom import async_register_panel
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 
 from .const import DOMAIN, PANEL_PATH
 from .core.accounting import active_versions, calculate, invoice_settlement
 from .core.archive import new_place
 from .core.backup import backup_document, make_zip
-from .core.common import MAX_BYTES, DataError, canonical, identity, wire
+from .core.common import MAX_BYTES, DataError, canonical, fingerprint, identity, wire
 from .core.comparison import compare_measurement
 from .core.forecast import compare_forecast, project_outcome, seasonal_forecast
 from .core.importer import export_csv
@@ -75,7 +76,9 @@ async def async_setup_api(hass):
             hass,
             frontend_url_path=PANEL_PATH,
             webcomponent_name="mnd-accounting-panel",
-            sidebar_title="MND",
+            # Správa se otevírá z konkrétního zařízení, hlavní přehled je
+            # nativní view Overview a zachová jeho horní lištu i na mobilu.
+            sidebar_title=None,
             sidebar_icon="mdi:fire",
             require_admin=True,
             module_url=f"{url}?v={digest}",
@@ -139,7 +142,20 @@ async def websocket_command(hass, connection, msg):
                     "place": copy.deepcopy(repo.data["places"][place_id]),
                     "result": coordinator.data.get(place_id, {}),
                 }
+                device = dr.async_get(hass).async_get_device(
+                    identifiers={(DOMAIN, f"{coordinator.entry.data['account_id']}:{place_id}")}
+                )
+                result["device_url"] = (
+                    f"/config/devices/device/{device.id}" if device else "/config/devices"
+                )
                 visible = result["place"]
+                # Cache protokolu není součást běžného čtecího UI. Historie
+                # vrací pouze normalizované doklady a stav jejich pokrytí.
+                for kind in ("advances", "invoices"):
+                    finance = visible.get("portal_evidence", {}).get(kind)
+                    if finance:
+                        finance.pop("cached", None)
+                        finance.pop("revisions", None)
                 visible["sample_count"] = len(visible["samples"])
                 visible["samples"] = []
                 raw_details = visible.get("portal_evidence", {}).get("details")
@@ -154,6 +170,10 @@ async def websocket_command(hass, connection, msg):
                 source = er.async_get(hass).async_get(registry_id) if registry_id else None
                 if source:
                     visible["settings"]["source_entity"] = source.entity_id
+                flow_id = visible["settings"].get("flow_registry_id")
+                flow = er.async_get(hass).async_get(flow_id) if flow_id else None
+                if flow:
+                    visible["settings"]["flow_entity"] = flow.entity_id
                 result["settlements"] = [
                     {
                         "id": i["id"],
@@ -167,6 +187,25 @@ async def websocket_command(hass, connection, msg):
                 ]
             elif action == "edit":
                 record = dict(payload["record"])
+                if payload["section"] == "calibration" and not record.get("entity"):
+                    record["entity"] = repo.data["places"][place_id]["settings"].get(
+                        "source_registry_id"
+                    )
+                    if not record["entity"]:
+                        raise DataError("calibration_sensor_required")
+                if payload["section"] == "settings" and "flow_entity" in record:
+                    from .core.live import FLOW_UNITS
+
+                    entity = record["flow_entity"]
+                    source = er.async_get(hass).async_get(entity) if entity else None
+                    state = hass.states.get(entity) if entity else None
+                    if entity and (
+                        source is None
+                        or state is None
+                        or state.attributes.get("unit_of_measurement") not in FLOW_UNITS
+                    ):
+                        raise DataError("incompatible_flow_sensor")
+                    record["flow_registry_id"] = source.id if source else None
                 if payload["section"] == "settings" and record.get("source_mode") == "sensor":
                     source = er.async_get(hass).async_get(record.get("source_entity", ""))
                     state = hass.states.get(record.get("source_entity", ""))
@@ -184,6 +223,24 @@ async def websocket_command(hass, connection, msg):
             elif action == "recompute":
                 await coordinator.async_recompute()
                 result = {"updated": True}
+            elif action == "accept_advances":
+                from homeassistant.util import dt as dt_util
+
+                from .core.common import local_day
+                from .core.finance import accept_advances
+
+                if payload.get("confirm") is not True:
+                    raise DataError("finance_allocation_confirmation_required")
+
+                def accept(data):
+                    accept_advances(
+                        place_id,
+                        data["places"][place_id],
+                        local_day(dt_util.utcnow(), hass.config.time_zone),
+                    )
+
+                result = await repo.transact(accept, expected_revision=payload.get("revision"))
+                await coordinator.async_recompute()
             elif action == "cloud_refresh":
                 await coordinator.async_refresh_cloud()
                 await coordinator.async_recompute()
@@ -257,7 +314,7 @@ async def websocket_command(hass, connection, msg):
                     payload["end"],
                 )
                 if result["complete"]:
-                    from .core.common import day, fingerprint
+                    from .core.common import day
 
                     quote = await hass.async_add_executor_job(
                         lambda: calculate(
@@ -392,6 +449,42 @@ async def websocket_command(hass, connection, msg):
                     updated.pop("username", None)
                     hass.config_entries.async_update_entry(coordinator.entry, data=updated)
                 result = {"logged_out": True}
+            elif action in ("finance_export", "invoice_pdf"):
+                place = repo.data["places"][place_id]
+                kind = payload.get("kind", "invoices")
+                if kind not in ("advances", "invoices"):
+                    raise DataError("invalid_finance_kind")
+                available = place.get("portal_evidence", {}).get(kind, {}).get("rows", [])
+                if action == "invoice_pdf":
+                    if kind != "invoices" or not any(
+                        r["id"] == str(payload["document_id"]) for r in available
+                    ):
+                        raise DataError("portal_document_identity_required")
+                    content, filename = await coordinator.portal.invoice_pdf(payload["document_id"])
+                else:
+                    content, filename = await coordinator.portal.finance_export(
+                        kind, [int(r["id"]) if r["id"].isdigit() else r["id"] for r in available]
+                    )
+                sha = await hass.async_add_executor_job(
+                    put_artifact, coordinator.artifact_root, content
+                )
+
+                def save(data):
+                    rows = data["places"][place_id]["artifacts"]
+                    if not any(r["id"] == sha for r in rows):
+                        from homeassistant.util import dt as dt_util
+
+                        rows.append(
+                            {
+                                "id": sha,
+                                "filename": filename,
+                                "source": "mnd",
+                                "acquired_at": dt_util.utcnow().isoformat(),
+                            }
+                        )
+
+                await repo.transact(save)
+                result = {"artifact": sha, "filename": filename}
             elif action in ("portal_profile", "portal_payments", "portal_document"):
                 place = repo.data["places"][place_id]
                 source = place["settings"].get("portal")
@@ -475,6 +568,26 @@ async def websocket_command(hass, connection, msg):
                 )
             else:
                 raise DataError("unknown_action")
+        if action in ("compare_measurement", "compare_forecast"):
+            # Porovnání patří k původní prognóze a shodnému období. Opakování
+            # nevytvoří duplicitu a nová prognóza nepřepíše starší výsledek.
+            prediction = snapshot["periods"][payload["period"]]
+            comparison = wire(
+                {
+                    **result,
+                    "from": prediction["From"],
+                    "to": prediction["To"],
+                    "snapshot_at": snapshot["retrieved_at"],
+                }
+            )
+            comparison["id"] = fingerprint(comparison)
+
+            def remember(data):
+                rows = data["places"][place_id].setdefault("comparisons", [])
+                if not any(r["id"] == comparison["id"] for r in rows):
+                    rows.append(comparison)
+
+            await repo.transact(remember)
         connection.send_result(msg["id"], wire(result))
     except (
         DataError,

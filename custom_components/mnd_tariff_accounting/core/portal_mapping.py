@@ -65,7 +65,9 @@ def portal_readings(rows, place, evidence):
             "MeterStateM3": row["M3G"],
             "MeterNumber": str(row["DEV_NUM"]),
             "Method": row["CRMT_NAME"],
-            "Status": row["STATUS_NAME"],
+            "Status": row["STATUS_NAME"].get("name", "")
+            if isinstance(row["STATUS_NAME"], dict)
+            else row["STATUS_NAME"],
             "SourceFile": evidence,
             "SourceRow": index,
         }

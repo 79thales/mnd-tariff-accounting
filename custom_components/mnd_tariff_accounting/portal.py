@@ -87,6 +87,9 @@ class PortalClient:
         if authenticated and not self._token:
             raise AuthenticationRequired("portal_auth_required")
         headers = {"Accept": "application/json"}
+        # Axios veřejného klienta vynechává undefined/null. Také aiohttp musí
+        # dostat pouze skutečné hodnoty; identifikátory nikdy nedoplňujeme nulou.
+        params = {k: v for k, v in (params or {}).items() if v is not None}
         if authenticated:
             headers["Inatoken"] = self._token
         # URL a parametry mají interní whitelist v jednotlivých veřejných
@@ -115,7 +118,7 @@ class PortalClient:
                         if response.status >= 500:
                             raise OSError("portal_server_unavailable")
                         if response.status != 200:
-                            raise PortalError("portal_request_failed")
+                            raise PortalError(f"portal_http_{response.status}")
                         if response.content_length and response.content_length > MAX_BYTES:
                             raise PortalError("portal_response_too_large")
                         parts, size = [], 0
@@ -285,6 +288,11 @@ class PortalClient:
             return content, name
 
     async def payments(self, partner_id, customer_id, cp_id, *, offset=0, limit=100):
+        """Přijaté platby za 365 dní jako veřejný getPayments, ne předpisy.
+
+        PAYID a CUSTA_ID určují položky platby. Omezení období se nesmí
+        vydávat za potvrzení celé zákaznické historie.
+        """
         if not 0 <= offset <= 100_000 or not 1 <= limit <= 500:
             raise PortalError("invalid_pagination")
         async with self.lock:
@@ -295,11 +303,104 @@ class PortalClient:
                     "partnerId": partner_id,
                     "custaId": customer_id,
                     "caccId": 170,
+                    "payPeriod": 365,
                     "cpId": cp_id,
                     "maxRowCount": limit,
                     "skipRowCount": offset,
                 },
             )
+
+    async def finance_list(self, kind, partner_id, customer_id, cp_id):
+        """Načte rostoucí prefix předpisů/faktur, stejně jako webové Show more.
+
+        Endpointy nemají doložený offset. Velikost proto roste po 100 až do
+        2 000 řádků; kratší prefix dokládá konec aktuálního seznamu. Dosažení
+        limitu je partial, nikdy prázdný či falešně kompletní archiv.
+        """
+        if kind not in ("advances", "invoices"):
+            raise PortalError("invalid_finance_kind")
+        async with self.lock:
+            for limit in range(100, 2001, 100):
+                rows = await self._request(
+                    "GET",
+                    "/api/" + kind,
+                    params={
+                        "partnerId": partner_id,
+                        "custaId": customer_id,
+                        "caccId": 170,
+                        "cpId": cp_id,
+                        "maxRowCount": limit,
+                        "unPaid": "false",
+                    },
+                )
+                if not isinstance(rows, list) or any(not isinstance(r, dict) for r in rows):
+                    raise PortalError("portal_schema_changed")
+                if len(rows) < limit:
+                    return {"rows": rows, "complete": True}
+            return {"rows": rows, "complete": False}
+
+    async def finance_detail(self, kind, document_id):
+        """Čtecí detail; veřejný web má oddělené adviId a ivaId."""
+        choices = {"advances": ("advance", "adviId"), "invoices": ("invoice", "ivaId")}
+        if kind not in choices:
+            raise PortalError("invalid_finance_kind")
+        path, key = choices[kind]
+        async with self.lock:
+            raw = await self._request("GET", "/api/" + path, params={key: document_id})
+            if not isinstance(raw, dict):
+                raise PortalError("portal_schema_changed")
+            return raw
+
+    async def payment_items(self, payment_id, customer_id):
+        """Rozpad platby na cílové doklady; nelze rozdělit součet odhadem."""
+        async with self.lock:
+            return await self._request(
+                "GET", "/api/paymentItems", params={"payId": payment_id, "custaId": customer_id}
+            )
+
+    async def finance_export(self, kind, document_ids):
+        """Exportuje pouze ověřená ID seznamu, nic neplatí ani nemění u MND.
+
+        POST vytváří čtecí soubor jako Export na webu; GUID slouží pouze
+        ke stažení. TLS a kontrola PDF/OOXML zůstávají společné s odečty.
+        """
+        paths = {
+            "advances": "AdvanceExport",
+            "invoices": "InvoiceExport",
+            "payments": "PaymentExport",
+        }
+        if kind not in paths or not document_ids or len(document_ids) > 2000:
+            raise PortalError("invalid_finance_export")
+        async with self.lock:
+            result = await self._request(
+                "POST", "/api/Documents/" + paths[kind], payload=document_ids
+            )
+            return await self._download_generated(result)
+
+    async def invoice_pdf(self, document_id):
+        """PDF konkrétního vyúčtování, nejprve metadata z InvoicePdf."""
+        async with self.lock:
+            result = await self._request(
+                "GET", "/api/Documents/InvoicePdf", params={"ivaId": document_id}
+            )
+            return await self._download_generated(result)
+
+    async def _download_generated(self, result):
+        if (
+            not isinstance(result, dict)
+            or not isinstance(result.get("DocumentGuid"), str)
+            or not isinstance(result.get("FileName"), str)
+            or any(c in result["FileName"] for c in ("/", "\\", ":"))
+        ):
+            raise PortalError("portal_schema_changed")
+        content = await self._request(
+            "GET",
+            "/data/Documents/GetByGuid",
+            params={"docGuid": result["DocumentGuid"]},
+            authenticated=False,
+            binary=True,
+        )
+        return content, result["FileName"]
 
     async def logout(self):
         """Veřejný web odhlašuje vymazáním sessionStorage; serverový logout není doložen."""

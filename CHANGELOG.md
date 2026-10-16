@@ -21,6 +21,30 @@
   the MND integration and open its HACS repository, with installation and
   restart prerequisites. The existing alpha tag and installer are unchanged.
 
+## 0.1.0-alpha.2 — přehled a konfigurace odběrného místa
+
+### Čeština
+
+- Jednoduchý čtecí přehled v horní liště Overview, bez duplicitního MND v bočním menu.
+- Veškerá správa z konkrétního zařízení MND; odstraněn velký úvodní banner a formuláře z běžného dashboardu.
+- Opraven společný generátor i přibalená šablona. Aktualizace starých MND karet zachová cizí karty, místní názvy a pořadí; před zápisem se stáhne záloha.
+- Doplněny historie záloh, skutečně zaúčtované úhrady dokladů, přehled a detail vyúčtování, samostatné exporty a PDF faktury podle veřejného klienta MND.
+- Platby používají doložené payPeriod=365; předpis není úhrada. Převzetí do knihy má potvrzené přiřazení k období, stabilní identity a audit oprav.
+- Průtok ze samostatného senzoru s přesným převodem na m³/h, čerstvostí a zachováním vazby při přejmenování. Spotřeba navazuje na MND kotvu; srovnání vyžaduje shodné hranice a bázi.
+- Přerušený průvodce lze po ověření účtu převzít; číselná chyba již nezanechá nekončící načítání a má opakování.
+- Jde nadále o prerelease. Nové finanční endpointy/exporty a mobilní vzhled vyžadují živé ověření; plné automatické smluvní ceny nejsou dokončené. Podrobnosti v docs/ALPHA_2.md.
+
+### English
+
+- Simplified read-only Overview tab, preserving HA navigation and removing the duplicate MND sidebar entry.
+- All administration starts from the selected MND device; removed the large hero and administrative forms from normal dashboard cards.
+- Updated both generator and bundled template. Existing MND cards can be upgraded while preserving unrelated cards, local titles and view order, with a downloaded backup before saving.
+- Added advance history, actual document allocations, invoice lists/details, separate exports and invoice PDF downloads based on the public MND client.
+- Payment requests use documented payPeriod=365. Prescriptions remain separate from payments; ledger acceptance requires explicit period allocation and keeps auditable revisions.
+- Added independently selected flow sensors, exact m³/h conversion, freshness checks and registry rename support. Meter/forecast comparisons require matching boundaries and energy basis.
+- Authenticated users can resume an abandoned setup flow; numeric request failures provide recovery instead of endless loading.
+- Still a prerelease: new financial endpoints/exports and mobile appearance require live validation. Complete automatic contract pricing remains unfinished. See docs/ALPHA_2.md.
+
 ## 0.1.0-alpha.1 — vývojová verze
 
 ### Čeština

@@ -108,6 +108,8 @@ def main():
         PLACE, place, "Europe/Prague", datetime(2026, 10, 16, tzinfo=timezone.utc)
     )
     keys = [
+        "current_flow_m3h",
+        "current_deposit_czk",
         "latest_mnd",
         "latest_mnd_date",
         "current_meter",
@@ -142,11 +144,11 @@ def main():
 <title>MND – vývojový náhled</title>
 <style>body{margin:0;background:#f6f8f6;font:15px Arial}.demo{padding:14px 28px;background:#fff4c7;color:#403816;display:flex;gap:16px;align-items:center;flex-wrap:wrap}.demo button,.demo select{font:inherit;padding:8px}.demo strong{flex:1}</style>
 <div class="demo"><strong>VÝVOJOVÝ NÁHLED · pouze syntetická data · nejde o běžící Home Assistant</strong><button id="theme">Světlé / tmavé</button><select id="language"><option value="cs">Čeština</option><option value="en">English</option></select></div>
-<mnd-accounting-panel></mnd-accounting-panel>
+<mnd-accounting-card></mnd-accounting-card>
 <script type="module">
 import './mnd-panel.js';
 const demo=await (await fetch('./demo.json')).json();
-const panel=document.querySelector('mnd-accounting-panel');
+const panel=document.querySelector('mnd-accounting-card');
 const hass={language:'cs',themes:{darkMode:false},states:{},callWS:async msg=>{
  switch(msg.action){
  case 'entries':return [{id:'demo-entry',name:'Syntetický účet'}];
@@ -156,7 +158,7 @@ const hass={language:'cs',themes:{darkMode:false},states:{},callWS:async msg=>{
  default:throw new Error('Náhled je pouze pro čtení. / Read-only preview.');
  }
 }};
-panel.hass=hass;
+panel.setConfig(demo.views.config.views[0].cards[0]);panel.hass=hass;
 document.getElementById('theme').onclick=()=>{hass.themes={darkMode:!hass.themes.darkMode};panel.hass=hass;panel.render();};
 document.getElementById('language').onchange=event=>{hass.language=event.target.value;panel.hass=hass;panel.render();};
 </script></html>""",

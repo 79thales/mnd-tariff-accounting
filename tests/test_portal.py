@@ -47,6 +47,45 @@ class Session:
 
 
 class PortalTests(unittest.IsolatedAsyncioTestCase):
+    async def test_payment_request_includes_public_period_and_omits_missing_parameters(self):
+        session = Session([Response([])])
+        portal = PortalClient(session)
+        portal._token = "synthetic"
+        await portal.payments(1, None, 7)
+        params = session.calls[0][2]["params"]
+        self.assertEqual(params["payPeriod"], 365)
+        self.assertNotIn("custaId", params)
+        self.assertEqual(params["cpId"], 7)
+
+    async def test_finance_grows_prefix_and_reports_limit_instead_of_false_complete(self):
+        session = Session(
+            [
+                Response([{"ADVI_ID": n} for n in range(100)]),
+                Response([{"ADVI_ID": n} for n in range(101)]),
+            ]
+        )
+        portal = PortalClient(session)
+        portal._token = "synthetic"
+        result = await portal.finance_list("advances", 1, 2, 7)
+        self.assertTrue(result["complete"])
+        self.assertEqual([c[2]["params"]["maxRowCount"] for c in session.calls], [100, 200])
+
+    async def test_export_uses_selected_document_ids_and_validated_generated_file(self):
+        session = Session(
+            [
+                Response({"DocumentGuid": "synthetic-guid", "FileName": "zaloha.xlsx"}),
+                Response(raw=b"PK\x03\x04synthetic"),
+            ]
+        )
+        portal = PortalClient(session)
+        portal._token = "synthetic"
+        content, name = await portal.finance_export("advances", [1, 2])
+        self.assertTrue(content.startswith(b"PK"))
+        self.assertEqual(name, "zaloha.xlsx")
+        self.assertEqual(session.calls[0][2]["json"], [1, 2])
+        self.assertTrue(session.calls[0][1].endswith("/Documents/AdvanceExport"))
+        self.assertNotIn("Inatoken", session.calls[1][2]["headers"])
+
     async def test_http_date_and_long_retry_after_are_respected(self):
         now = datetime(2026, 10, 16, 12, 0, tzinfo=timezone.utc)
         self.assertEqual(retry_seconds("Fri, 16 Oct 2026 12:02:00 GMT", now), 120)

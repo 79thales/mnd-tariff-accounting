@@ -359,6 +359,8 @@ class StatisticsTests(unittest.TestCase):
 class DashboardTests(unittest.TestCase):
     def test_template_entities_and_navigation(self):
         keys = (
+            "current_flow_m3h",
+            "current_deposit_czk",
             "latest_mnd",
             "latest_mnd_date",
             "current_meter",

@@ -35,6 +35,38 @@ async def ready(hass):
     return entry
 
 
+async def test_flow_sensor_conversion_rename_and_unload(hass):
+    selected = await ready(hass)
+    coordinator = selected.runtime_data
+    source_entry = MockConfigEntry(domain="test", data={})
+    source_entry.add_to_hass(hass)
+    registry = er.async_get(hass)
+    source = registry.async_get_or_create(
+        "sensor",
+        "test",
+        "synthetic-flow",
+        suggested_object_id="synthetic_flow",
+        config_entry=source_entry,
+    )
+    hass.states.async_set(source.entity_id, "10", {"unit_of_measurement": "L/min"})
+    await coordinator.async_edit(
+        PLACE,
+        "settings",
+        {"flow_entity": source.entity_id, "flow_registry_id": source.id, "flow_max_age": 900},
+        coordinator.repository.data["revision"],
+    )
+    assert coordinator.data[PLACE]["current_flow_m3h"] == "0.60"
+    renamed = registry.async_update_entity(source.entity_id, new_entity_id="sensor.renamed_flow")
+    hass.states.async_set(renamed.entity_id, "20", {"unit_of_measurement": "L/min"})
+    await hass.async_block_till_done()
+    await coordinator.async_recompute()
+    assert coordinator.data[PLACE]["current_flow_m3h"] == "1.20"
+    hass.states.async_set(renamed.entity_id, "unavailable", {"unit_of_measurement": "L/min"})
+    await coordinator.async_recompute()
+    assert coordinator.data[PLACE]["current_flow_m3h"] is None
+    await hass.config_entries.async_unload(selected.entry_id)
+
+
 async def test_non_admin_cannot_read_or_mutate_private_websocket(
     hass, hass_ws_client, hass_read_only_access_token
 ):

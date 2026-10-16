@@ -6,7 +6,7 @@ samostatný test obejde mock_storage a ověří skutečný zápis v dočasné sl
 """
 
 import json
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.core import CoreState
@@ -53,6 +53,105 @@ async def test_import_config_flow_and_duplicate(hass):
         )
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"]["mode"] == "import"
+
+
+async def test_abandoned_cloud_flow_can_resume_after_authenticated_confirmation(hass):
+    """Pád mobilu po přihlášení nevyžaduje restart celé domácnosti."""
+    portal = AsyncMock()
+    portal.login.return_value = [{"PARTNER_ID": 7}]
+    portal.profile.return_value = {"InaId": "synthetic-account"}
+    portal.supply_points.return_value = [
+        {"CPE_EAN": PLACE, "CP_ID": 7, "CONT_ID": 8, "CP_NAME": "Synthetic", "CUSTA_ID": 9}
+    ]
+
+    async def login():
+        flow = await hass.config_entries.flow.async_init(DOMAIN, context={"source": "user"})
+        await hass.config_entries.flow.async_configure(flow["flow_id"], {"next_step_id": "cloud"})
+        return await hass.config_entries.flow.async_configure(
+            flow["flow_id"],
+            {"username": "synthetic@example.invalid", "password": "synthetic", "remember": False},
+        )
+
+    with patch(
+        "custom_components.mnd_tariff_accounting.config_flow.PortalClient", return_value=portal
+    ):
+        first = await login()
+        assert first["step_id"] == "places"
+        second = await login()
+        assert second["step_id"] == "resume"
+        second = await hass.config_entries.flow.async_configure(
+            second["flow_id"], {"confirm": True}
+        )
+        assert second["step_id"] == "places"
+        assert first["flow_id"] not in [
+            f["flow_id"] for f in hass.config_entries.flow.async_progress()
+        ]
+        with patch("custom_components.mnd_tariff_accounting.async_setup_entry", return_value=True):
+            result = await hass.config_entries.flow.async_configure(
+                second["flow_id"], {"places": [PLACE]}
+            )
+        assert result["type"] == FlowResultType.CREATE_ENTRY
+        assert len(hass.config_entries.async_entries(DOMAIN)) == 1
+
+
+async def test_device_configuration_and_hidden_admin_panel(hass):
+    from homeassistant.components.frontend import DATA_PANELS
+    from homeassistant.helpers import device_registry as dr
+
+    selected = entry()
+    selected.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(selected.entry_id)
+    device = dr.async_get(hass).async_get_device(
+        identifiers={(DOMAIN, f"synthetic-account:{PLACE}")}
+    )
+    assert device.configuration_url.startswith("homeassistant://mnd-tariff-accounting?")
+    assert f"place={PLACE}" in device.configuration_url
+    assert hass.data[DATA_PANELS]["mnd-tariff-accounting"].sidebar_title is None
+    await hass.config_entries.async_unload(selected.entry_id)
+
+
+async def test_finance_refresh_repairs_customer_identity_and_preserves_data_on_failure(hass):
+    """Živé HA adaptéry, syntetické portálové odpovědi, žádné bankovní operace."""
+    from custom_components.mnd_tariff_accounting.portal import PortalError
+
+    selected = entry()
+    selected.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(selected.entry_id)
+    coordinator = selected.runtime_data
+    source = {"partner_id": 1, "cp_id": 7, "contract_id": 8, "customer_id": None}
+    await coordinator.repository.transact(
+        lambda data: data["places"][PLACE].update(
+            settings={"portal": source},
+            portal_evidence={"details": {"CPE_EAN": PLACE, "CP_ID": 7, "CUSTA_ID": 9}},
+        )
+    )
+    portal = AsyncMock()
+    advance = {
+        "ADVI_ID": 1,
+        "CP_ID": 7,
+        "CUSTA_ID": 9,
+        "ADVI_DATE": "2026-01-15",
+        "ADVI_SUMTOTAL": "1000",
+        "ADVI_BALANCE": "750",
+        "CURRENCY": {"code": "CZK"},
+        "PayInfo": [{"PAY_DATE": "2026-01-14", "PAY_AMOUNT": "250"}],
+    }
+    portal.finance_list.side_effect = [
+        {"rows": [advance], "complete": True},
+        {"rows": [], "complete": True},
+    ]
+    portal.finance_detail.return_value = advance
+    coordinator.portal = portal
+    assert await coordinator._refresh_finance(PLACE, source) == []
+    saved = coordinator.repository.data["places"][PLACE]
+    assert saved["settings"]["portal"]["customer_id"] == 9
+    assert saved["portal_evidence"]["advances"]["rows"][0]["paid"] == "250"
+    portal.finance_list.side_effect = PortalError("portal_unavailable")
+    assert await coordinator._refresh_finance(PLACE, source)
+    saved = coordinator.repository.data["places"][PLACE]
+    assert saved["portal_evidence"]["advances"]["rows"][0]["paid"] == "250"
+    assert saved["portal_evidence"]["errors"]["advances"]["reason"] == "portal_unavailable"
+    await hass.config_entries.async_unload(selected.entry_id)
 
 
 async def test_setup_entities_store_reload_and_unload(hass):

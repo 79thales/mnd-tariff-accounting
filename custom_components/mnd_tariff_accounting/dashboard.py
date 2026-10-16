@@ -54,5 +54,5 @@ def build_views(title, path, entities, entry_id, place_id):
         "config": expand(config),
         "missing_entities": sorted(missing),
         "requirements": [],
-        "comments": "Vzhled Moje MND; hlavní view, pět detailů a navigace ze společné šablony.",
+        "comments": "Nativní horní lišta HA; čtecí hlavní view a detaily, správa z konkrétního zařízení. Aktualizace mění jen vlastní kartu stejného účtu a místa; před zápisem exportovat zálohu Overview.",
     }

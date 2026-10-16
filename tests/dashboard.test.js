@@ -25,3 +25,14 @@ test("YAML a automatický Overview mají pouze export",async()=>{
   await assert.rejects(addViews(async()=>({lovelace:{config:{mode:"yaml"}}}),{views:[]},[{path:"mnd"}]),/overview_not_storage/);
   assert.throws(()=>mergeViews({views:[],strategy:{type:"original-states"}},[{path:"mnd"}]),/overview_not_editable/);
 });
+
+test("aktualizace staré šablony zachová cizí karty, místní název a pořadí",()=>{
+  const card={type:"custom:mnd-accounting-card",entry_id:"one",place:"p",tab:"editor",local_setting:42};
+  const current={theme:"local",views:[{path:"home",cards:[]},{path:"mnd",title:"Můj název",cards:[card,{type:"markdown",content:"Místní poznámka"}]}]};
+  const next=[{path:"mnd",cards:[{...card,tab:"overview",layout_version:2}]}];
+  const result=mergeViews(current,next,{update:true});
+  assert.deepEqual(result.views[0],current.views[0]);assert.equal(result.views[1].title,"Můj název");
+  assert.deepEqual(result.views[1].cards[1],current.views[1].cards[1]);assert.equal(result.views[1].cards[0].tab,"overview");
+  assert.equal(current.views[1].cards[0].tab,"editor");assert.equal(result.theme,"local");
+  assert.throws(()=>mergeViews(current,[{path:"mnd",cards:[{...card,entry_id:"other"}]}],{update:true}),/foreign_view_conflict/);
+});

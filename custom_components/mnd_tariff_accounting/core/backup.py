@@ -133,6 +133,7 @@ def restore_place(data: dict, parsed: dict):
     for section in (
         "daily_profile",
         "local_forecasts",
+        "comparisons",
         "portal_evidence",
         "last_successful_import",
     ):

@@ -1,14 +1,26 @@
 {
   "domain": "mnd_tariff_accounting",
   "name": "MND Tariff & Accounting",
-  "after_dependencies": ["recorder"],
-  "codeowners": ["@79thales"],
+  "after_dependencies": [
+    "recorder"
+  ],
+  "codeowners": [
+    "@79thales"
+  ],
   "config_flow": true,
-  "dependencies": ["frontend", "http", "lovelace", "panel_custom", "websocket_api"],
+  "dependencies": [
+    "frontend",
+    "http",
+    "lovelace",
+    "panel_custom",
+    "websocket_api"
+  ],
   "documentation": "https://github.com/79thales/mnd-tariff-accounting",
   "integration_type": "hub",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/79thales/mnd-tariff-accounting/issues",
-  "requirements": ["pypdf==6.19.0"],
-  "version": "0.1.0-alpha.1"
+  "requirements": [
+    "pypdf==6.19.0"
+  ],
+  "version": "0.1.0-alpha.2"
 }

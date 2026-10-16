@@ -38,6 +38,13 @@
         "data": {
           "places": "Selected gas supply points"
         }
+      },
+      "resume": {
+        "title": "Resume MND setup",
+        "description": "The account is authenticated. Confirm to replace its previously opened setup flow; other accounts are preserved.",
+        "data": {
+          "confirm": "Continue here"
+        }
       }
     },
     "error": {
@@ -55,7 +62,14 @@
     "step": {
       "init": {
         "title": "MND settings",
-        "description": "[Open accounting panel and Generate dashboard]({panel_url}). Changes affect local HA records only."
+        "description": "Select a supply point. Its configuration is also available directly from the MND device page.",
+        "data": {
+          "place": "Supply point"
+        }
+      },
+      "manage": {
+        "title": "Supply point configuration",
+        "description": "[Open this supply point configuration]({panel_url}). Changes affect local HA records."
       }
     }
   },
@@ -132,6 +146,9 @@
       },
       "invoice_remaining_czk": {
         "name": "Remaining invoice settlement"
+      },
+      "current_flow_m3h": {
+        "name": "Current gas flow"
       }
     },
     "button": {
@@ -140,6 +157,9 @@
       },
       "generate_dashboard": {
         "name": "Generate dashboard"
+      },
+      "configure_place": {
+        "name": "Configure supply point"
       }
     }
   }

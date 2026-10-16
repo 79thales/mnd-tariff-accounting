@@ -38,6 +38,13 @@
         "data": {
           "places": "Vybraná plynová místa"
         }
+      },
+      "resume": {
+        "title": "Pokračovat v nastavení MND",
+        "description": "Účet je ověřen. Potvrzením nahradíte jeho dříve otevřeného průvodce; ostatní účty zůstanou zachovány.",
+        "data": {
+          "confirm": "Pokračovat zde"
+        }
       }
     },
     "error": {
@@ -55,7 +62,14 @@
     "step": {
       "init": {
         "title": "Nastavení MND",
-        "description": "[Otevřít účetní panel a Generate dashboard]({panel_url}). Úpravy mění pouze místní evidenci v HA."
+        "description": "Vyberte odběrné místo. Jeho správa je dostupná také přímo z detailu zařízení MND.",
+        "data": {
+          "place": "Odběrné místo"
+        }
+      },
+      "manage": {
+        "title": "Konfigurace odběrného místa",
+        "description": "[Otevřít konfiguraci tohoto odběrného místa]({panel_url}). Zápisy mění místní evidenci HA."
       }
     }
   },
@@ -132,6 +146,9 @@
       },
       "invoice_remaining_czk": {
         "name": "Zbývá vypořádat vyúčtování"
+      },
+      "current_flow_m3h": {
+        "name": "Aktuální průtok plynu"
       }
     },
     "button": {
@@ -140,6 +157,9 @@
       },
       "generate_dashboard": {
         "name": "Generate dashboard"
+      },
+      "configure_place": {
+        "name": "Konfigurace odběrného místa"
       }
     }
   }

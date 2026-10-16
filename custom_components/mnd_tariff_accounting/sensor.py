@@ -7,9 +7,10 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, PANEL_PATH
 
 SENSORS = {
+    "current_flow_m3h": ("m³/h", "volume_flow_rate", None),
     "latest_mnd": ("m³", "gas", None),
     "latest_mnd_date": (None, "date", None),
     "current_meter": ("m³", "gas", None),
@@ -65,6 +66,10 @@ class MndSensor(CoordinatorEntity, SensorEntity):
             name=coordinator.repository.data["places"][place_id]["name"] or "MND",
             manufacturer="Community integration",
             model="Gas accounting",
+            configuration_url=(
+                f"homeassistant://{PANEL_PATH}?entry_id="
+                f"{coordinator.entry.entry_id}&place={place_id}&tab=editor"
+            ),
         )
 
     @property
@@ -97,6 +102,8 @@ class MndSensor(CoordinatorEntity, SensorEntity):
                 "observed_at": data.get("current_at"),
                 "quality": data.get("measurement_reason"),
             }
+        if self.key == "current_flow_m3h":
+            return {"reported_at": data.get("flow_at"), "quality": data.get("flow_status")}
         if self.key in ("known_cost_czk", "balance_czk", "volume_m3", "energy_mwh"):
             return {
                 "period_from": data.get("evaluated_from"),

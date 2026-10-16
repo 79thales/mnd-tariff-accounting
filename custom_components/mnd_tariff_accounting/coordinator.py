@@ -19,7 +19,11 @@ from homeassistant.core import callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.event import async_call_later, async_track_state_change_event
+from homeassistant.helpers.event import (
+    async_call_later,
+    async_track_state_change_event,
+    async_track_time_interval,
+)
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt as dt_util
 
@@ -27,9 +31,11 @@ from .const import DOMAIN, POLL_HOURS, SOURCE_DEBOUNCE_SECONDS
 from .core.archive import Repository, apply_import, new_place
 from .core.backup import parse_native, parse_zip, restore_place
 from .core.common import DataError, decimal, fingerprint, identity, load_json, wire
+from .core.finance import finance_rows, merge_finance
 from .core.forecast import add_snapshot
 from .core.importer import parse_v1
 from .core.invoice_pdf import parse_invoice_pdf
+from .core.live import flow_value
 from .core.portal_mapping import consumption_periods, portal_readings
 from .core.projection import evaluate_place
 from .core.xlsx import parse_workbook
@@ -73,6 +79,7 @@ class MndCoordinator(DataUpdateCoordinator):
         self._unsubscribers = []
         self._registry_unsubscribe = None
         self._debounce = None
+        self._flow_debounce = None
         self._closed = False
         self._pending_samples = {}
         self._recompute_lock = asyncio.Lock()
@@ -100,6 +107,11 @@ class MndCoordinator(DataUpdateCoordinator):
 
             await self.repository.transact(initial)
         self._subscribe_sources()
+        # Čerstvost průtoku musí vypršet i bez dalšího pulsu. Minutový
+        # přepočet nevolá síť a unload ho spolehlivě odpojí.
+        self._clock_unsubscribe = async_track_time_interval(
+            self.hass, self._clock_recompute, timedelta(minutes=1)
+        )
         self._registry_unsubscribe = self.hass.bus.async_listen(
             er.EVENT_ENTITY_REGISTRY_UPDATED, self._registry_changed
         )
@@ -134,6 +146,19 @@ class MndCoordinator(DataUpdateCoordinator):
         registry = er.async_get(self.hass)
         for place_id, place in self.repository.data["places"].items():
             settings = place["settings"]
+            flow = registry.async_get(
+                settings.get("flow_registry_id") or settings.get("flow_entity", "")
+            )
+            if flow:
+
+                @callback
+                def flow_changed(_event):
+                    if self._flow_debounce is None and not self._closed:
+                        self._flow_debounce = async_call_later(self.hass, 1, self._flow_recompute)
+
+                self._unsubscribers.append(
+                    async_track_state_change_event(self.hass, [flow.entity_id], flow_changed)
+                )
             source = registry.async_get(settings.get("source_entity", ""))
             if settings.get("source_registry_id"):
                 source = registry.async_get(settings["source_registry_id"])
@@ -148,6 +173,15 @@ class MndCoordinator(DataUpdateCoordinator):
                 async_track_state_change_event(self.hass, [source.entity_id], changed)
             )
             self._queue_sample(place_id, source.id, self.hass.states.get(source.entity_id))
+
+    async def _flow_recompute(self, _now):
+        self._flow_debounce = None
+        if not self._closed:
+            await self.async_recompute()
+
+    async def _clock_recompute(self, _now):
+        if not self._closed:
+            await self.async_recompute()
 
     @callback
     def _registry_changed(self, event):
@@ -164,8 +198,14 @@ class MndCoordinator(DataUpdateCoordinator):
             settings = place["settings"]
             source_id = settings.get("source_registry_id")
             current = registry.async_get(source_id) if source_id else None
-            if settings.get("source_entity") not in affected and (
-                not current or current.entity_id not in affected
+            flow = registry.async_get(settings.get("flow_registry_id", ""))
+            flow_affected = settings.get("flow_entity") in affected or (
+                flow and flow.entity_id in affected
+            )
+            if (
+                not flow_affected
+                and settings.get("source_entity") not in affected
+                and (not current or current.entity_id not in affected)
             ):
                 continue
             if current is None and source_id:
@@ -336,12 +376,117 @@ class MndCoordinator(DataUpdateCoordinator):
                                     .update({key: {"reason": reason, "attempted_at": at}})
                                 )
                             )
+                    # Finanční zdroje jsou nezávislé na grafu a odečtech.
+                    # Chyba jednoho seznamu nesmaže starší platné doklady.
+                    failures.extend(await self._refresh_finance(place_id, source))
                 self.cloud_status = "partial" if failures else "connected"
             except AuthenticationRequired:
                 self.cloud_status = "reauth_required"
                 self.entry.async_start_reauth(self.hass)
             except (PortalError, DataError) as err:
                 self.cloud_status = str(err)
+
+    async def _refresh_finance(self, place_id, source):
+        """Načte historii a detaily se skutečnými úhradami, nejvýše 120 s/druh.
+
+        Zákaznické ID smí doplnit jen ověřený detail stejného místa. Surová
+        data a revize zůstávají v private Store. Rozpracovaný prefix se
+        uchová, úplnost detailů je výslovná a další refresh může pokračovat.
+        """
+        failures = []
+        place = self.repository.data["places"][place_id]
+        detail = place.get("portal_evidence", {}).get("details", {})
+        source = dict(source)
+        if source.get("customer_id") is None:
+            if (
+                detail.get("CPE_EAN") != place_id
+                or detail.get("CP_ID") != source["cp_id"]
+                or detail.get("CUSTA_ID") is None
+            ):
+                return ["portal_customer_identity_missing"]
+            source["customer_id"] = detail["CUSTA_ID"]
+            await self.repository.transact(
+                lambda data: data["places"][place_id]["settings"]["portal"].update(
+                    customer_id=source["customer_id"]
+                )
+            )
+        for kind in ("advances", "invoices"):
+            at = dt_util.utcnow().isoformat()
+            previous = place.get("portal_evidence", {}).get(kind, {})
+            try:
+                listing = await self.portal.finance_list(
+                    kind, source["partner_id"], source["customer_id"], source["cp_id"]
+                )
+                raw_rows, all_details = [], True
+                cached = {r["list_hash"]: r["detail"] for r in previous.get("cached", [])}
+                new_cache = []
+                deadline = asyncio.get_running_loop().time() + 120
+                rows_to_read = listing["rows"]
+                cursor = previous.get("cursor", 0) % max(1, len(rows_to_read))
+                attempts = 0
+                rows_to_read = rows_to_read[cursor:] + rows_to_read[:cursor]
+                for row in rows_to_read:
+                    reference = fingerprint(row)
+                    raw = cached.get(reference)
+                    # I nezměněný součet dokladu může mít opravené datum
+                    # platby. Detaily pravidelně obnovujeme po dávkách;
+                    # kurzor zajistí, že starší řádky nevyhladoví.
+                    if attempts < 40 and asyncio.get_running_loop().time() < deadline:
+                        attempts += 1
+                        key = "ADVI_ID" if kind == "advances" else "IVA_ID"
+                        try:
+                            raw = {**row, **await self.portal.finance_detail(kind, row[key])}
+                        except AuthenticationRequired:
+                            raise
+                        except (PortalError, KeyError):
+                            all_details = False
+                    if raw is None:
+                        raw, all_details = row, False
+                    else:
+                        new_cache.append({"list_hash": reference, "detail": raw})
+                    raw_rows.append(raw)
+                rows = finance_rows(kind, raw_rows, source)
+                all_details = all_details and all(r["payments_known"] for r in rows)
+
+                def commit(data):
+                    evidence = data["places"][place_id].setdefault("portal_evidence", {})
+                    old = evidence.get(kind, {})
+                    history = old.get("revisions", [])
+                    changed = {r["id"]: r for r in rows}
+                    history = history + [
+                        {"at": at, "row": r}
+                        for r in old.get("rows", [])
+                        if r["id"] in changed and r["revision"] != changed[r["id"]]["revision"]
+                    ]
+                    evidence[kind] = {
+                        "rows": merge_finance(old.get("rows", []), rows),
+                        "cached": new_cache,
+                        "revisions": history,
+                        "list_complete": listing["complete"],
+                        "details_complete": all_details,
+                        "cursor": (cursor + attempts) % max(1, len(rows_to_read)),
+                        "details_refreshed_all": attempts == len(rows_to_read),
+                        "acquired_at": at,
+                    }
+                    evidence.setdefault("errors", {}).pop(kind, None)
+
+                await self.repository.transact(commit)
+                if not all_details or not listing["complete"]:
+                    failures.append("portal_finance_partial")
+            except AuthenticationRequired:
+                raise
+            except (PortalError, DataError) as err:
+                reason = str(err)
+                failures.append(reason)
+                await self.repository.transact(
+                    lambda data: (
+                        data["places"][place_id]
+                        .setdefault("portal_evidence", {})
+                        .setdefault("errors", {})
+                        .update({kind: {"reason": reason, "attempted_at": at}})
+                    )
+                )
+        return failures
 
     async def _evaluate(self):
         async with self._recompute_lock:
@@ -361,6 +506,25 @@ class MndCoordinator(DataUpdateCoordinator):
                         "archive_revision": revision,
                         "cloud_status": self.cloud_status,
                     }
+                    settings = place["settings"]
+                    registry = er.async_get(self.hass)
+                    flow = registry.async_get(
+                        settings.get("flow_registry_id") or settings.get("flow_entity", "")
+                    )
+                    state = self.hass.states.get(flow.entity_id) if flow else None
+                    results[place_id].update(
+                        flow_value(
+                            state.state if state else None,
+                            state.attributes.get("unit_of_measurement") if state else None,
+                            (
+                                getattr(state, "last_reported", None) or state.last_updated
+                            ).isoformat()
+                            if state
+                            else None,
+                            dt_util.utcnow(),
+                            settings.get("flow_max_age", 900),
+                        )
+                    )
                 if revision == self.repository.data["revision"]:
                     # Repairs vysvětluje problém relace, nikoli zákaznické
                     # hodnoty. Archiv i dostupné místní entity zůstávají aktivní.
@@ -479,6 +643,11 @@ class MndCoordinator(DataUpdateCoordinator):
 
     async def async_close(self):
         self._closed = True
+        if getattr(self, "_clock_unsubscribe", None):
+            self._clock_unsubscribe()
+        if self._flow_debounce:
+            self._flow_debounce()
+            self._flow_debounce = None
         if self._debounce:
             self._debounce()
             self._debounce = None

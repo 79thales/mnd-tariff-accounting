@@ -20,7 +20,9 @@
             "volume_m3": "{{entity:volume_m3}}",
             "known_cost_czk": "{{entity:known_cost_czk}}",
             "paid_czk": "{{entity:paid_czk}}",
-            "balance_czk": "{{entity:balance_czk}}"
+            "balance_czk": "{{entity:balance_czk}}",
+            "current_flow_m3h": "{{entity:current_flow_m3h}}",
+            "current_deposit_czk": "{{entity:current_deposit_czk}}"
           },
           "navigation": [
             {
@@ -40,16 +42,14 @@
               "path": "/lovelace/{{PATH}}-prognozy"
             },
             {
-              "tab": "editor",
-              "path": "/lovelace/{{PATH}}-editor"
-            },
-            {
               "tab": "history",
               "path": "/lovelace/{{PATH}}-historie"
             }
-          ]
+          ],
+          "layout_version": 2
         }
-      ]
+      ],
+      "subview": false
     },
     {
       "title": "Spotřeba",
@@ -73,7 +73,9 @@
             "volume_m3": "{{entity:volume_m3}}",
             "known_cost_czk": "{{entity:known_cost_czk}}",
             "paid_czk": "{{entity:paid_czk}}",
-            "balance_czk": "{{entity:balance_czk}}"
+            "balance_czk": "{{entity:balance_czk}}",
+            "current_flow_m3h": "{{entity:current_flow_m3h}}",
+            "current_deposit_czk": "{{entity:current_deposit_czk}}"
           },
           "navigation": [
             {
@@ -93,14 +95,11 @@
               "path": "/lovelace/{{PATH}}-prognozy"
             },
             {
-              "tab": "editor",
-              "path": "/lovelace/{{PATH}}-editor"
-            },
-            {
               "tab": "history",
               "path": "/lovelace/{{PATH}}-historie"
             }
-          ]
+          ],
+          "layout_version": 2
         }
       ]
     },
@@ -126,7 +125,9 @@
             "volume_m3": "{{entity:volume_m3}}",
             "known_cost_czk": "{{entity:known_cost_czk}}",
             "paid_czk": "{{entity:paid_czk}}",
-            "balance_czk": "{{entity:balance_czk}}"
+            "balance_czk": "{{entity:balance_czk}}",
+            "current_flow_m3h": "{{entity:current_flow_m3h}}",
+            "current_deposit_czk": "{{entity:current_deposit_czk}}"
           },
           "navigation": [
             {
@@ -146,14 +147,11 @@
               "path": "/lovelace/{{PATH}}-prognozy"
             },
             {
-              "tab": "editor",
-              "path": "/lovelace/{{PATH}}-editor"
-            },
-            {
               "tab": "history",
               "path": "/lovelace/{{PATH}}-historie"
             }
-          ]
+          ],
+          "layout_version": 2
         }
       ]
     },
@@ -179,7 +177,9 @@
             "volume_m3": "{{entity:volume_m3}}",
             "known_cost_czk": "{{entity:known_cost_czk}}",
             "paid_czk": "{{entity:paid_czk}}",
-            "balance_czk": "{{entity:balance_czk}}"
+            "balance_czk": "{{entity:balance_czk}}",
+            "current_flow_m3h": "{{entity:current_flow_m3h}}",
+            "current_deposit_czk": "{{entity:current_deposit_czk}}"
           },
           "navigation": [
             {
@@ -199,19 +199,16 @@
               "path": "/lovelace/{{PATH}}-prognozy"
             },
             {
-              "tab": "editor",
-              "path": "/lovelace/{{PATH}}-editor"
-            },
-            {
               "tab": "history",
               "path": "/lovelace/{{PATH}}-historie"
             }
-          ]
+          ],
+          "layout_version": 2
         }
       ]
     },
     {
-      "title": "Editor",
+      "title": "Konfigurace odběrného místa",
       "path": "{{PATH}}-editor",
       "icon": "mdi:pencil",
       "panel": true,
@@ -232,7 +229,9 @@
             "volume_m3": "{{entity:volume_m3}}",
             "known_cost_czk": "{{entity:known_cost_czk}}",
             "paid_czk": "{{entity:paid_czk}}",
-            "balance_czk": "{{entity:balance_czk}}"
+            "balance_czk": "{{entity:balance_czk}}",
+            "current_flow_m3h": "{{entity:current_flow_m3h}}",
+            "current_deposit_czk": "{{entity:current_deposit_czk}}"
           },
           "navigation": [
             {
@@ -252,19 +251,17 @@
               "path": "/lovelace/{{PATH}}-prognozy"
             },
             {
-              "tab": "editor",
-              "path": "/lovelace/{{PATH}}-editor"
-            },
-            {
               "tab": "history",
               "path": "/lovelace/{{PATH}}-historie"
             }
-          ]
+          ],
+          "layout_version": 2,
+          "admin_link": true
         }
       ]
     },
     {
-      "title": "Historie a doklady",
+      "title": "Vyúčtování",
       "path": "{{PATH}}-historie",
       "icon": "mdi:file-document",
       "panel": true,
@@ -285,7 +282,9 @@
             "volume_m3": "{{entity:volume_m3}}",
             "known_cost_czk": "{{entity:known_cost_czk}}",
             "paid_czk": "{{entity:paid_czk}}",
-            "balance_czk": "{{entity:balance_czk}}"
+            "balance_czk": "{{entity:balance_czk}}",
+            "current_flow_m3h": "{{entity:current_flow_m3h}}",
+            "current_deposit_czk": "{{entity:current_deposit_czk}}"
           },
           "navigation": [
             {
@@ -305,14 +304,11 @@
               "path": "/lovelace/{{PATH}}-prognozy"
             },
             {
-              "tab": "editor",
-              "path": "/lovelace/{{PATH}}-editor"
-            },
-            {
               "tab": "history",
               "path": "/lovelace/{{PATH}}-historie"
             }
-          ]
+          ],
+          "layout_version": 2
         }
       ]
     }

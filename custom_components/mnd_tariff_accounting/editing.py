@@ -128,9 +128,16 @@ def edit_place(data, *, place_id, section, record, now: datetime, zone: str):
             "source_mode",
             "source_entity",
             "source_registry_id",
+            "flow_entity",
+            "flow_registry_id",
+            "flow_max_age",
             "segment",
         )
         _fields(record, allowed)
+        if "flow_max_age" in record:
+            record["flow_max_age"] = int(record["flow_max_age"])
+            if not 30 <= record["flow_max_age"] <= 86400:
+                raise DataError("invalid_flow_max_age")
         merged = {**place["settings"], **record}
         if "name" in record:
             if not isinstance(record["name"], str) or len(record["name"].strip()) > 160:

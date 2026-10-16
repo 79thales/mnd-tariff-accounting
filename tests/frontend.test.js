@@ -20,10 +20,10 @@ async function surface({config,entries=[{id:"account-a",name:"Test"}],data=detai
   await element.load();return {element,calls};
 }
 test("MND přehled nepromění neznámé hodnoty na nulu a escapuje názvy",async()=>{
-  const {element}=await surface();
+  const {element}=await surface({config:{entry_id:"account-a",place:PLACE,tab:"overview"}});
   const values=[...element.shadowRoot.querySelectorAll(".value")].map(e=>e.textContent);
-  assert.match(values[0],/—/);assert.match(values[3],/^0/);assert.match(values[4],/—/);
-  assert.equal(element.shadowRoot.querySelector("h1").textContent,"Dům <test>");
+  assert.match(values[0],/—/);assert.match(values[4],/^0/);assert.match(values[5],/—/);
+  assert.equal(element.shadowRoot.querySelector("h1").textContent,"Test");
   assert.equal(element.shadowRoot.querySelector("test"),null);
   element.hass={...element._hass,themes:{darkMode:true}};
   assert.equal(element.hasAttribute("dark"),true);
@@ -33,10 +33,11 @@ test("šest generovaných pohledů sdílí MND kartu, vazby entit a úplnou navi
   assert.equal(template.views.length,6);
   for(const view of template.views){
     assert.equal(view.panel,true);assert.equal(view.cards.length,1);
-    const config=view.cards[0];assert.equal(config.type,"custom:mnd-accounting-card");assert.equal(config.navigation.length,6);
-    const {element}=await surface({config:{...config,entry_id:"account-a",place:PLACE,entities:{current_meter:"sensor.renamed_meter"}}});
-    assert.equal(element.shadowRoot.querySelectorAll("nav a").length,6);
-    assert.equal(element.shadowRoot.querySelectorAll("nav [aria-current=page]").length,1);
+    const config=view.cards[0];assert.equal(config.type,"custom:mnd-accounting-card");assert.equal(config.navigation.length,5);
+    const {element}=await surface({config:{...config,entry_id:"account-a",place:PLACE,entities:{latest_mnd:"sensor.renamed_meter"}}});
+    assert.equal(element.shadowRoot.querySelectorAll("nav a").length,5);
+    assert.equal(element.shadowRoot.querySelectorAll("nav [aria-current=page]").length,config.tab==="editor"?0:1);
+    assert.equal(element.shadowRoot.querySelectorAll("form,input[type=file],#dashboard-preview").length,0);
     if(config.tab==="overview"){
       let entity; element.addEventListener("hass-more-info",event=>entity=event.detail.entityId);
       element.shadowRoot.querySelector("[data-entity]").click();assert.equal(entity,"sensor.renamed_meter");
@@ -83,3 +84,25 @@ test("anglické zobrazení velkého desetinného čísla neztrácí desetinná m
   assert.equal(element.number("100000000000000.125","m³"),"100,000,000,000,000.125 m³");
 });
 test.after(()=>window.happyDOM.abort());
+
+test("chyba s číselným kódem ukončí spinner a opakování obnoví data",async()=>{
+  const {element}=await surface({config:{entry_id:"account-a",place:PLACE}});
+  const original=element._hass.callWS;
+  element._detail=null;element._hass.callWS=async()=>{throw {code:3};};
+  await element.load({force:true});
+  assert.match(element.shadowRoot.textContent,/nepodařilo/);
+  assert.doesNotMatch(element.shadowRoot.textContent,/Načítání…/);
+  assert.ok(element.shadowRoot.getElementById("retry-load"));
+  element._hass.callWS=original;await element.load({force:true});
+  assert.equal(element._failed,false);assert.equal(element.shadowRoot.getElementById("retry-load"),null);
+});
+
+test("čtecí zálohy zobrazí částečnou úhradu a detail bez administračních formulářů",async()=>{
+  const data=detail();data.place.portal_evidence={advances:{rows:[{id:"1",number:"1",kind:"advances",prescribed:"1000",paid:"250",remaining:"750",payments_known:true,payments:[{date:"2026-01-05",amount:"250"}]}]}};
+  const {element}=await surface({config:{entry_id:"account-a",place:PLACE,tab:"accounting"},data});
+  assert.match(element.shadowRoot.textContent,/1000/);assert.match(element.shadowRoot.textContent,/250/);
+  element.shadowRoot.querySelector("[data-finance-id]").click();
+  assert.match(element.shadowRoot.textContent,/2026-01-05/);
+  assert.equal(element.shadowRoot.getElementById("accept-advances"),null);
+  assert.equal(element.shadowRoot.querySelector("[data-finance-export]"),null);
+});

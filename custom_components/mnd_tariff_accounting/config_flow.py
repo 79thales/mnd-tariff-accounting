@@ -84,8 +84,6 @@ class MndConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             "password": user_input["password"] if user_input["remember"] else None,
                         },
                     )
-                await self.async_set_unique_id(account_id)
-                self._abort_if_unique_id_configured()
                 places = []
                 for partner in partners:
                     rows = await portal.supply_points(partner["PARTNER_ID"])
@@ -102,7 +100,9 @@ class MndConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     "username": user_input["username"],
                     "password": user_input["password"] if user_input["remember"] else None,
                 }
-                return await self.async_step_places()
+                # Identitu rezervujeme až po načtení míst. Výpadek API tak
+                # nezablokuje nový pokus opuštěným přihlašovacím formulářem.
+                return await self._reserve_cloud_account()
             except AuthenticationRequired:
                 errors["base"] = "invalid_auth"
             except (PortalError, DataError):
@@ -119,6 +119,44 @@ class MndConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 }
             ),
             errors=errors,
+        )
+
+    async def _reserve_cloud_account(self):
+        account_id = self._cloud["account_id"]
+        if any(e.unique_id == account_id for e in self.hass.config_entries.async_entries(DOMAIN)):
+            return self.async_abort(reason="already_configured")
+        self._pending_account_flows = [
+            f["flow_id"]
+            for f in self._async_in_progress(match_context={"unique_id": account_id})
+            if f["context"].get("source") == "user"
+        ]
+        if self._pending_account_flows:
+            return await self.async_step_resume()
+        await self.async_set_unique_id(account_id)
+        return await self.async_step_places()
+
+    async def async_step_resume(self, user_input=None):
+        """Nově ověřené přihlášení může po potvrzení převzít vlastní opuštěný flow.
+
+        Ruší se pouze user průvodce shodné identity, ne jiný účet nebo reauth.
+        Ochrana async_set_unique_id zůstává zapnutá i při souběžném pokusu.
+        """
+        if user_input and user_input.get("confirm"):
+            account_id = self._cloud["account_id"]
+            if any(
+                e.unique_id == account_id for e in self.hass.config_entries.async_entries(DOMAIN)
+            ):
+                return self.async_abort(reason="already_configured")
+            for flow in self._async_in_progress(match_context={"unique_id": account_id}):
+                if (
+                    flow["flow_id"] in self._pending_account_flows
+                    and flow["context"].get("source") == "user"
+                ):
+                    self.hass.config_entries.flow.async_abort(flow["flow_id"])
+            await self.async_set_unique_id(account_id)
+            return await self.async_step_places()
+        return self.async_show_form(
+            step_id="resume", data_schema=vol.Schema({vol.Required("confirm", default=False): bool})
         )
 
     async def async_step_places(self, user_input=None):
@@ -160,12 +198,34 @@ class MndOptionsFlow(config_entries.OptionsFlow):
     """Formuláře účtů jsou v panelu; options nabízí jednoznačnou navigaci."""
 
     async def async_step_init(self, user_input=None):
+        """Obecné options vybere místo; odkaz zařízení už nese jeho identitu."""
+        if user_input is not None:
+            self._place = user_input["place"]
+            return await self.async_step_manage()
+        coordinator = getattr(self.config_entry, "runtime_data", None)
+        places = (
+            coordinator.repository.data["places"]
+            if coordinator
+            else {p["id"]: p for p in self.config_entry.data.get("places", [])}
+        )
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Required("place"): vol.In(
+                        {key: value.get("name", key) for key, value in places.items()}
+                    )
+                }
+            ),
+        )
+
+    async def async_step_manage(self, user_input=None):
         if user_input is not None:
             return self.async_create_entry(title="", data=dict(self.config_entry.options))
         return self.async_show_form(
-            step_id="init",
+            step_id="manage",
             description_placeholders={
-                "panel_url": f"/{PANEL_PATH}?entry_id={self.config_entry.entry_id}",
+                "panel_url": f"/{PANEL_PATH}?entry_id={self.config_entry.entry_id}&place={self._place}&tab=editor"
             },
             data_schema=vol.Schema({}),
         )

@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 
 from .accounting import active_versions, calculate, invoice_settlement
 from .common import DataError, instant, local_day, wire
+from .live import anchor_comparisons
 from .metering import Reading, active_readings, consumption_intervals, current_state
 from .temporal_accounting import boundary
 
@@ -35,6 +36,8 @@ def evaluate_place(place_id: str, place: dict, zone: str, now: datetime | None =
         "reading_count": len(readings),
         "archive_revision": None,
         "cloud_status": "not_connected",
+        "meter_comparisons": anchor_comparisons(place_id, place, zone),
+        "forecast_comparisons": place.get("comparisons", []),
     }
     if (
         mnd
