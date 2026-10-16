@@ -1,4 +1,4 @@
-# Implementační report MND 0.1.0
+# Implementační report MND 0.1.0-alpha.1
 
 Vývoj byl zahájen 16. 10. 2026 na pokyn „Programuj“. Jde o vývojovou verzi,
 **nikoli ověřené produkční vydání nebo dokončenou cloudovou paritu C#**.
@@ -13,13 +13,20 @@ Reference C# a ČEZ nebyly upraveny. ORLEN/EDC nejsou součástí runtime.
   zachování cizích views, řízené release API a rozměry/alfa brand PNG:
   **21 testů úspěšně**.
 - Ruff, kompilace Pythonu a kontrola syntaxe JavaScriptu.
-- Kontrola Git indexu: 97 souborů, sedm očekávaných PNG (tři návrhy a čtyři
+- Linux / Python 3.14: **100 Python a 21 Node testů**, úspěšné HACS a Hassfest.
+  [Quality – ověřená revize 1a0d905](https://github.com/79thales/mnd-tariff-accounting/actions/runs/38881599550).
+- Skutečný HA **2026.3.1 / plugin 0.13.317** a **2026.10.1 / plugin 0.13.372**:
+  **16 HA testů úspěšně v každém prostředí**. Ověřeny jsou importní config flow,
+  setup/reload/unload, atomická evidence, skutečný zápis na disk i jeho chyba,
+  stopping/read-only Store, WS/HTTP/služby pro nesprávce, admin summary,
+  zachování Overview, statický frontend a přejmenování zdroje podle registry UUID.
+- Kontrola Git indexu: 98 souborů, sedm očekávaných PNG (tři návrhy a čtyři
   distribuční ikony), žádné přístupy ani zákaznické dokumenty. Runtime strom
   obsahuje 43 souborů. Nálezy syntetických EIC končících X/Y byly ověřeny
   jako fixtures; místní prostředí, cache a pracovní náhled nejsou sledovány.
 - Celkové pokrytí Python runtime v této místní sadě je **50 % včetně větví**.
-  Zahrnuje i dosud nespouštěné HA adaptéry s nulovým pokrytím; samotná sada
-  doménových testů není důkazem správné funkce těchto adaptérů v HA.
+  Samotná doménová sada nespouští HA adaptéry. HA matice výše je samostatný
+  skutečný běh; pokrytí obou sad se zde nesčítá ani nevydává za úplné.
 - Vizuální kontrola souborů ikon v 256 px a kontrolního listu ve 32/64 px
   na světlém i tmavém pozadí. PNG exporty vznikají z vlastního SVG.
 - Veřejný průzkum Moje MND bez loginu: HTML, konfigurace a veřejné JS/CSS.
@@ -32,32 +39,22 @@ vývoji poslouchá pouze na `127.0.0.1:8766`. Náhled není emulace HA lifecycle
 
 ## Neprovedené ověření a zbývající práce
 
-1. Skutečné lifecycle, oprávnění HTTP/WS, služby, Recorder, přejmenování
-   entity a frontend v HA **2026.3.1 / plugin 0.13.317** a v aktuální stable.
-   Resolver při kontrole našel **2026.10.1 / plugin 0.13.372 / Python 3.14**.
-   Místně je Python 3.12 ve Windows, není dostupné Linux prostředí ani WSL
-   distribuce. Připravená CI matice zatím nebyla spuštěna. Kontrola zdrojového
-   API HA není náhradou skutečného běhu.
-   Připraveno je sedm HA testů, včetně potvrzení zápisu při vypínání HA
-   a odmítnutí transakce do read-only Store; tyto testy zatím neběžely.
-2. GitHub repozitář byl po výslovném souhlasu založen veřejně:
-   [79thales/mnd-tariff-accounting](https://github.com/79thales/mnd-tariff-accounting).
-   Hassfest v prvním běhu prošel; HACS požadoval doplnit témata repozitáře,
-   ta byla doplněna. Quality prošlo v doménové/Node části, obě verze HA
-   odhalily dvě chyby testovacího harnessu, které byly opraveny. Následuje
-   opakovaný běh rozšířené HA sady, zatím bez tvrzení o úspěchu.
-3. Nový oprávněný živý test přihlášení a odpovědí účtu MND v HA. Nečetla jsem
+1. Širší HA scénáře: skutečný Recorder s retencí, celý cloudový backfill,
+   reauth flow a úspěšný správcovský import/download zákaznických originálů.
+   Úspěšných 16 lifecycle/rozhraní testů nepokrývá každou větev runtime.
+2. Nový oprávněný živý test přihlášení a odpovědí účtu MND v HA. Nečetla jsem
    staré přístupy a neprováděla nový zákaznický login. MFA, skutečné limity,
    výměna smlouvy a celý cloudový tok zůstávají neověřené.
-4. Automatické převzetí plných smluvních cen z portálu: surový detail a
+3. Automatické převzetí plných smluvních cen z portálu: surový detail a
    smluvní doklady se uchovávají; jednotky, platnost, DPH a plnost složek se
    zatím zadávají nebo importují z doloženého C# v1. Nejsou hádány z textu.
    Platební zpráva MND se přebírá z v1; její živá mapa není doložena.
-5. Vizuální QA v HA na mobilu/desktopu a ověření dialogu brand obrázků.
+4. Vizuální QA v HA na mobilu/desktopu a ověření dialogu brand obrázků.
    CUA nevrátil dostupný prohlížeč. DOM testy nejsou screenshotové ověření.
-6. Po úspěšných kontrolách vytvořit neměnný tag, instalační ZIP z tohoto
-   tagu a draft. V tomto projektu zatím není release tag, instalační ZIP,
-   draft ani instalace do živého HA.
+5. Produkční vydání až po doplnění výše uvedených cloudových funkcí a živém
+   ověření. Verze `0.1.0-alpha.1` je určena pro draft a testování; nebyla
+   instalována do provozního HA. Její tag i ZIP vznikají až po úspěšném CI
+   konkrétní finální revize, finální stav draftu je v GitHub Releases.
 
 Přidání do Overview používá kontrolu celé konfigurace těsně před jedním
 zápisem a následné čtení. Nativní HA save nemá CAS, proto nelze garantovat
@@ -75,7 +72,7 @@ Uváděné cesty modulů jsou relativní k `custom_components/mnd_tariff_account
 | ID | Implementace | Konkrétní test / skutečný výsledek |
 | --- | --- | --- |
 | M01 | `portal.py`, `config_flow.py`, API logout/forget | `test_portal`: login, odmítnutí, HTML, redirect, backoff OK; config/reauth a live čekají |
-| M02 | více entry/míst, registry, `technical_details` | `frontend.test.js`: více účtů a opožděná odpověď OK; lifecycle a živý detail čekají |
+| M02 | více entry/míst, registry, `technical_details` | DOM izolace účtů a HA lifecycle/registry OK; živý detail čeká |
 | M03 | `projection.py`, oddělené zálohy/hodnocení/platební zpráva | projekce a import unit OK; zpráva platby z v1, živá mapa platebního stavu čeká |
 | M04 | `accounting.py`, verzované role tarifů, import/editor | `test_alternative_not_charged`, změna sazby a DPH OK; automatická interpretace portálových smluvních cen čeká |
 | M05 | soukromé SHA originály, autentizovaný download, portálové doklady | `test_zip_roundtrip_with_original` OK; skutečný HA download a živé smluvní PDF čekají |
@@ -111,7 +108,7 @@ Uváděné cesty modulů jsou relativní k `custom_components/mnd_tariff_account
 | T10 | manuální i senzorová projekce a ruční roční profil | nastavení a nativní události v HA |
 | T11 | syntetické příklady priority, rebaze a opravy MND | HA historický senzor |
 | T12 | den bez vymyšleného času; přesné intradenní body samostatně | UX nejistoty v HA |
-| T13 | neplatné jednotky nevymažou fakturu; registry přejmenování implementováno | skutečný registry update/remove |
+| T13 | neplatné jednotky nevymažou fakturu; skutečný HA registry rename zachová UUID | širší remove/disabled varianty |
 | T14 | mezilehlý reset, nová kalibrace po resetu, mezera a nula | dlouhá skutečná historie zdroje |
 | T15 | převody/mezery/jednotky a doložený faktor pro srovnání | fakturační koeficient skutečného účtu |
 | T16 | alternativa neúčtuje, sazba/DPH jednou, chybějící mezistav odmítnut | skutečné produktové dokumenty |
@@ -125,26 +122,26 @@ Uváděné cesty modulů jsou relativní k `custom_components/mnd_tariff_account
 | T24 | chybějící část zůstává null, překryvy odděleně | skutečné hraniční periody portálu |
 | T25 | starý snapshot zachován, shodné dokončené měření/faktura, nesoulad odmítnut | živé vyhodnocení pozdější skutečnosti |
 | T26 | léto samo nedá zimní prognózu; bez cen není přesná finanční prognóza | roční historie skutečného místa |
-| T27 | budoucí Store schema a chyba save nepublikují prázdný stav | skutečný HA Store, Recorder retention a disková chyba |
+| T27 | budoucí schema odmítnuto; skutečný atomický Store, disková chyba, stopping/read-only ověřeny | Recorder retention a pád celého procesu |
 | T28 | dva souběžné commity a cancellation během save neztratí revizi | reálný pád procesu HA a přepočet během importu |
 | T29 | starší v1, přesné Decimal, raw provenience, Actual a backup | kompletní volitelné pole po poli proti skutečnému exportu |
-| T30 | připravené skutečné lifecycle testy bez fake HA modulu | oba Linux HA běhy dosud neprovedeny |
+| T30 | 16 skutečných HA testů úspěšně na 2026.3.1 i 2026.10.1 | širší runtime scénáře uvedené výše |
 | T31 | registry placeholdery včetně přejmenovaných názvů; graf bez ApexCharts | skutečný HA registry a chybějící entity |
 | T32 | kolize, cizí views, změna po náhledu, ztracená odpověď; jeden save | skutečné úložiště Overview; nativní HA nemá CAS |
 | T33 | YAML/strategy pouze export, kolize odmítá přepis | místně upravená MND kompozice v HA |
 | T34 | DOM, dark atribut a nuly; brand vizuálně v 32/64 px | screenshoty mobil/desktop/tooltipy v HA |
-| T35 | všech šest views používá stejnou kartu a společnou šablonu | nová instalace i upgrade v HA |
-| T36 | serverové admin kontroly a diagnostická whitelist implementovány | skutečné neoprávněné HTTP/WS pokusy v HA |
+| T35 | šest views sdílí šablonu; skutečný setup/reload zachová Overview | vizuální upgrade upravených MND views |
+| T36 | skutečné HTTP/WS/služby odmítnou nesprávce; admin summary funguje | širší fuzz a úspěšný import/download |
 | T37 | skutečné dočasné Git tagy, reprodukovatelný ZIP, neshodný commit a immutable API | release tohoto projektu po CI |
-| T38 | zkontrolovaný index 97 souborů, runtime strom 43 souborů, pouze syntetické fixtures | finální tagged instalační ZIP po CI |
+| T38 | zkontrolovaný index 98 souborů, runtime strom 43 souborů, pouze syntetické fixtures | finální tagged instalační ZIP po CI |
 
 ## Způsob dokončení
 
-Nejbližší ověřovací krok je spuštění připraveného CI v Linuxu nad konkrétním
-commitem. Veřejné odeslání zdrojů musí být vědomé; není provedeno potichu.
+Zdrojový repozitář je po souhlasu veřejný a první skutečná matice CI prošla.
+Finální alpha revize musí projít stejnými kontrolami před tagem a draftem.
 Automatická kontrola prvotní zveřejnění odmítla bez dalšího výslovného
 souhlasu. Po následném uživatelském „Ano“ byl repozitář založen a zdroj
 odeslán; předchozí blokace již neplatí. Výchozí větev je `master_HA`.
-Poté se opraví nalezené skutečné HA problémy, provede oprávněný test MND a
-vizuální QA, teprve potom tag/build/draft. Úspěch syntetických testů tento
-postup nenahrazuje. Provozní HA nebyl změněn.
+Pro přechod z alpha verze na produkční vydání zbývá doplnit živé cloudové
+mapování a oprávněně ověřit účet MND i vizuální HA. Úspěch syntetických
+testů tento postup nenahrazuje. Provozní HA nebyl změněn.

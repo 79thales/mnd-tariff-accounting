@@ -11,7 +11,14 @@ Verze manifestu, tagu a CS/EN changelogu musí souhlasit.
 Resolver 16. 10. 2026 našel stable HA 2026.10.1, plugin 0.13.372 a Python 3.14.
 Minimum bylo upraveno na 2026.3.1/plugin 0.13.317: plugin pro přesné 2026.3.0
 nebyl nalezen. Metadata pro 2026.3.0 vyžadují Python >=3.14.2; sousední pluginy
-cílí 2026.2.3 a potom 2026.3.1. Volbu musí potvrdit skutečné testy.
+cílí 2026.2.3 a potom 2026.3.1. Obě zvolené varianty již prošly 16 skutečnými
+HA testy v Linuxu; Quality obsahuje také 100 doménových/protokolových testů
+a 21 Node testů. Stejné kontroly jsou povinné i pro finální alpha revizi.
+
+První balíček má verzi `0.1.0-alpha.1`, tag `v0.1.0-alpha.1` a zůstává
+draftem s příznakem prerelease. Tento stav nepředstírá dokončené cloudové
+mapování ani živé ověření MND. Zveřejnění draftu není automatická součást
+build workflow; testovací ZIP lze předat místně bez instalace do HA.
 
 ```text
 python scripts/build_release.py --ref vX.Y.Z --expected-tag vX.Y.Z

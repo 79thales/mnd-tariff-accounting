@@ -31,6 +31,8 @@ Import má vlastní funkční cestu, ale nenahrazuje cloudové M01–M08.
 Pracovní strom ČEZ obsahuje necommitnuté opravy; nebyl upraven. C# pracovní
 strom byl při úvodní kontrole čistý. Dostupný Python je 3.12.14; minimum
 HA 2026.3.1 i aktuální stable 2026.10.1 vyžadují samostatně odpovídající prostředí.
-Lokální unit testy nejsou prohlášením o ověření lifecycle nové verze HA.
+Lokální unit testy nenahrazují lifecycle; následné skutečné Linux CI již
+ověřilo 16 HA testů na obou přesných párech HA/plugin. Tím není ověřen
+zákaznický cloudový účet ani vizuální frontend v prohlížeči.
 Stav testů a všech požadavků je v IMPLEMENTACE.md; neprovedené kontroly
 zůstávají výslovně neověřené.

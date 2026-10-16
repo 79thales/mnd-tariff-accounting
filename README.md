@@ -4,7 +4,7 @@ Samostatná integrace plynu podle [úplného zadání](ZADANI_MND_SOL_6_1.md).
 Runtime je Python, přibalený frontend JavaScript bez externí Lovelace
 závislosti. Nepotřebuje WPF, WebView2 ani REST token k vlastnímu HA.
 
-**Stav: vývojová verze 0.1.0.** Jednotkové testy nepotvrzují funkci na
+**Stav: vývojová verze 0.1.0-alpha.1.** Jednotkové testy nepotvrzují funkci na
 zákaznickém účtu. Přesný stav a omezení jsou v [reportu](IMPLEMENTACE.md).
 Zdroj je ve veřejném repozitáři [79thales/mnd-tariff-accounting](https://github.com/79thales/mnd-tariff-accounting).
 Vydání instalátoru je oddělené od zveřejnění zdrojů.
@@ -26,14 +26,18 @@ Vydání instalátoru je oddělené od zveřejnění zdrojů.
 
 ## Použití vývojové verze
 
-Před provozním použitím musí projít Quality, HACS, Hassfest, skutečná HA
-lifecycle matice a samostatná oprávněná živá kontrola. Testovací minimum
-je **HA 2026.3.1** s přesně odpovídajícím pluginem 0.13.317. Metadata tohoto
-páru nenahrazují provedené testy. Pro původně navržené 2026.3.0 přesný plugin
-nebyl nalezen, proto bylo minimum zvýšeno.
+Quality, HACS a Hassfest prošly. Skutečná HA matice ověřila 16 testů na
+**2026.3.1 / plugin 0.13.317** i **2026.10.1 / plugin 0.13.372**.
+To nenahrazuje živý test MND ani vizuální kontrolu v HA. Úplné automatické
+převzetí smluvních cen a živé mapování platebního stavu zatím chybějí;
+doložené tarify lze zadat ručně nebo importovat z C# v1.
+Pro původně navržené minimum 2026.3.0 přesný plugin nebyl nalezen, proto
+bylo minimum zvýšeno na ověřenou 2026.3.1.
 
 Po schválené instalaci patří celý adresář `custom_components/mnd_tariff_accounting/`
-do konfigurace HA. V **Nastavení → Zařízení a služby → Přidat integraci → MND**
+do konfigurace HA. ZIP z draftu obsahuje runtime přímo v kořeni; rozbalte
+jej do `config/custom_components/mnd_tariff_accounting/` a restartujte HA.
+V **Nastavení → Zařízení a služby → Přidat integraci → MND**
 zvolte importní profil nebo účet MND. EIC a číslo měřidla jsou text.
 Přihlašovací údaje patří do chráněného formuláře HA, nikoli do zdrojů.
 Uložení hesla je výslovná volba; běžné úložiště HA není šifrovaný trezor.
@@ -75,9 +79,12 @@ MND XLSX and the C# v1 archive, keeps auditable readings, tariffs, actual
 payments, invoices and historical forecast snapshots, and provides a bundled
 panel and an Overview dashboard generator.
 
-Development version 0.1.0 is not a verified production release. Live MND
-validation and the Linux HA compatibility matrix are pending; see
-`IMPLEMENTACE.md`. The minimum test target is HA 2026.3.1.
+Development version 0.1.0-alpha.1 is not a verified production release.
+Quality, HACS and Hassfest passed, including 16 real HA tests on both
+2026.3.1 and 2026.10.1. Live MND validation and visual QA remain pending.
+Complete automatic contract pricing and live payment-status mapping are
+not implemented; manual tariffs and C# v1 imports are available. See
+`IMPLEMENTACE.md`. The tested minimum is HA 2026.3.1.
 
 Unknown values remain distinct from zero, planned advances from actual
 payments, and forecasts from confirmed invoices. Credentials, private
