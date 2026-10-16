@@ -6,7 +6,8 @@ závislosti. Nepotřebuje WPF, WebView2 ani REST token k vlastnímu HA.
 
 **Stav: vývojová verze 0.1.0.** Jednotkové testy nepotvrzují funkci na
 zákaznickém účtu. Přesný stav a omezení jsou v [reportu](IMPLEMENTACE.md).
-Cílový veřejný repozitář uvedený v manifestu ještě není publikací projektu.
+Zdroj je ve veřejném repozitáři [79thales/mnd-tariff-accounting](https://github.com/79thales/mnd-tariff-accounting).
+Vydání instalátoru je oddělené od zveřejnění zdrojů.
 
 ## Funkce
 

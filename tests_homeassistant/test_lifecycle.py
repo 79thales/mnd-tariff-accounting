@@ -1,15 +1,19 @@
 """Lifecycle, Store, registry a formuláře proti skutečné verzi HA z CI matice.
 
 Pouze syntetická data v dočasné konfiguraci. Nespouští zákaznické MND ani
-neinstaluje integraci do provozního HA. Mockovaný je jen síťový portál.
+neinstaluje integraci do provozního HA. Používá standardní HA fixtures;
+samostatný test obejde mock_storage a ověří skutečný zápis v dočasné složce.
 """
 
+import json
 from unittest.mock import patch
 
 import pytest
 from homeassistant.core import CoreState
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.storage import Store
+from homeassistant.util.file import WriteError
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.mnd_tariff_accounting.const import DOMAIN
@@ -17,6 +21,9 @@ from custom_components.mnd_tariff_accounting.core.common import DataError
 from custom_components.mnd_tariff_accounting.storage import ConfirmedStore
 
 PLACE = "27ZG000Z0000000X"
+# Uloženo před aktivací fixture mock_storage, abychom samostatně ověřili
+# i skutečný atomický zápis na disk, nikoli pouze paměťové úložiště pluginu.
+_REAL_STORE_WRITE = Store._async_write_data
 
 
 def entry():
@@ -72,8 +79,9 @@ async def test_setup_entities_store_reload_and_unload(hass):
     assert await hass.config_entries.async_reload(selected.entry_id)
     await hass.async_block_till_done()
     assert len(selected.runtime_data.repository.data["places"][PLACE]["readings"]) == 1
+    reloaded = selected.runtime_data
     assert await hass.config_entries.async_unload(selected.entry_id)
-    assert selected.runtime_data._closed
+    assert coordinator._closed and reloaded._closed
 
 
 async def test_store_failure_is_not_successful_commit(hass):
@@ -82,14 +90,37 @@ async def test_store_failure_is_not_successful_commit(hass):
     assert await hass.config_entries.async_setup(selected.entry_id)
     coordinator = selected.runtime_data
     before = coordinator.repository.data["revision"]
-    with patch.object(
-        coordinator.store, "_write_data", side_effect=OSError("synthetic disk failure")
-    ):
-        with pytest.raises(OSError):
+    # Plugin nahrazuje základní _async_write_data. Chybu proto vstříkneme
+    # do tohoto rozhraní pod naším ConfirmedStore, aby se ověřil jeho převod.
+    with patch.object(Store, "_async_write_data", side_effect=WriteError("synthetic disk failure")):
+        with pytest.raises(HomeAssistantError, match="mnd_archive_write_failed"):
             await coordinator.repository.transact(lambda data: data.update(marker=True))
     assert coordinator.repository.data["revision"] == before
     assert "marker" not in coordinator.repository.data
     await hass.config_entries.async_unload(selected.entry_id)
+
+
+async def test_real_atomic_store_writes_disk_and_propagates_failure(hass, tmp_path):
+    """Skutečný soubor v dočasné složce; pád zapisovače nezmění uložený obsah."""
+    store = ConfirmedStore(
+        hass,
+        1,
+        "mnd.synthetic-disk",
+        private=True,
+        atomic_writes=True,
+        serialize_in_event_loop=False,
+    )
+    target = tmp_path / "archive.json"
+    store.path = str(target)
+    with patch.object(Store, "_async_write_data", _REAL_STORE_WRITE):
+        await store.async_save({"revision": 1})
+        assert json.loads(target.read_text())["data"] == {"revision": 1}
+        with patch.object(
+            store, "_write_prepared_data", side_effect=WriteError("synthetic full disk")
+        ):
+            with pytest.raises(HomeAssistantError, match="mnd_archive_write_failed"):
+                await store.async_save({"revision": 2})
+        assert json.loads(target.read_text())["data"] == {"revision": 1}
 
 
 async def test_unknown_archive_version_refuses_setup_without_erasing(hass):

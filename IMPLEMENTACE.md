@@ -40,8 +40,12 @@ vývoji poslouchá pouze na `127.0.0.1:8766`. Náhled není emulace HA lifecycle
    API HA není náhradou skutečného běhu.
    Připraveno je sedm HA testů, včetně potvrzení zápisu při vypínání HA
    a odmítnutí transakce do read-only Store; tyto testy zatím neběžely.
-2. HACS a Hassfest. Pracovní manifest obsahuje plánovanou GitHub adresu;
-   repozitář zatím neexistuje. Workflow je připravené, nikoli úspěšné.
+2. GitHub repozitář byl po výslovném souhlasu založen veřejně:
+   [79thales/mnd-tariff-accounting](https://github.com/79thales/mnd-tariff-accounting).
+   Hassfest v prvním běhu prošel; HACS požadoval doplnit témata repozitáře,
+   ta byla doplněna. Quality prošlo v doménové/Node části, obě verze HA
+   odhalily dvě chyby testovacího harnessu, které byly opraveny. Následuje
+   opakovaný běh rozšířené HA sady, zatím bez tvrzení o úspěchu.
 3. Nový oprávněný živý test přihlášení a odpovědí účtu MND v HA. Nečetla jsem
    staré přístupy a neprováděla nový zákaznický login. MFA, skutečné limity,
    výměna smlouvy a celý cloudový tok zůstávají neověřené.
@@ -53,7 +57,7 @@ vývoji poslouchá pouze na `127.0.0.1:8766`. Náhled není emulace HA lifecycle
    CUA nevrátil dostupný prohlížeč. DOM testy nejsou screenshotové ověření.
 6. Po úspěšných kontrolách vytvořit neměnný tag, instalační ZIP z tohoto
    tagu a draft. V tomto projektu zatím není release tag, instalační ZIP,
-   veřejný remote, draft ani instalace do živého HA.
+   draft ani instalace do živého HA.
 
 Přidání do Overview používá kontrolu celé konfigurace těsně před jedním
 zápisem a následné čtení. Nativní HA save nemá CAS, proto nelze garantovat
@@ -138,10 +142,9 @@ Uváděné cesty modulů jsou relativní k `custom_components/mnd_tariff_account
 
 Nejbližší ověřovací krok je spuštění připraveného CI v Linuxu nad konkrétním
 commitem. Veřejné odeslání zdrojů musí být vědomé; není provedeno potichu.
-Automatická kontrola oprávnění odmítla založení veřejného repozitáře
-`79thales/mnd-tariff-accounting` a odeslání zdrojů bez dalšího výslovného
-souhlasu uživatele. Repo, push ani CI proto tímto pokusem nevznikly.
-Souhlas byl vyžádán; místní commity jsou uloženy ve větvi `master_HA`.
+Automatická kontrola prvotní zveřejnění odmítla bez dalšího výslovného
+souhlasu. Po následném uživatelském „Ano“ byl repozitář založen a zdroj
+odeslán; předchozí blokace již neplatí. Výchozí větev je `master_HA`.
 Poté se opraví nalezené skutečné HA problémy, provede oprávněný test MND a
 vizuální QA, teprve potom tag/build/draft. Úspěch syntetických testů tento
 postup nenahrazuje. Provozní HA nebyl změněn.
