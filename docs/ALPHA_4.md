@@ -88,3 +88,32 @@ ověření uložené konfigurace nejsou vizuální zkouškou mobilní aplikace.
 
 Loňské a topné/netopné srovnání nadále vyžaduje odpovídající historii;
 alpha.4 z chybějícího minulého roku nevytváří odhadnutou skutečnost.
+
+## Dokončené ověření 16. 10. 2026
+
+[Workflow tagu](https://github.com/79thales/mnd-tariff-accounting/actions/runs/38918479190)
+úspěšně ověřilo Quality, HACS a Hassfest: 130 Python testů, 26 Node testů
+a 22 skutečných HA testů na každé z dvojic HA 2026.3.1/plugin 0.13.317
+a aktuální stable HA 2026.10.1/plugin 0.13.372.
+
+Tag `v0.1.0-alpha.4` ukazuje na runtime commit
+`431a75ff08dd242376ba2896cba82366a7ba4d02`. Instalační ZIP má 175 772 bajtů,
+47 runtime souborů a SHA-256
+`4812d1d1ac508d73d26ede1393b6c78ae7c69d32789c59225717538332f3430f`.
+Draft i anonymní stažení zveřejněného prerelease odpovídají sestavení z tagu.
+
+Uživatelem schválené nasazení přes HACS a jediný restart potvrdily běžící
+alpha.4. Živý přehled načetl dodavatelské účetní období, nenulové úhrady,
+plán, odběr, náklady a výhled výsledku bez chyby MND. Historie původního
+pulsního zdroje byla načtena v potvrzeném rozsahu této alfy; při kontrolním
+překryvu 1 080 hodin souhlasily přírůstky s odvozeným objemovým senzorem.
+
+Šest existujících MND karet v Overview je aktualizovaných na kompozici 3,
+bez změny ostatních pohledů. Uložená konfigurace byla porovnána s připraveným
+patchem, generátor nemá chybějící entity a poskytovaný JS odpovídá tagu.
+Živě prošly oba finanční exporty, PDF vyúčtování a kontrola odkazu konfigurace
+zařízení. Konečný privátní ZIP prošel kontrolou hash originálů i obnovou
+nastavení, odečtů, profilu a cenových podkladů do izolované paměti.
+
+Skutečné mobilní vykreslení není tímto ověřené; prohlížeč nebyl k dispozici.
+Soukromé hodnoty a podrobný protokol zůstávají mimo veřejný repozitář.

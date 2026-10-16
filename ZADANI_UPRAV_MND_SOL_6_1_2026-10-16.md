@@ -104,6 +104,12 @@ Tři nově dodané mobilní snímky jsou vzorem kompozice a významu grafů; oso
 částky, identifikátory a samotné snímky se do veřejného projektu nepřenášejí.
 Vzhled zůstává odvozený od MND. Nepřebírej elektrické tarify, HDO ani entity ČEZ.
 
+Pozdější výslovné upřesnění uživatele: pro finanční přehled a hlavní grafy
+je rozhodující **účetní období MND, nikoli kalendářní rok**. Originální
+vyúčtování má přednost ve vlastním rozsahu. Novější měření a cenový model
+nesmějí jeho energii ani náklad započítat znovu. Implementaci této části
+a skutečné ověření alpha.4 popisuje [report](docs/ALPHA_4.md).
+
 - Hlavní stránka má ukázat hlavní ukazatele, aktuální průtok a spotřebu,
   spotřebu za srovnatelnou část loňského období a vývoj odběru plynu.
   Ostatní tabulky, doklady, úplné grafy a rozbory patří do čtecích detailů.
