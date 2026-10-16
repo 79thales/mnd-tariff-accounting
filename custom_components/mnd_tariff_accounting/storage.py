@@ -24,6 +24,19 @@ from .core.common import MAX_BYTES, DataError
 class ConfirmedStore(Store):
     """HA Store v privátním režimu; chyba zapisovače musí dojít až do formuláře."""
 
+    async def async_save(self, data):
+        """Potvrdí až skutečný zápis, také během zastavování Home Assistantu.
+
+        Základní Store při stopping pouze naplánuje závěrečný zápis. Účetní
+        transakce však musí znát výsledek už před zveřejněním nové revize.
+        Stejný interní zapisovač zachová zámek, atomický soubor i úklid listeneru.
+        """
+        if self._read_only:
+            raise HomeAssistantError("mnd_archive_read_only")
+        await super().async_save(data)
+        if self._data is not None:
+            await self._async_handle_write_data()
+
     async def _async_write_data(self, data):
         # Standardní Store některé diskové chyby pouze zaloguje. Změna typu
         # zabrání tomu, aby UI potvrdilo commit, který zapisovač odmítl.

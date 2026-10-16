@@ -1,10 +1,10 @@
 {
   "domain": "mnd_tariff_accounting",
   "name": "MND Tariff & Accounting",
+  "after_dependencies": ["recorder"],
   "codeowners": ["@79thales"],
   "config_flow": true,
   "dependencies": ["frontend", "http", "lovelace", "panel_custom", "websocket_api"],
-  "after_dependencies": ["recorder"],
   "documentation": "https://github.com/79thales/mnd-tariff-accounting",
   "integration_type": "hub",
   "iot_class": "cloud_polling",

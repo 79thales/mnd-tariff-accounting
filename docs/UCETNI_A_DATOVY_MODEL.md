@@ -102,3 +102,13 @@ nikoli jen dosud změřené části měsíce. Datum skutečné platby se kontrol
 samostatně; budoucí úhrada není skutečnost. Vlastní prognóza smí použít jen
 profil stejného registry ID a segmentu. Starý import nepřepíše novější
 snapshot jen pořadím nahrání.
+
+Opravená faktura přebírá platby a vratky svých předchozích verzí. Vrácený
+přeplatek se při následné opravě na nedoplatek připočte ke skutečnému dluhu.
+Původní výsledek faktury zůstává oddělen od zbývajícího vypořádání; nejasně
+spárovaná platba ani převod bez opačné protistrany fakturu neuzavřou.
+
+Účetní revize se zveřejní až po dokončení atomického zápisu do Store,
+také při vypínání HA. Úložiště v read-only režimu transakci odmítne.
+Tato ochrana využívá interní zapisovač Store, proto ji pro každou podporovanou
+verzi HA samostatně ověřují připravené lifecycle testy.

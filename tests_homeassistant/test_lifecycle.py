@@ -7,11 +7,14 @@ neinstaluje integraci do provozního HA. Mockovaný je jen síťový portál.
 from unittest.mock import patch
 
 import pytest
+from homeassistant.core import CoreState
 from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.exceptions import HomeAssistantError
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.mnd_tariff_accounting.const import DOMAIN
 from custom_components.mnd_tariff_accounting.core.common import DataError
+from custom_components.mnd_tariff_accounting.storage import ConfirmedStore
 
 PLACE = "27ZG000Z0000000X"
 
@@ -97,6 +100,24 @@ async def test_unknown_archive_version_refuses_setup_without_erasing(hass):
         return_value={"schema_version": 999},
     ):
         assert not await hass.config_entries.async_setup(selected.entry_id)
+
+
+async def test_stopping_store_finishes_write_before_acknowledgement(hass):
+    store = ConfirmedStore(hass, 1, "mnd.synthetic-stopping", private=True)
+    hass.set_state(CoreState.stopping)
+    with patch.object(store, "_async_write_data") as writer:
+        await store.async_save({"revision": 42})
+    writer.assert_awaited_once()
+    assert writer.await_args.args[0]["data"]["revision"] == 42
+    assert store._data is None
+    hass.set_state(CoreState.not_running)
+
+
+async def test_read_only_store_cannot_acknowledge_accounting_commit(hass):
+    store = ConfirmedStore(hass, 1, "mnd.synthetic-read-only", private=True)
+    store.make_read_only()
+    with pytest.raises(HomeAssistantError, match="mnd_archive_read_only"):
+        await store.async_save({"revision": 42})
 
 
 async def test_invalid_grid_is_atomic_and_does_not_emit_source_states(hass):

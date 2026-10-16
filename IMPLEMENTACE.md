@@ -13,6 +13,10 @@ Reference C# a ČEZ nebyly upraveny. ORLEN/EDC nejsou součástí runtime.
   zachování cizích views, řízené release API a rozměry/alfa brand PNG:
   **21 testů úspěšně**.
 - Ruff, kompilace Pythonu a kontrola syntaxe JavaScriptu.
+- Kontrola Git indexu: 97 souborů, sedm očekávaných PNG (tři návrhy a čtyři
+  distribuční ikony), žádné přístupy ani zákaznické dokumenty. Runtime strom
+  obsahuje 43 souborů. Nálezy syntetických EIC končících X/Y byly ověřeny
+  jako fixtures; místní prostředí, cache a pracovní náhled nejsou sledovány.
 - Celkové pokrytí Python runtime v této místní sadě je **50 % včetně větví**.
   Zahrnuje i dosud nespouštěné HA adaptéry s nulovým pokrytím; samotná sada
   doménových testů není důkazem správné funkce těchto adaptérů v HA.
@@ -34,6 +38,8 @@ vývoji poslouchá pouze na `127.0.0.1:8766`. Náhled není emulace HA lifecycle
    Místně je Python 3.12 ve Windows, není dostupné Linux prostředí ani WSL
    distribuce. Připravená CI matice zatím nebyla spuštěna. Kontrola zdrojového
    API HA není náhradou skutečného běhu.
+   Připraveno je sedm HA testů, včetně potvrzení zápisu při vypínání HA
+   a odmítnutí transakce do read-only Store; tyto testy zatím neběžely.
 2. HACS a Hassfest. Pracovní manifest obsahuje plánovanou GitHub adresu;
    repozitář zatím neexistuje. Workflow je připravené, nikoli úspěšné.
 3. Nový oprávněný živý test přihlášení a odpovědí účtu MND v HA. Nečetla jsem
@@ -126,12 +132,16 @@ Uváděné cesty modulů jsou relativní k `custom_components/mnd_tariff_account
 | T35 | všech šest views používá stejnou kartu a společnou šablonu | nová instalace i upgrade v HA |
 | T36 | serverové admin kontroly a diagnostická whitelist implementovány | skutečné neoprávněné HTTP/WS pokusy v HA |
 | T37 | skutečné dočasné Git tagy, reprodukovatelný ZIP, neshodný commit a immutable API | release tohoto projektu po CI |
-| T38 | ignore pravidla, pouze syntetické fixtures, připravená kontrola indexu/runtime stromu | finální tagged instalační ZIP po CI |
+| T38 | zkontrolovaný index 97 souborů, runtime strom 43 souborů, pouze syntetické fixtures | finální tagged instalační ZIP po CI |
 
 ## Způsob dokončení
 
 Nejbližší ověřovací krok je spuštění připraveného CI v Linuxu nad konkrétním
 commitem. Veřejné odeslání zdrojů musí být vědomé; není provedeno potichu.
+Automatická kontrola oprávnění odmítla založení veřejného repozitáře
+`79thales/mnd-tariff-accounting` a odeslání zdrojů bez dalšího výslovného
+souhlasu uživatele. Repo, push ani CI proto tímto pokusem nevznikly.
+Souhlas byl vyžádán; místní commity jsou uloženy ve větvi `master_HA`.
 Poté se opraví nalezené skutečné HA problémy, provede oprávněný test MND a
 vizuální QA, teprve potom tag/build/draft. Úspěch syntetických testů tento
 postup nenahrazuje. Provozní HA nebyl změněn.
