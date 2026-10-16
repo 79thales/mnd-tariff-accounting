@@ -32,7 +32,7 @@ async def ready(hass):
 
 
 async def test_pulse_statistics_use_explicit_volume_and_preserve_two_source_series(hass):
-    hass.config.set_time_zone("UTC")
+    hass.config.time_zone = "UTC"
     entry = await ready(hass)
     coordinator = entry.runtime_data
     registry = er.async_get(hass)
