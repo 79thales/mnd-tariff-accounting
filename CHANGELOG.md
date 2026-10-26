@@ -21,6 +21,42 @@
   the MND integration and open its HACS repository, with installation and
   restart prerequisites. The existing alpha tag and installer are unchanged.
 
+## 0.1.0-beta.1 — první beta, měření kotle a přehlednější dashboard
+
+### Čeština
+
+- První beta přebírá ověřené měření kotle a přehled z alpha.5. Oproti této
+  alfě se funkční kód nemění; nová verze má vlastní tag a instalační balíček.
+- V administraci každého odběrného místa lze zapnout měření elektrického
+  příkonu a vybrat volitelný elektroměr kotle. Náhled ukáže dostupnost zdrojů;
+  elektrická energie zůstává oddělená od plynu a vyúčtování MND.
+- Hlavní přehled obsahuje tři bloky: právě teď, spotřebu a vyúčtování.
+  Podrobnosti Spotřeba doplňují provozní historii a známou elektrickou
+  spotřebu za dnešek a měsíc s časem a skutečným pokrytím.
+- Živé hodnoty se obnovují bez ztráty fokusu a rozepsaných formulářů.
+  Chybějící a zastaralá data se nevydávají za nulovou spotřebu.
+- Generátor i přibalená šablona používají kompozici 4. Hlavní pohled,
+  podstránky, navigace i finanční přehledy zůstávají zachované.
+- Úvod v HACS je pouze český a používá stejné členění jako ČEZ: odznaky,
+  logo, novinky, informace o integraci, požadavky a instalaci.
+
+**Po aktualizaci:** restartujte Home Assistant a obnovte prohlížeč. Měření
+kotle zapněte v konfiguraci zařízení MND v části **Elektrická spotřeba
+plynového kotle** a vyberte zdroje. Již uložený dashboard se sám nepřepíše;
+novou podobu převezměte z náhledu generátoru po záloze Overview.
+Beta je určená k testování. Zásuvku ani termostat tato funkce neovládá.
+
+### English
+
+- First beta packages the verified alpha.5 runtime without functional changes.
+- Includes optional boiler electricity monitoring, compact overview, native
+  history and explicitly partial energy summaries; electricity stays separate
+  from gas accounting. Generator and bundled dashboard share layout 4.
+- HACS documentation and generated release notes are Czech-only as requested.
+- Restart Home Assistant and refresh the browser after installing. Configure
+  boiler sensors per supply point; preview and back up dashboard changes.
+  Beta status does not imply stable status or completed mobile visual QA.
+
 ## 0.1.0-alpha.5 — měření kotle a jednoduchý přehled
 
 ### Čeština

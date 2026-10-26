@@ -4,20 +4,20 @@
 [![Integrace HACS](https://img.shields.io/badge/HACS-Integrace-41BDF5?logo=home-assistant-community-store&logoColor=white&style=flat)](https://my.home-assistant.io/redirect/hacs_repository/?owner=79thales&repository=mnd-tariff-accounting&category=integration)
 [![Nejnovější vydání](https://img.shields.io/github/v/release/79thales/mnd-tariff-accounting?include_prereleases&label=Vyd%C3%A1n%C3%AD&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases)
 [![Stažení instalátoru celkem](https://img.shields.io/github/downloads/79thales/mnd-tariff-accounting/mnd_tariff_accounting.zip?label=Sta%C5%BEen%C3%AD%20celkem&displayAssetName=false&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases)
-[![Stažení instalátoru nejnovější verze](https://img.shields.io/github/downloads/79thales/mnd-tariff-accounting/v0.1.0-alpha.4/mnd_tariff_accounting.zip?label=Sta%C5%BEen%C3%AD%20verze&displayAssetName=false&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.4)
+[![Stažení instalátoru nejnovější verze](https://img.shields.io/github/downloads/79thales/mnd-tariff-accounting/v0.1.0-beta.1/mnd_tariff_accounting.zip?label=Sta%C5%BEen%C3%AD%20verze&displayAssetName=false&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-beta.1)
 [![Kontroly](https://img.shields.io/github/check-suites/79thales/mnd-tariff-accounting/master_HA?label=Kontroly&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/actions)
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/79thales/mnd-tariff-accounting/master_HA/custom_components/mnd_tariff_accounting/brand/icon@2x.png" alt="MND Tariff & Accounting" width="180">
 </p>
 
-## Nově ve verzi 0.1.0-alpha.4
+## Nově ve verzi 0.1.0-beta.1
 
-Přehled používá skutečné účetní období MND a společně zobrazuje spotřebu,
-náklady, zaplacené zálohy a očekávaný výsledek vyúčtování. Měsíční graf plynu
-rozlišuje úplné, neúplné a chybějící měření. Originální faktura má přednost
-ve svém období; novější měření z Home Assistantu na ni navazuje.
-Postup a omezení: [účetní přehled a měření](docs/ALPHA_4.md).
+První beta přináší jednodušší přehled se třemi bloky: právě teď, spotřeba
+a vyúčtování. V administraci lze zapnout měření elektrického příkonu kotle
+a jeho samostatné spotřeby. Detail Spotřeba doplňuje provozní historii;
+neúplné měření zůstává označené. Elektřina kotle se nezapočítává do plynu.
+Postup a omezení: [první beta](docs/BETA_1.md).
 
 ## O integraci
 
@@ -27,17 +27,17 @@ uchovává jejich původ a rozlišuje skutečné platby, předpisy záloh a prog
 Běžný dashboard slouží k prohlížení; správa odběrného místa je v konfiguraci
 příslušného zařízení MND.
 
-[Aktuální vydání](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.4)
+[Aktuální vydání](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-beta.1)
 
-**Jde o vývojovou verzi.** Poslední veřejný instalátor je alpha.4; neveřejný
-draft nové verze není aktualizací dostupnou v HACS. Historii ověřování
-popisují [alpha.4](docs/ALPHA_4.md), [alpha.3](docs/ALPHA_3.md),
+**Stav: beta.** Verze je určená k testování, nikoli označená jako stabilní.
+Přípravu a živé ověření funkcí popisuje [report](docs/ALPHA_5.md).
+Historii ověřování popisují [alpha.4](docs/ALPHA_4.md), [alpha.3](docs/ALPHA_3.md),
 [alpha.2](docs/ALPHA_2.md) a [původní report](IMPLEMENTACE.md).
 
 Odznaky stažení počítají pouze instalační přílohu `mnd_tariff_accounting.zip`,
 včetně aktualizací a ručního stažení. Nejde o počet uživatelů ani aktivních
 instalací. Celkový odznak sčítá přílohy všech vydání; odznak verze patří
-veřejné alpha.4. Zdrojové archivy a instalace z větve se nezapočítávají.
+veřejné beta.1. Zdrojové archivy a instalace z větve se nezapočítávají.
 Údaje mohou být dočasně uložené v mezipaměti; integrace kvůli nim neposílá
 telemetrii.
 
@@ -62,6 +62,8 @@ telemetrii.
 - Účetní období MND, náklady a zálohy ve společném grafu, měsíční HA sloupce m³.
 - Průtok m³/h, historie záloh a úhrad, fakturační detaily a oddělené exporty MND.
 - Formuláře a Generate dashboard pro horní lištu existujícího Overview.
+- Volitelné měření příkonu a elektrické energie kotle s pokrytím denních
+  a měsíčních souhrnů; provozní historie v detailu Spotřeba.
 - Čtecí cloudový klient podle nalezeného veřejného JS MND, reauth a obnovitelná
   historie. [Autentizace a hranice ověření](docs/AUTENTIZACE.md).
 
@@ -73,12 +75,12 @@ telemetrii.
 Tlačítko **Přidat integraci** otevře přímo konfiguraci MND ve vašem
 Home Assistantu. Nejdříve nainstalujte integrační soubory a restartujte HA.
 Tlačítko **HACS** otevře tento repozitář jako integraci, stejně jako u ČEZ.
-Testovací [vydání v0.1.0-alpha.4](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.4)
+Testovací [vydání v0.1.0-beta.1](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-beta.1)
 je dostupné jako **prerelease**. V HACS obnovte informace repozitáře, zapněte
-zobrazení beta verzí a při stahování vyberte **v0.1.0-alpha.4**. V dialogu má
+zobrazení beta verzí a při stahování vyberte **v0.1.0-beta.1**. V dialogu má
 být uvedena tato verze, nikoli commit výchozí větve. Po instalaci restartujte HA.
 
-Pro ruční instalaci je dostupný [instalační ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v0.1.0-alpha.4/mnd_tariff_accounting.zip).
+Pro ruční instalaci je dostupný [instalační ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v0.1.0-beta.1/mnd_tariff_accounting.zip).
 
 Quality, HACS a Hassfest se ověřují pro každý tag. Skutečné HA testy používají
 minimum 2026.3.1 a aktuální stabilní verzi s přesně odpovídajícím pluginem.
