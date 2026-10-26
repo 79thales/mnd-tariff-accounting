@@ -8,6 +8,12 @@ HACS a Hassfest. Připravené workflow není úspěšná kontrola. Staged diff
 a celý ZIP se prohlédnou kvůli soukromým údajům i nečekaným binárním souborům.
 Verze manifestu, tagu a CS/EN changelogu musí souhlasit.
 
+Podle výslovné volby uživatele obsahují GitHub release notes pouze češtinu.
+Zdrojový CHANGELOG zachovává český i anglický oddíl; generátor ze zvolené
+verze vybere jen neprázdnou sekci **Čeština**. Anglický text do souboru
+`release-notes.md` ani nového draftu nepřenáší. Chybějící český oddíl je chyba
+sestavení. Tato volba nemění instalační runtime ani existující tagy a assety.
+
 Resolver 16. 10. 2026 našel stable HA 2026.10.1, plugin 0.13.372 a Python 3.14.
 Minimum bylo upraveno na 2026.3.1/plugin 0.13.317: plugin pro přesné 2026.3.0
 nebyl nalezen. Metadata pro 2026.3.0 vyžadují Python >=3.14.2; sousední pluginy

@@ -27,7 +27,13 @@ def _git(repository: Path, *args: str) -> bytes:
 
 
 def extract_release_notes(changelog: str, version: str) -> str:
-    """Vybere pouze požadovanou verzi a zachová české i anglické notes."""
+    """Vybere české notes požadované verze pro soubor i GitHub draft.
+
+    Zdrojový changelog může zůstat dvojjazyčný. Výstup obsahuje pouze český
+    oddíl, včetně jeho vnořených nadpisů; končí před dalším jazykem nebo
+    nadpisem stejné úrovně. Chybějící či prázdný český text zastaví sestavení,
+    aby automatizace nevydala anglický nebo neúplný náhradní popis.
+    """
     changelog = changelog.replace("\r\n", "\n")
     match = re.search(
         rf"^## {re.escape(version)}(?:[ \t][^\n]*)?\n(.*?)(?=^## |\Z)",
@@ -36,13 +42,14 @@ def extract_release_notes(changelog: str, version: str) -> str:
     )
     if match is None:
         raise ValueError(f"CHANGELOG.md has no release notes for {version}")
-    notes = match.group(1).strip() + "\n"
-    if not all(
-        re.search(rf"^### {language}$", notes, flags=re.MULTILINE)
-        for language in ("Čeština", "English")
-    ):
-        raise ValueError("Release notes must contain Czech and English sections")
-    return notes
+    czech = re.search(
+        r"^### Čeština[ \t]*\n(.*?)(?=^### |\Z)",
+        match.group(1),
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    if czech is None or not czech.group(1).strip():
+        raise ValueError("Release notes must contain a nonempty Czech section")
+    return "### Čeština\n\n" + czech.group(1).strip() + "\n"
 
 
 def build_release(

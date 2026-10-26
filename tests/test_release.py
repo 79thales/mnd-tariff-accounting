@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 from zipfile import ZipFile
 
-from scripts.build_release import build_release
+from scripts.build_release import build_release, extract_release_notes
 from scripts.verify_release_package import verify_existing_installer
 
 
@@ -52,7 +52,29 @@ class ReleaseTests(unittest.TestCase):
             self.assertEqual(set(package.namelist()), {"manifest.json", "__init__.py"})
             self.assertIn(b"committed runtime", package.read("__init__.py"))
         self.assertIn("Čeština", notes)
-        self.assertIn("English", notes)
+        self.assertNotIn("English", notes)
+        self.assertNotIn("Synthetic verification", notes)
+
+    def test_czech_notes_preserve_nested_headings_and_selected_version_only(self):
+        changelog = (
+            "## 0.2.0\r\n### Čeština\r\nNovější verze.\r\n"
+            "## 0.1.0\r\nÚvod.\r\n### English\r\nEnglish first.\r\n"
+            "### Čeština\r\nČeská změna.\r\n#### Podrobnosti\r\nDoplnění.\r\n"
+            "### Další jazyk\r\nCizí text.\r\n## 0.0.9\r\nStarší verze.\r\n"
+        )
+        self.assertEqual(
+            extract_release_notes(changelog, "0.1.0"),
+            "### Čeština\n\nČeská změna.\n#### Podrobnosti\nDoplnění.\n",
+        )
+
+    def test_czech_only_changelog_is_accepted_but_missing_or_empty_czech_fails(self):
+        self.assertEqual(
+            extract_release_notes("## 0.1.0\n### Čeština\nZměna.\n", "0.1.0"),
+            "### Čeština\n\nZměna.\n",
+        )
+        for body in ("### English\nText.\n", "### Čeština\n\n### English\nText.\n"):
+            with self.subTest(body=body), self.assertRaisesRegex(ValueError, "Czech section"):
+                extract_release_notes("## 0.1.0\n" + body, "0.1.0")
 
     def test_matching_version_does_not_allow_different_commit(self):
         (self.root / "marker.txt").write_text("second commit, same manifest")
