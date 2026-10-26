@@ -1,27 +1,54 @@
-# MND Tariff & Accounting for Home Assistant
+# MND Tariff & Accounting – plyn a vyúčtování pro Home Assistant
 
-[![Přidat integraci MND do Home Assistantu](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=mnd_tariff_accounting)
-[![Otevřít repozitář MND v HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=79thales&repository=mnd-tariff-accounting&category=integration)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2026.3.1%2B-41BDF5?logo=home-assistant&logoColor=white&style=flat)](https://www.home-assistant.io/)
+[![Integrace HACS](https://img.shields.io/badge/HACS-Integrace-41BDF5?logo=home-assistant-community-store&logoColor=white&style=flat)](https://my.home-assistant.io/redirect/hacs_repository/?owner=79thales&repository=mnd-tariff-accounting&category=integration)
+[![Nejnovější vydání](https://img.shields.io/github/v/release/79thales/mnd-tariff-accounting?include_prereleases&label=Vyd%C3%A1n%C3%AD&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases)
+[![Stažení instalátoru celkem](https://img.shields.io/github/downloads/79thales/mnd-tariff-accounting/mnd_tariff_accounting.zip?label=Sta%C5%BEen%C3%AD%20celkem&displayAssetName=false&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases)
+[![Stažení instalátoru nejnovější verze](https://img.shields.io/github/downloads/79thales/mnd-tariff-accounting/v0.1.0-alpha.4/mnd_tariff_accounting.zip?label=Sta%C5%BEen%C3%AD%20verze&displayAssetName=false&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.4)
+[![Kontroly](https://img.shields.io/github/check-suites/79thales/mnd-tariff-accounting/master_HA?label=Kontroly&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/actions)
 
-Samostatná integrace plynu podle [úplného zadání](ZADANI_MND_SOL_6_1.md).
-Runtime je Python, přibalený frontend JavaScript bez externí Lovelace
-závislosti. Nepotřebuje WPF, WebView2 ani REST token k vlastnímu HA.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/79thales/mnd-tariff-accounting/master_HA/custom_components/mnd_tariff_accounting/brand/icon@2x.png" alt="MND Tariff & Accounting" width="180">
+</p>
 
-**Stav zdrojů: vývojová verze 0.1.0-alpha.5.** Volitelné měření kotle
-a jednodušší přehled popisuje [report alpha.5](docs/ALPHA_5.md).
-Předchozí účetní model, graf nákladů a záloh a měsíční měření popisuje
-[report alpha.4](docs/ALPHA_4.md). Níže uvedený veřejný instalátor alpha.4
-zůstává posledním zveřejněným balíčkem do samostatné publikace nové verze.
-Historii oprav uchovávají [alpha.3](docs/ALPHA_3.md), [alpha.2](docs/ALPHA_2.md)
-a [původní report](IMPLEMENTACE.md).
-Zdroj je ve veřejném repozitáři [79thales/mnd-tariff-accounting](https://github.com/79thales/mnd-tariff-accounting).
-Vydání instalátoru je oddělené od zveřejnění zdrojů.
+## Nově ve verzi 0.1.0-alpha.4
 
-V nevydaných zdrojích je připravený [jednodušší přehled a volitelné měření
-elektřiny plynového kotle](docs/KOTEL_A_PREHLED.md). Výběr zásuvky je samostatný
-pro každé místo; její elektrická energie se nezapočítává do vyúčtování MND.
+Přehled používá skutečné účetní období MND a společně zobrazuje spotřebu,
+náklady, zaplacené zálohy a očekávaný výsledek vyúčtování. Měsíční graf plynu
+rozlišuje úplné, neúplné a chybějící měření. Originální faktura má přednost
+ve svém období; novější měření z Home Assistantu na ni navazuje.
+Postup a omezení: [účetní přehled a měření](docs/ALPHA_4.md).
 
-## Funkce
+## O integraci
+
+Nezávislá komunitní integrace pro sledování plynu, nákladů a vyúčtování MND
+v Home Assistantu. Spojuje odečty a doklady dodavatele s místním měřením,
+uchovává jejich původ a rozlišuje skutečné platby, předpisy záloh a prognózy.
+Běžný dashboard slouží k prohlížení; správa odběrného místa je v konfiguraci
+příslušného zařízení MND.
+
+[Aktuální vydání](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.4)
+
+**Jde o vývojovou verzi.** Poslední veřejný instalátor je alpha.4; neveřejný
+draft nové verze není aktualizací dostupnou v HACS. Historii ověřování
+popisují [alpha.4](docs/ALPHA_4.md), [alpha.3](docs/ALPHA_3.md),
+[alpha.2](docs/ALPHA_2.md) a [původní report](IMPLEMENTACE.md).
+
+Odznaky stažení počítají pouze instalační přílohu `mnd_tariff_accounting.zip`,
+včetně aktualizací a ručního stažení. Nejde o počet uživatelů ani aktivních
+instalací. Celkový odznak sčítá přílohy všech vydání; odznak verze patří
+veřejné alpha.4. Zdrojové archivy a instalace z větve se nezapočítávají.
+Údaje mohou být dočasně uložené v mezipaměti; integrace kvůli nim neposílá
+telemetrii.
+
+## Požadavky
+
+- Home Assistant `2026.3.1` nebo novější.
+- HACS při instalaci přes HACS.
+- Účet MND pro přístup k portálu, nebo vlastní podklady pro importní profil.
+- Běžný přehled používá přibalený frontend bez externích karet Lovelace.
+
+## Co integrace umí
 
 - XLSX s ověřením EIC, českých čísel, obou Excelových kalendářů a bezpečnosti.
 - Import C# archivu v1 včetně cen, úhrad, metadat dokumentů a prognóz.
@@ -38,9 +65,12 @@ pro každé místo; její elektrická energie se nezapočítává do vyúčtová
 - Čtecí cloudový klient podle nalezeného veřejného JS MND, reauth a obnovitelná
   historie. [Autentizace a hranice ověření](docs/AUTENTIZACE.md).
 
-## Použití vývojové verze
+## Instalace do Home Assistantu
 
-Tlačítko **Přidat integraci** nahoře otevře přímo konfiguraci MND ve vašem
+[![Otevřít repozitář MND v HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=79thales&repository=mnd-tariff-accounting&category=integration)
+[![Přidat integraci MND do Home Assistantu](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=mnd_tariff_accounting)
+
+Tlačítko **Přidat integraci** otevře přímo konfiguraci MND ve vašem
 Home Assistantu. Nejdříve nainstalujte integrační soubory a restartujte HA.
 Tlačítko **HACS** otevře tento repozitář jako integraci, stejně jako u ČEZ.
 Testovací [vydání v0.1.0-alpha.4](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.4)
@@ -67,6 +97,8 @@ zvolte importní profil nebo účet MND. EIC a číslo měřidla jsou text.
 Přihlašovací údaje patří do chráněného formuláře HA, nikoli do zdrojů.
 Uložení hesla je výslovná volba; běžné úložiště HA není šifrovaný trezor.
 
+## Nastavení odběrného místa
+
 Správa je v **Nastavení → Zařízení a služby → Zařízení → MND** pro dané
 odběrné místo. Otevřete jeho konfigurační odkaz; účet i místo jsou již vybrané.
 Zde nastavíte období, kumulativní senzor, průtok, platnost reportu, kalibraci,
@@ -77,10 +109,12 @@ Před převzetím předpisů a skutečných úhrad do místní knihy potvrďte j
 přiřazení k nastavenému období a zkontrolujte ruční duplicity. PDF faktury
 nepotvrzuje automaticky její úplné účetní náklady.
 
+## Dashboard
+
 **Generate dashboard → Vytvořit náhled → Uložit MND v horní liště** přidá nebo
 aktualizuje vlastní MND views v `/lovelace`. Použijte stejnou cestu jako dříve.
 Před zápisem se stáhne záloha Overview; cizí karty, názvy a pořadí se zachovají.
-Generátor i přibalená šablona mají stejnou kompozici verze 2. Po instalaci
+Generátor i přibalená šablona používají stejnou kompozici dané verze. Po instalaci
 obnovte aplikaci/prohlížeč. Importy, editory a generátor jsou dostupné z
 konfigurace zařízení; běžný dashboard slouží k prohlížení.
 YAML a automatický Overview mají export fragmentu `views`. Soukromé údaje,
@@ -106,40 +140,3 @@ na beta či starší náhradu. Instalační ZIP vzniká pouze z Git stromu tagu.
 Vydání začíná draftem, publikované tagy/assets jsou neměnné.
 [Proces vydání](docs/VYDANI.md), [Git politika](GIT_POLITIKY_CEZ.md),
 [changelog](CHANGELOG.md), [návrh značky](NAVRH_LOGA.md), [vzhled MND](docs/VZHLED_MND.md).
-
-## English
-
-[Add MND integration](https://my.home-assistant.io/redirect/config_flow_start/?domain=mnd_tariff_accounting) · [Open in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=79thales&repository=mnd-tariff-accounting&category=integration)
-
-Install the integration files and restart HA before using **Add integration**.
-The [alpha prerelease](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-alpha.4)
-is now public. Refresh repository information in HACS, enable beta versions
-and select **v0.1.0-alpha.4** in the download dialog instead of a default-branch
-commit. Restart HA after installation. A [manual installer ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v0.1.0-alpha.4/mnd_tariff_accounting.zip)
-is also available.
-
-Independent community Home Assistant gas accounting integration. It imports
-MND XLSX and the C# v1 archive, keeps auditable readings, tariffs, actual
-payments, invoices and historical forecast snapshots, and provides a bundled
-panel and an Overview dashboard generator.
-
-Development version 0.1.0-alpha.4 is not a verified production release.
-The billing-period overview, original invoice precedence and measured monthly gas bars are described in `docs/ALPHA_4.md`. Unknown future regulated prices and calendar-day fixed-charge proration are explicit forecast assumptions.
-The normal Overview tab is read-only; supply point administration opens from
-its MND device configuration link. The generator and bundled template update
-existing MND cards while preserving unrelated cards, titles and view order.
-Flow sensors support exact conversion to m³/h. Advance/invoice histories,
-allocated payment details, separate exports and invoice PDF downloads are available.
-Accepting advances into the local ledger requires an explicit period allocation.
-
-Quality, HACS and Hassfest run against each release tag, with real HA tests on
-the supported minimum and dynamically resolved stable version. Earlier live
-validation confirmed financial lists, exports and invoice downloads (`docs/ALPHA_3.md`).
-The new billing model and its pricing limits are documented in `docs/ALPHA_4.md`.
-Mobile visual QA remains unverified.
-
-Unknown values remain distinct from zero, planned advances from actual
-payments, and forecasts from confirmed invoices. Credentials, private
-documents and real customer data are excluded from source control,
-diagnostics and the installer. The MIT license preserves adapted ČEZ tooling
-notices. Sources do not install themselves into a live HA instance.
