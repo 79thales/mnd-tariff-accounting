@@ -21,6 +21,39 @@
   the MND integration and open its HACS repository, with installation and
   restart prerequisites. The existing alpha tag and installer are unchanged.
 
+## 0.1.0-beta.2 — přehledný editor a odkazy na nastavení
+
+### Čeština
+
+- Editor nově rozděluje úlohy do skupin Měření a kotel, Platby a zálohy,
+  Ceny a vyúčtování. Formuláře začínají sbalené, mají stručný popis a při
+  rozbalení jiné úlohy zachovávají rozepsané hodnoty.
+- Nápověda rozlišuje neznámé údaje místní knihy od již sledovaných záloh MND.
+  Chybějící místní období neznamená ztrátu dodavatelských plateb; zálohy
+  není nutné znovu ručně opisovat ani dvojitě započítávat.
+- Přímé odkazy otevřou nastavení období, výběr zdroje průtoku nebo historii
+  záloh MND pro správné odběrné místo. Otevření odkazu nic neukládá.
+- Generátor a přibalená šablona mají shodné prokliky. Složení hlavního
+  přehledu, podstránek, finančních grafů a navigace zůstává zachované.
+- README viditelně uvádí licenci MIT, shodnou s ČEZ Dynamic Tariff i s textem
+  již přibaleným do instalátoru. Podmínky licence se nemění.
+
+**Po aktualizaci:** restartujte Home Assistant a obnovte prohlížeč. V Editoru
+rozbalte pouze požadovanou úlohu. U neznámých údajů otevřete nápovědu
+**Neznámé údaje a nastavení**; odkazy vás dovedou ke konkrétnímu poli.
+Zápisy nadále potvrzujte tlačítkem příslušného formuláře.
+
+### English
+
+- Group the editor into collapsible tasks, retaining unsaved inputs when
+  collapsing or opening another task. Preserve the open task after refresh.
+- Explain local-ledger unknowns separately from monitored MND payments.
+  Add read-only navigation to period settings, flow source and MND advances.
+- Synchronize generated and bundled dashboard configuration links without
+  changing the overview, detail views or accounting calculations.
+- Make the existing MIT license, identical to the ČEZ reference, visible
+  in README. Restart Home Assistant and refresh the browser after updating.
+
 ## 0.1.0-beta.1 — první beta, měření kotle a přehlednější dashboard
 
 ### Čeština

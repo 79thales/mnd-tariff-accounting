@@ -298,6 +298,60 @@ test("anglický kompaktní přehled a validace kotle používají anglické popi
   assert.equal(element.errorText(new Error('boiler_power_required')),'Select the boiler electric power sensor.');
 });
 
+test("editor začíná sbalenými úlohami a rozbalení nic neodesílá",async()=>{
+  const {element,calls}=await surface();
+  const root=element.shadowRoot;
+  assert.equal(root.querySelectorAll('.editor-group').length,3);
+  assert.equal(root.querySelectorAll('details[data-editor-section][open]').length,0);
+  assert.equal(root.querySelectorAll('[data-editor-section]').length,10);
+  const callsBefore=calls.length;
+  const boiler=root.querySelector('[data-editor-section="boiler"]');
+  boiler.open=true;
+  const power=boiler.querySelector('[name=boiler_power_entity]');
+  boiler.open=false;
+  root.querySelector('[data-editor-section="readings"]').open=true;
+  assert.equal(boiler.querySelector('[name=boiler_power_entity]'),power);
+  assert.equal(calls.length,callsBefore);
+});
+
+test("sbalení zachová rozepsanou hodnotu a obnova zachová otevřenou úlohu",async()=>{
+  const {element}=await surface();
+  const settings=element.shadowRoot.querySelector('[data-editor-section="settings"]');
+  settings.open=true;
+  const name=settings.querySelector('[name=name]');name.value='Rozepsaná změna';
+  settings.open=false;settings.open=true;
+  assert.equal(name.value,'Rozepsaná změna');
+  element._message='Kontrola formuláře';element.render();
+  assert.equal(element.shadowRoot.querySelector('[data-editor-section="settings"]').open,true);
+  assert.equal(element.shadowRoot.querySelectorAll('[data-editor-section][open]').length,1);
+  assert.equal(element.shadowRoot.querySelector('form[data-section="settings"] [name=name]').value,'Dům <test>');
+});
+
+test("nápověda rozliší místní knihu od plateb MND a odkazy nesou správné místo",async()=>{
+  const data=detail();delete data.place.settings.period_from;
+  data.place.portal_evidence={advances:{rows:[]}};
+  const {element,calls}=await surface({data});
+  const help=element.shadowRoot.querySelector('.configuration-help');
+  assert.match(help.textContent,/Zaplacené zálohy už sledujeme z MND/);
+  const links=[...help.querySelectorAll('a')].map(a=>new URL(a.href,'http://localhost'));
+  for(const link of links){assert.equal(link.searchParams.get('entry_id'),'account-a');assert.equal(link.searchParams.get('place'),PLACE);}
+  assert.ok(links.some(link=>link.searchParams.get('field')==='period_from'&&link.searchParams.get('section')==='settings'));
+  assert.ok(links.some(link=>link.searchParams.get('field')==='flow_entity'));
+  assert.ok(links.some(link=>link.searchParams.get('tab')==='accounting'&&link.hash==='#mnd-advances'));
+  assert.equal(calls.some(call=>call.action==='edit'),false);
+});
+
+test("přímý odkaz otevře nastavení období bez předvyplnění či zápisu",async()=>{
+  const previous=globalThis.location;
+  try{
+    globalThis.location={search:`?entry_id=account-a&place=${PLACE}&tab=editor&section=settings&field=period_from`};
+    const {element,calls}=await surface();
+    assert.equal(element.shadowRoot.querySelector('[data-editor-section="settings"]').open,true);
+    assert.equal(element.shadowRoot.querySelector('[name=period_from]').value,'2026-01-01');
+    assert.equal(calls.some(call=>call.action==='edit'),false);
+  }finally{globalThis.location=previous;}
+});
+
 test("historický pulsní zdroj je dostupný pouze v konfiguraci zařízení",async()=>{
   const {element}=await surface();
   element._hass.states={'sensor.pulses':{entity_id:'sensor.pulses',state:'100',attributes:{unit_of_measurement:'pulse',state_class:'total_increasing'}}};

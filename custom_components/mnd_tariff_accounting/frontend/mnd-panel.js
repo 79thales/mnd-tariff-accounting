@@ -78,6 +78,9 @@ h2{font-size:21px;line-height:1.35;margin:0 0 18px}h3{font-size:18px;margin:0 0 
 .overview-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-bottom:16px}.overview-grid>section{padding:16px;margin:0}.overview-grid h2{font-size:19px;margin-bottom:12px}.overview-grid h3{font-size:17px;margin-bottom:6px}.overview-grid p{margin:6px 0}.overview-grid .muted{font-size:13px;line-height:1.45}.overview-grid .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}.overview-grid .card{padding:12px}.overview-grid .card .value{font-size:22px;margin-top:8px}.overview-grid .balance-value{font-size:29px;margin:4px 0 10px}.overview-grid details{margin-top:10px}.overview-grid summary{cursor:pointer}.overview-grid+.weekly-consumption{padding:16px;margin-bottom:16px}.weekly-consumption .billing-plot{max-height:280px}
 @media(min-width:1050px){.overview-grid{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch}}
 @media(max-width:650px){.overview-grid>section,.overview-grid .card{padding:16px}.overview-grid .card .value{font-size:20px}.overview-grid .grid{gap:10px}.overview-grid+.weekly-consumption{padding:16px}}
+.editor-intro{margin:0 0 20px;line-height:1.5}.editor-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:20px;align-items:start}.editor-group{min-width:0}.editor-group>h2{font-size:19px;margin:0 0 12px}.editor-item{border:1px solid var(--mnd-border);border-radius:8px;background:var(--mnd-surface);margin-bottom:10px;overflow:hidden}.editor-item>summary{cursor:pointer;min-height:64px;padding:14px 16px;line-height:1.4}.editor-item>summary:focus-visible{outline:2px solid var(--mnd-lime);outline-offset:-3px}.editor-item>summary>span{display:inline;min-width:0}.editor-item strong{font-size:16px}.editor-description{display:block;font-size:13px;color:var(--mnd-muted);margin:5px 0 0 18px}.editor-item[open]>summary{border-bottom:1px solid var(--mnd-border);background:var(--mnd-soft)}.editor-item>form,.editor-item>section{border:0;border-radius:0;padding:16px;margin:0;box-shadow:none}.editor-item>form>h3,.editor-item>section>h2{display:none}.editor-item label{overflow-wrap:anywhere}.editor-item select{max-width:100%}
+.configuration-help{margin:0 0 20px;padding:12px 16px;border:1px solid var(--mnd-border);border-radius:8px;line-height:1.5}.configuration-help>summary{cursor:pointer;font-weight:600;min-height:24px}.configuration-help p{margin:10px 0}.configuration-help a{display:inline-block;padding:5px 0}.configuration-help>summary:focus-visible{outline:2px solid var(--mnd-lime)}
+@media(max-width:650px){.editor-groups{grid-template-columns:minmax(0,1fr);gap:18px}.editor-item>summary{padding:13px 14px}.editor-item>form,.editor-item>section{padding:14px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}`;
 
 const TABS = {overview:"Přehled",readings:"Spotřeba",accounting:"Účetnictví",forecasts:"Prognózy",editor:"Editor",history:"Historie a doklady",dashboard:"Generate dashboard"};
@@ -85,6 +88,12 @@ const EN = {"Přehled":"Overview","Spotřeba":"Consumption","Účetnictví":"Acc
 /* Zdrojové popisy dokladů a uživatelské texty se nepřekládají. Překlad
  * mění pouze popisky aplikace, nikdy hodnoty options posílané serveru. */
 Object.assign(EN,{
+  "Neznámé údaje a nastavení":"Unknown values and settings",
+  "Místní účetní kniha nemá zadané období. Její saldo, platby a spotřeba proto zůstávají neznámé.":"The local ledger has no configured period, so its balance, payments and consumption remain unknown.",
+  "Zaplacené zálohy už sledujeme z MND. Do místní knihy je znovu neopisujte.":"Paid advances are already tracked from MND. Do not enter them again in the local ledger.",
+  "Dodavatelské zálohy MND a místní účetní kniha jsou samostatné evidence.":"MND supplier advances and the local ledger are separate records.",
+  "Zdroj průtoku nemá platný aktuální údaj. Chybějící údaj není nulový odběr.":"The flow source has no valid current value. Missing data is not zero consumption.",
+  "Nastavit období":"Configure period","Zobrazit zálohy MND":"Show MND advances","Zkontrolovat zdroj průtoku":"Check flow source",
   "Odběrné místo":"Supply point","Plyn · moje domácnost":"Gas · my home","Vaše energie pod kontrolou":"Your energy at a glance",
   "Spotřeba, zálohy a vyúčtování na jednom místě":"Consumption, advances and invoices in one place",
   "Odečet MND je kotvou pro navazující měření":"MND readings anchor subsequent measurements",
@@ -210,6 +219,21 @@ Object.assign(EN,{
   "Požadavek termostatu není samostatným důkazem hoření. Rozdílné jednotky mají samostatné grafy se stejnou časovou osou.":"Thermostat demand alone does not prove combustion. Different units use separate charts on the same time axis.",
   "Odhad používá podklady MND a doložené ceny. Skutečné vyúčtování má přednost; elektřina kotle se do něj nezapočítává.":"The estimate uses MND records and documented prices. The supplier invoice takes priority; boiler electricity is excluded."
 });
+Object.assign(EN,{
+  "Měření a kotel":"Metering and boiler","Platby a zálohy":"Payments and advances",
+  "Ceny a vyúčtování":"Prices and invoices","Měsíční zálohy a úhrady":"Monthly advances and payments",
+  "Vyberte, co chcete upravit. Změny se uloží až tlačítkem v otevřeném formuláři.":"Choose what to edit. Changes are saved only with the button in the open form.",
+  "Účetní období, plynoměr, senzor objemu a průtoku.":"Billing period, gas meter, volume and flow sensors.",
+  "Volitelné měření elektřiny kotle; zásuvku ani termostat neovládá.":"Optional boiler electricity measurement; does not control the socket or thermostat.",
+  "Zapište stav plynoměru a skutečný čas včetně UTC posunu.":"Enter the gas meter reading and actual time including the UTC offset.",
+  "Propojte fyzický odečet a stav senzoru ve stejný okamžik.":"Match the physical reading and sensor value at the same instant.",
+  "Měsíční předpisy a skutečné úhrady za nastavené období.":"Monthly prescriptions and actual payments for the configured period.",
+  "Jednotlivá úhrada, předpis nebo vrácený přeplatek.":"An individual payment, prescription or refunded surplus.",
+  "Převeďte doložený kredit mezi účetními obdobími.":"Transfer documented credit between billing periods.",
+  "Doložené ceny, jejich platnost, DPH a stálé platby.":"Documented prices, validity, VAT and fixed charges.",
+  "Koeficient kWh/m³ a období, pro které platí.":"The kWh/m³ factor and its validity period.",
+  "Potvrďte účetní údaje podle originálního dokladu.":"Confirm accounting values against the original document."
+});
 const COMMON_PERIOD = [field("from","Od (včetně)","date"),field("to","Do (bez tohoto dne)","date")];
 const FORMS = [
   {section:"boiler",title:"Elektrická spotřeba plynového kotle",fields:[
@@ -260,7 +284,17 @@ class MndSurface extends Base {
       if(!this._entry){this._loaded=true;this._message=entries.length?"Vyberte účet":"Nejprve přidejte integraci v Nastavení → Zařízení a služby.";this.render();return;}
       const summary=background?this._summary:await this.command("summary");if(request!==this._request)return;
       this._summary=summary;this._place=this._config?.place || this._place || query.get("place") || summary.places[0]?.id;
-      if(!this._queryApplied){this._tab=this._config?.tab || query.get("tab") || this._tab;this._queryApplied=true;}
+      if(!this._queryApplied){
+        this._tab=this._config?.tab || query.get("tab") || this._tab;
+        // Odkaz jen otevře odpovídající úlohu a pole. Nikdy nevyplňuje data
+        // ani nevolá edit; povolené cíle pocházejí z definic formulářů.
+        const section=query.get("section");const form=FORMS.find(f=>f.section===section);
+        if(this._admin&&(form||section==="advances")){
+          this._editorOpen=section;
+          this._editorFocus=form?.fields.some(f=>f.name===query.get("field"))?query.get("field"):null;
+        }
+        this._queryApplied=true;
+      }
       if(this._place)this._detail=await this.command("detail");if(request!==this._request)return;
       this._loaded=true;this._failed=false;this._message="";
       if(background&&this.shadowRoot.activeElement){this.updateLiveMetrics();this.backgroundLoadError("");}else this.render();
@@ -285,6 +319,60 @@ class MndSurface extends Base {
     return labels[code]?this.text(labels[code]):"Požadavek se nepodařilo dokončit. Zkuste jej opakovat. ("+(/^[a-zA-Z0-9_]{1,80}$/.test(code)?code:"request_failed")+")";
   }
   async run(action){if(this._busy)return;this._busy=true;this._failed=false;this._message="";try{await action();}catch(error){this._failed=true;this._message=this.errorText(error);}finally{this._busy=false;this.render();}}
+  editorUrl(section="",field="",tab="editor"){
+    /* Parametry nesou explicitní účet a místo, takže odkaz neotevře jiné
+     * odběrné místo. Starší uložené karty dostanou stejný bezpečný fallback
+     * jako nový generátor; nepřijímáme externí ani javascriptové adresy. */
+    const fallback="/mnd-tariff-accounting?"+new URLSearchParams({entry_id:this._entry,place:this._place,tab});
+    const configured=this._config?.editor_url;
+    const url=new URL(typeof configured==="string"&&configured.startsWith("/mnd-tariff-accounting?")?configured:fallback,"http://mnd.local");
+    url.searchParams.set("tab",tab);
+    if(section)url.searchParams.set("section",section);
+    if(field)url.searchParams.set("field",field);
+    return url.pathname+url.search;
+  }
+  configurationHelp(){
+    const p=this._detail?.place;if(!p)return "";
+    const missingPeriod=!p.settings.period_from||!p.settings.period_to;
+    const missingFlow=this.liveMetrics().flow.value===null;
+    if(!missingPeriod&&!missingFlow)return "";
+    const link=(label,url)=>`<a href="${esc(url)}">${esc(this.text(label))}</a>`;
+    return `<details class="configuration-help"><summary>${this.text("Neznámé údaje a nastavení")}</summary>${missingPeriod?`<p>${this.text("Místní účetní kniha nemá zadané období. Její saldo, platby a spotřeba proto zůstávají neznámé.")}</p><p>${this.text(p.portal_evidence?.advances?"Zaplacené zálohy už sledujeme z MND. Do místní knihy je znovu neopisujte.":"Dodavatelské zálohy MND a místní účetní kniha jsou samostatné evidence.")}</p><p>${link("Nastavit období",this.editorUrl("settings","period_from"))} · ${link("Zobrazit zálohy MND",this.editorUrl("","","accounting")+"#mnd-advances")}</p>`:""}${missingFlow?`<p>${this.text("Zdroj průtoku nemá platný aktuální údaj. Chybějící údaj není nulový odběr.")}</p><p>${link("Zkontrolovat zdroj průtoku",this.editorUrl("settings","flow_entity"))}</p>`:""}</details>`;
+  }
+  editorMarkup(){
+    /* Editor ukazuje nejprve účel jednotlivých úloh, nikoli všechna pole.
+     * Formuláře zůstávají v DOM i po sbalení: rozepsané hodnoty ani výběry
+     * zdrojů se při otevření jiné úlohy neztrácejí a nic se neodesílá.
+     * Nativní details/summary funguje klávesnicí i na mobilu; společné name
+     * dovolí otevřít jednu úlohu. Otevřenou úlohu render obnoví i po chybě
+     * nebo uložení, zatímco dosavadní validace a revize zápisů zůstávají.
+     */
+    const descriptions={
+      settings:"Účetní období, plynoměr, senzor objemu a průtoku.",
+      boiler:"Volitelné měření elektřiny kotle; zásuvku ani termostat neovládá.",
+      readings:"Zapište stav plynoměru a skutečný čas včetně UTC posunu.",
+      calibration:"Propojte fyzický odečet a stav senzoru ve stejný okamžik.",
+      advances:"Měsíční předpisy a skutečné úhrady za nastavené období.",
+      events:"Jednotlivá úhrada, předpis nebo vrácený přeplatek.",
+      transfer:"Převeďte doložený kredit mezi účetními obdobími.",
+      tariffs:"Doložené ceny, jejich platnost, DPH a stálé platby.",
+      conversions:"Koeficient kWh/m³ a období, pro které platí.",
+      invoices:"Potvrďte účetní údaje podle originálního dokladu."
+    };
+    const groups=[
+      ["Měření a kotel",["settings","boiler","readings","calibration"]],
+      ["Platby a zálohy",["advances","events","transfer"]],
+      ["Ceny a vyúčtování",["tariffs","conversions","invoices"]]
+    ];
+    const item=key=>{
+      const form=FORMS.find(f=>f.section===key);
+      const content=key==="advances"?this.advancesMarkup():this.formMarkup(form);
+      if(!content)return "";
+      const title=key==="advances"?"Měsíční zálohy a úhrady":form.title;
+      return `<details class="editor-item" name="mnd-editor" data-editor-section="${key}" ${this._editorOpen===key?"open":""}><summary><span><strong>${esc(this.text(title))}</strong><span class="editor-description">${esc(this.text(descriptions[key]))}</span></span></summary>${content}</details>`;
+    };
+    return `<p class="muted editor-intro">${this.text("Vyberte, co chcete upravit. Změny se uloží až tlačítkem v otevřeném formuláři.")}</p>${this.configurationHelp()}<div class="editor-groups">${groups.map(([title,keys])=>`<div class="editor-group"><h2>${esc(this.text(title))}</h2>${keys.map(item).join("")}</div>`).join("")}</div>`;
+  }
   formMarkup(form){const settings=this._detail?.place.settings || {};return `<form data-section="${form.section}"><h3>${form.title}</h3>${form.fields.map(f=>{
     const value=(["settings","boiler"].includes(form.section)||f.name==="segment")?settings[f.name]:(form.section==="invoices"&&f.name==="artifact"?this._invoiceArtifact:"");let input;
     if(f.type==="checkbox")input=`<input name="${f.name}" type="checkbox" ${value?"checked":""}> ${esc(f.label)}`;
@@ -464,7 +552,7 @@ class MndSurface extends Base {
     const evidence=this._detail?.place.portal_evidence||{};
     const advances=evidence.advances;
     const invoices=evidence.invoices;
-    const section=(data,kind,title)=>`<section><h2>${title}</h2>${data?`<p class="muted">Aktualizováno: ${esc(data.acquired_at)} · ${data.list_complete&&data.details_complete&&data.details_refreshed_all!==false?"Seznam a detaily načteny":"Částečné podklady"}</p>${table(data.rows||[],kind==="advances"?[["due","Splatnost"],["prescribed","Předpis Kč"],["paid","Uhrazeno Kč"],["remaining","Zbývá Kč"],["state","Stav"]]:[["number","Doklad"],["from","Od"],["to_inclusive","Do včetně"],["invoice_result","Výsledek dle MND Kč"],["remaining","Zbývá dle MND Kč"],["state","Stav"]])}${(data.rows||[]).map(row=>`<button data-finance-kind="${kind}" data-finance-id="${esc(row.id)}">Detail ${esc(row.number)}</button>`).join(" ")}${this._admin?`<p><button data-finance-export="${kind}">Export ${kind==="advances"?"historie záloh":"přehledu vyúčtování"}</button></p>`:""}`:`<p>${evidence.errors?.[kind]?"Načtení MND selhalo. Poslední dostupné údaje zůstávají zachovány.":"Dosud nenačteno z MND."}</p>`}</section>`;
+    const section=(data,kind,title)=>`<section id="mnd-${kind}"><h2>${title}</h2>${data?`<p class="muted">Aktualizováno: ${esc(data.acquired_at)} · ${data.list_complete&&data.details_complete&&data.details_refreshed_all!==false?"Seznam a detaily načteny":"Částečné podklady"}</p>${table(data.rows||[],kind==="advances"?[["due","Splatnost"],["prescribed","Předpis Kč"],["paid","Uhrazeno Kč"],["remaining","Zbývá Kč"],["state","Stav"]]:[["number","Doklad"],["from","Od"],["to_inclusive","Do včetně"],["invoice_result","Výsledek dle MND Kč"],["remaining","Zbývá dle MND Kč"],["state","Stav"]])}${(data.rows||[]).map(row=>`<button data-finance-kind="${kind}" data-finance-id="${esc(row.id)}">Detail ${esc(row.number)}</button>`).join(" ")}${this._admin?`<p><button data-finance-export="${kind}">Export ${kind==="advances"?"historie záloh":"přehledu vyúčtování"}</button></p>`:""}`:`<p>${evidence.errors?.[kind]?"Načtení MND selhalo. Poslední dostupné údaje zůstávají zachovány.":"Dosud nenačteno z MND."}</p>`}</section>`;
     const selected=this._financeDetail;
     return section(advances,"advances","Historie záloh MND")+(this._admin?`<section><h3>Přiřazení do místní evidence</h3><p>Potvrzením přiřadíte předpisy splatné ve zvoleném účetním období a jejich skutečné úhrady do tohoto období. Ruční duplicitní platby nejprve zkontrolujte. Úplnost historie se nepotvrzuje automaticky.</p><label><input id="confirm-finance" type="checkbox"> Potvrzuji přiřazení a kontrolu ručních duplicit</label><button id="accept-advances">Převzít předpisy a úhrady do období</button></section>`:"")+section(invoices,"invoices","Vyúčtování MND")+(selected?`<section><h2>Detail ${esc(selected.number)}</h2><p>${esc(selected.from||"")} → ${esc(selected.to_inclusive||"")} · ${esc(selected.state||"")}</p><p>Předpis Kč: ${this.number(selected.prescribed)} · Uhrazeno Kč: ${this.number(selected.paid)} · Zbývá dle MND Kč: ${this.number(selected.remaining)}</p><h3>Skutečně zaúčtované úhrady dokladu</h3>${selected.payments_known?table(selected.payments,[["date","Datum úhrady"],["amount","Kč"]]):"Detail úhrad dosud nebyl načten."}${selected.kind==="invoices"?`<button id="invoice-pdf">Stáhnout vyúčtování PDF</button>`:""}<p class="muted">Úhrady jsou přiřazené k tomuto dokladu; předpis není skutečná platba. Výsledek a stav vypořádání jsou údaje dodavatele.</p></section>`:"");
   }
@@ -503,16 +591,16 @@ class MndSurface extends Base {
     if(!this._admin){
       if(this._tab==="editor"||this._config?.admin_link)return `<section><h2>Konfigurace odběrného místa</h2><a href="${esc(this._detail.device_url||"/config/devices")}">Otevřít zařízení MND v Nastavení</a></section>`;
       if(this._tab==="history")return this.financeMarkup();
-      if(this._tab==="accounting")return this.billingSummary()+this.cashChart()+this.financeMarkup();
+      if(this._tab==="accounting")return this.configurationHelp()+this.billingSummary()+this.cashChart()+this.financeMarkup();
       if(this._tab==="forecasts")return this.chart()+`<section><h2>Ověřená porovnání prognóz</h2>${table(p.comparisons||[],[["from","Od"],["to","Do"],["difference","Odchylka MWh"],["percentage","Odchylka %"]])}<p>Porovnání vyžaduje dokončené shodné období a doloženou energetickou bázi. Průběžná spotřeba není chyba celoroční predikce.</p></section>`;
       if(this._tab==="readings")return this.boilerDetails()+this.monthlyChart()+`<section><h2>Historie odečtů</h2>${table(p.readings,[["date","Den"],["value","m³"],["source","Zdroj"],["method","Metoda"]])}</section><section><h2>Porovnání senzoru s odečtem MND</h2>${table(this._detail.result.meter_comparisons||[],[["date","Den"],["expected","Senzor m³"],["actual","MND m³"],["difference","Rozdíl m³"],["percentage","Rozdíl %"],["reason","Stav porovnání"]])}</section>`;
     }
     switch(this._tab){
-      case "overview":return this.overview();
+      case "overview":return this.overview()+this.configurationHelp();
       case "readings":return this.boilerDetails()+this.monthlyChart()+`<section><h2>Historie odečtů</h2>${table(p.readings,[["date","Den"],["observed_at","Přesný čas"],["value","m³"],["meter","Plynoměr"],["source","Zdroj"],["method","Metoda"],["status","Status"],["id","ID pro opravu"]])}</section>`;
       case "accounting":return this.financeMarkup()+`<section><h2>Platby a předpisy</h2><p class="muted">Předpis a předpokládaná platba nezvyšují skutečně zaplacenou částku.</p>${table(p.events,[["date","Datum"],["role","Role"],["amount","Kč"],["verification","Ověření"],["id","ID"]])}</section><section><h2>Vyúčtování</h2>${table(p.invoices,[["number","Doklad"],["from","Od"],["to","Do výlučně"],["cost","Náklad Kč"],["result","Dokladové saldo Kč"],["id","ID"]])}</section><section><h2>Cenové úseky</h2>${table(p.tariffs,[["name","Tarif"],["from","Od"],["to","Do výlučně"],["commodity","Obchodní Kč/MWh"],["other","Ostatní Kč/MWh"],["fixed","Kč/měsíc"],["role","Role"],["id","ID"]])}</section>`;
       case "forecasts":return `<section><h2>Historie prognóz</h2><select id="snapshot">${p.snapshots.map((s,i)=>`<option value="${i}" ${i===(this._snapshotIndex??p.snapshots.length-1)?"selected":""}>${esc(s.retrieved_at)}</option>`).join("")}</select><p class="muted">Starší předpověď zůstává uložená. Přesnost lze hodnotit až za shodné dokončené období a doložené měření.</p></section>${this.chart()}`;
-      case "editor":return `<div class="notice">Zápisy jsou místní evidence v HA. Časy odečtů zadávejte s výslovným UTC posunem. Pole bez údaje ponechte prázdná.</div>${this.advancesMarkup()}<div class="forms">${FORMS.map(f=>this.formMarkup(f)).join("")}</div>`;
+      case "editor":return this.editorMarkup();
       case "history":return `<section><h2>Import odečtů, faktury a účetního archivu</h2><p>XLSX / JSON / ZIP nejvýše 64 MiB; PDF nejvýše 8 MiB. Před importem ověříme identitu vybraného místa.</p><input type="file" id="file" accept=".xlsx,.json,.zip,.pdf"><button id="preview-import">Zkontrolovat soubor</button>${this._importPreview?`<div class="notice">Řádků: ${esc(this._importPreview.rows)}; odmítnutých: ${esc(this._importPreview.rejected)}<br>${esc(this._importPreview.warnings.join(", "))}</div>${this._importPreview.proposal?`<p>Částky z PDF jsou pouze návrh. Doklad nejprve uložte a účetní údaje samostatně potvrďte v Editoru.</p>${table(this._importPreview.proposal.candidates,[["kind","Význam"],["value","Hodnota"],["unit","Jednotka"],["context","Kontext dokladu"]])}`:""}<button id="commit-import" class="primary">Potvrdit import tohoto souboru</button>`:""}</section><section><h2>Soukromý export</h2><button id="export">Stáhnout účetní archiv JSON</button></section><section><h2>Doklady</h2>${p.artifacts.map(a=>`<p><button data-artifact="${esc(a.id)}">Stáhnout ${esc(a.filename)}</button> <span class="muted">${esc(a.acquired_at)}</span></p>`).join("") || "Žádné uložené originály."}</section><section><h2>Audit</h2>${table(p.audit.slice(-100),[["received_at","Čas"],["action","Akce"],["section","Oblast"],["id","ID"]])}</section>`;
       case "dashboard":return `<section><h2>Přidat do horní lišty Overview</h2><p>Jednoduchý přehled a čtecí detaily. Uložení aktualizuje i již vytvořenou MND šablonu a zachová cizí karty. Záloha Overview se před uložením stáhne do vašeho zařízení.</p><label>Název<input id="view-title" value="MND"></label><label>Cesta<input id="view-path" value="mnd"></label><button id="dashboard-preview">Vytvořit náhled</button>${this._preview?`<p class="muted">Chybějící entity: ${esc(this._preview.missing_entities.join(", ") || "žádné")}</p><h3>Náhled skutečných dat</h3><div id="dashboard-visual"></div><textarea readonly>${esc(JSON.stringify(this._preview.config,null,2))}</textarea><button id="dashboard-export">Stáhnout fragment views</button><button id="dashboard-save" class="primary" ${this._preview.missing_entities.length?"disabled":""}>Uložit MND v horní liště</button>`:""}</section>`;
       default:return "";
@@ -525,6 +613,10 @@ class MndSurface extends Base {
     return this._config?"":`<nav aria-label="MND">${Object.entries(TABS).filter(([key])=>["editor","accounting","history","forecasts","dashboard"].includes(key)).map(([key,title])=>`<button data-tab="${key}" class="${key===this._tab?"active":""}" ${key===this._tab?'aria-current="page"':""}>${title}</button>`).join("")}</nav>`;
   }
   render(){if(!this.shadowRoot)return;const p=this._detail?.place;
+    // Zachování rozbalené úlohy se týká jen struktury UI. Obnova po zápisu
+    // dále používá potvrzená data serveru a nemění účetní transakce.
+    const editorItems=this.shadowRoot.querySelectorAll("[data-editor-section]");
+    if(editorItems.length)this._editorOpen=[...editorItems].find(item=>item.open)?.dataset.editorSection||null;
     this.shadowRoot.innerHTML=`<style>${CSS}
 main{padding:16px;padding-top:max(16px,env(safe-area-inset-top));padding-bottom:max(16px,env(safe-area-inset-bottom))}header{padding-bottom:12px}.brand strong{font-size:20px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.card{min-width:0}.card .value{overflow-wrap:anywhere}.value{font-size:25px}.mark{width:36px;height:36px}nav{margin-bottom:16px}h1{font-size:20px;margin:0}</style><main>${this._admin?`<p><a href="${esc(this._detail?.device_url||"/config/devices")}">← Zpět na zařízení MND</a></p>`:""}<header><div class="brand"><div class="mark" aria-hidden="true">${BRAND_ICON}</div><div><strong>MND</strong><h1>${esc(this._admin?"Konfigurace odběrného místa":(p?.name||this._config?.title||"Přehled"))}</h1></div></div>${this._admin&&!this._place?`<div class="account-picker"><label>Registrovaný účet<select id="entry"><option value="">Vyberte účet</option>${(this._entries||[]).map(e=>`<option value="${esc(e.id)}" ${e.id===this._entry?"selected":""}>${esc(e.name)}</option>`).join("")}</select></label><label>Odběrné místo<select id="place">${(this._summary?.places||[]).map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("")}</select></label></div>`:""}</header>${this.navigation()}${this._message?`<div role="status" class="notice ${this._failed?"error":""}">${esc(this._message)}${this._failed?'<p><button id="retry-load">Zkusit znovu</button></p>':""}</div>`:""}${this.body()}${this.extraMarkup()}${this.portalMarkup()}${this._admin?`<footer class="muted">Revize archivu ${esc(this._detail?.revision??"—")}</footer>`:""}</main>`;
     this.shadowRoot.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{this._tab=b.dataset.tab;this.render();});
@@ -572,6 +664,10 @@ main{padding:16px;padding-top:max(16px,env(safe-area-inset-top));padding-bottom:
     const boilerForm=this.shadowRoot.querySelector('form[data-section="boiler"]');
     if(boilerForm)boilerForm.onchange=()=>this.updateLiveMetrics();
     this.updateLiveMetrics();void this.mountHistory();
+    if(this._admin&&this._tab==="editor"&&this._editorFocus){
+      const target=this.shadowRoot.querySelector(`form[data-section="${this._editorOpen}"] [name="${this._editorFocus}"]`);
+      target?.focus({preventScroll:true});target?.scrollIntoView?.({block:"center"});this._editorFocus=null;
+    }
     if((this._hass?.language || "cs").startsWith("en")){const walk=node=>{for(const child of node.childNodes){if(child.nodeType===3&&node.tagName!=="TD"){const key=child.textContent.trim();if(EN[key])child.textContent=child.textContent.replace(key,EN[key]);else for(const [cs,en] of [["Neznámé díly nejsou nuly.","Unknown components are not zero."],["Řádků:","Rows:"],["odmítnutých:","rejected:"],["Chybějící entity:","Missing entities:"],["žádné","none"],["Odchylka výhledu minus skutečnost:","Forecast minus actual:"],["Odhad zbývajících nákladů:","Estimated remaining cost:"],["Odhad výsledku období:","Estimated period outcome:"],["Místní návrh měsíční zálohy:","Local suggested monthly advance:"],["Stáhnout ","Download "]])child.textContent=child.textContent.replace(cs,en);}else if(child.nodeType===1&&child.tagName!=="STYLE"&&child.tagName!=="TEXTAREA"&&child.tagName!=="PRE")walk(child);}};walk(this.shadowRoot);}
   }
   async upload(file,preview){if(file.size>64*1024*1024)throw new Error("Soubor je větší než 64 MiB.");const response=await this._hass.fetchWithAuth(`/api/${DOMAIN}/import/${encodeURIComponent(this._entry)}/${encodeURIComponent(this._place)}?filename=${encodeURIComponent(file.name)}&preview=${preview?1:0}`,{method:"POST",body:file});const result=await response.json();if(!response.ok)throw new Error(result.error || "Import selhal.");return result;}

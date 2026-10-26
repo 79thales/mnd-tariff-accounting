@@ -55,7 +55,8 @@
             }
           ],
           "layout_version": 4,
-          "billing_mode": "supplier"
+          "billing_mode": "supplier",
+          "editor_url": "{{EDITOR_URL}}"
         }
       ],
       "subview": false
@@ -117,7 +118,8 @@
             }
           ],
           "layout_version": 4,
-          "billing_mode": "supplier"
+          "billing_mode": "supplier",
+          "editor_url": "{{EDITOR_URL}}"
         }
       ]
     },
@@ -178,7 +180,8 @@
             }
           ],
           "layout_version": 4,
-          "billing_mode": "supplier"
+          "billing_mode": "supplier",
+          "editor_url": "{{EDITOR_URL}}"
         }
       ]
     },
@@ -239,7 +242,8 @@
             }
           ],
           "layout_version": 4,
-          "billing_mode": "supplier"
+          "billing_mode": "supplier",
+          "editor_url": "{{EDITOR_URL}}"
         }
       ]
     },
@@ -301,7 +305,8 @@
           ],
           "layout_version": 4,
           "admin_link": true,
-          "billing_mode": "supplier"
+          "billing_mode": "supplier",
+          "editor_url": "{{EDITOR_URL}}"
         }
       ]
     },
@@ -362,7 +367,8 @@
             }
           ],
           "layout_version": 4,
-          "billing_mode": "supplier"
+          "billing_mode": "supplier",
+          "editor_url": "{{EDITOR_URL}}"
         }
       ]
     }

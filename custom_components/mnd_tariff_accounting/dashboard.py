@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
+from urllib.parse import urlencode
 
 from .core.common import DataError
 
@@ -21,6 +22,8 @@ def build_views(title, path, entities, entry_id, place_id):
     Vzhled vlastní karty sdílí hlavní panel i náhled; entity jsou odkazy na
     skutečný registr, takže přejmenování senzoru nemění účetní identitu.
     JSON je současně platný YAML. Chybějící entity dovolují export, ne zápis.
+    Prokliky do editoru nesou explicitní účet a místo v URL s bezpečně
+    zakódovanými parametry; otevření odkazu nemění účetní data ani dashboard.
     """
     if (
         not isinstance(title, str)
@@ -38,7 +41,14 @@ def build_views(title, path, entities, entry_id, place_id):
             return [expand(v) for v in value]
         if not isinstance(value, str):
             return value
-        replacements = {"TITLE": title.strip(), "PATH": path, "ENTRY": entry_id, "PLACE": place_id}
+        replacements = {
+            "TITLE": title.strip(),
+            "PATH": path,
+            "ENTRY": entry_id,
+            "PLACE": place_id,
+            "EDITOR_URL": "/mnd-tariff-accounting?"
+            + urlencode({"entry_id": entry_id, "place": place_id, "tab": "editor"}),
+        }
         for key, replacement in replacements.items():
             value = value.replace("{{" + key + "}}", replacement)
 
