@@ -10,6 +10,7 @@ from datetime import datetime
 
 from .core.accounting import ROLES, active_versions
 from .core.archive import merge_records
+from .core.boiler import BOILER_FIELDS
 from .core.common import DataError, day, decimal, fingerprint, instant, local_day, period, wire
 from .core.metering import Reading
 
@@ -117,7 +118,7 @@ def edit_place(data, *, place_id, section, record, now: datetime, zone: str):
                 }
                 place["events"], _ = merge_records(place["events"], [wire(event)])
         active_versions(place["events"])
-    elif section == "settings":
+    elif section in ("settings", "boiler"):
         allowed = (
             "name",
             "period_from",
@@ -136,7 +137,15 @@ def edit_place(data, *, place_id, section, record, now: datetime, zone: str):
             "history_unit_m3",
             "segment",
         )
-        _fields(record, allowed)
+        _fields(record, BOILER_FIELDS if section == "boiler" else allowed)
+        if section == "boiler":
+            if "boiler_enabled" in record and not isinstance(record["boiler_enabled"], bool):
+                raise DataError("invalid_boolean")
+            if "boiler_max_age" in record:
+                age = decimal(record["boiler_max_age"], nonnegative=True)
+                if age != age.to_integral_value() or not 30 <= age <= 86400:
+                    raise DataError("invalid_boiler_max_age")
+                record["boiler_max_age"] = int(age)
         if "flow_max_age" in record:
             record["flow_max_age"] = int(record["flow_max_age"])
             if not 30 <= record["flow_max_age"] <= 86400:
@@ -147,6 +156,8 @@ def edit_place(data, *, place_id, section, record, now: datetime, zone: str):
                 raise DataError("invalid_history_volume_factor")
             record["history_unit_m3"] = factor
         merged = {**place["settings"], **record}
+        if merged.get("boiler_enabled") and not merged.get("boiler_power_entity"):
+            raise DataError("boiler_power_required")
         if "name" in record:
             if not isinstance(record["name"], str) or len(record["name"].strip()) > 160:
                 raise DataError("invalid_place_name")

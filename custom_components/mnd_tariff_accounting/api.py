@@ -155,7 +155,7 @@ async def websocket_command(hass, connection, msg):
                 result = {
                     "revision": repo.data["revision"],
                     "place": copy.deepcopy(repo.data["places"][place_id]),
-                    "result": coordinator.data.get(place_id, {}),
+                    "result": copy.deepcopy(coordinator.data.get(place_id, {})),
                 }
                 device = _place_device(hass, coordinator.entry, place_id)
                 result["device_url"] = (
@@ -191,6 +191,18 @@ async def websocket_command(hass, connection, msg):
                 history_source = er.async_get(hass).async_get(history_id) if history_id else None
                 if history_source:
                     visible["settings"]["history_source_entity"] = history_source.entity_id
+                # Nastavení kotle se resolveuje podle UUID také pro formulář
+                # a nativní graf. Pouhá návštěva nic nekonfiguruje ani nezapíná.
+                from .boiler import async_energy_summary
+                from .boiler import sources as boiler_sources
+
+                for kind, entity in boiler_sources(hass, visible["settings"]).items():
+                    if entity:
+                        visible["settings"][f"boiler_{kind}_entity"] = entity
+                if visible["settings"].get("boiler_enabled"):
+                    result["result"].setdefault("boiler", {})["electricity"] = (
+                        await async_energy_summary(coordinator, visible["settings"])
+                    )
                 result["settlements"] = [
                     {
                         "id": i["id"],

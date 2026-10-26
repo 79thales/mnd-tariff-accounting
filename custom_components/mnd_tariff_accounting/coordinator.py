@@ -27,9 +27,13 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt as dt_util
 
+from .boiler import live_values as boiler_live_values
+from .boiler import sources as boiler_sources
+from .boiler import validated_settings as validated_boiler_settings
 from .const import DOMAIN, POLL_HOURS, SOURCE_DEBOUNCE_SECONDS
 from .core.archive import Repository, apply_import, new_place
 from .core.backup import parse_native, parse_zip, restore_place
+from .core.boiler import consumption_summary
 from .core.common import DataError, day, decimal, fingerprint, identity, load_json, local_day, wire
 from .core.finance import finance_rows, merge_finance
 from .core.forecast import add_snapshot
@@ -149,7 +153,10 @@ class MndCoordinator(DataUpdateCoordinator):
             flow = registry.async_get(
                 settings.get("flow_registry_id") or settings.get("flow_entity", "")
             )
-            if flow:
+            live_entities = [flow.entity_id] if flow else []
+            if settings.get("boiler_enabled"):
+                live_entities.extend(e for e in boiler_sources(self.hass, settings).values() if e)
+            if live_entities:
 
                 @callback
                 def flow_changed(_event):
@@ -157,7 +164,9 @@ class MndCoordinator(DataUpdateCoordinator):
                         self._flow_debounce = async_call_later(self.hass, 1, self._flow_recompute)
 
                 self._unsubscribers.append(
-                    async_track_state_change_event(self.hass, [flow.entity_id], flow_changed)
+                    async_track_state_change_event(
+                        self.hass, list(set(live_entities)), flow_changed
+                    )
                 )
             source = registry.async_get(settings.get("source_entity", ""))
             if settings.get("source_registry_id"):
@@ -227,7 +236,13 @@ class MndCoordinator(DataUpdateCoordinator):
         """
         if self._closed:
             return
-        affected = {event.data.get("entity_id"), event.data.get("old_entity_id")}
+        # Chybějící old_entity_id není dotčená entita. None by jinak kolidovalo
+        # s nevybranými zdroji a zbytečně obnovovalo všechny posluchače.
+        affected = {
+            value
+            for value in (event.data.get("entity_id"), event.data.get("old_entity_id"))
+            if value
+        }
         registry = er.async_get(self.hass)
         for place_id, place in self.repository.data["places"].items():
             settings = place["settings"]
@@ -237,8 +252,16 @@ class MndCoordinator(DataUpdateCoordinator):
             flow_affected = settings.get("flow_entity") in affected or (
                 flow and flow.entity_id in affected
             )
+            boiler_affected = bool(
+                affected.intersection(boiler_sources(self.hass, settings).values())
+            )
+            boiler_affected |= any(
+                settings.get(f"boiler_{k}_entity") in affected
+                for k in ("power", "energy", "demand")
+            )
             if (
                 not flow_affected
+                and not boiler_affected
                 and settings.get("source_entity") not in affected
                 and (not current or current.entity_id not in affected)
             ):
@@ -249,6 +272,10 @@ class MndCoordinator(DataUpdateCoordinator):
                 unsubscribe()
             self._unsubscribers.clear()
             self._subscribe_sources()
+            if self._flow_debounce is None:
+                # I odstranění zdroje musí změnit dostupnost bez čekání na
+                # další měření, které již z odstraněné entity nepřijde.
+                self._flow_debounce = async_call_later(self.hass, 1, self._flow_recompute)
             break
 
     def _queue_sample(self, place_id, source_id, state):
@@ -698,6 +725,17 @@ class MndCoordinator(DataUpdateCoordinator):
                             settings.get("flow_max_age", 900),
                         )
                     )
+                    results[place_id]["boiler"] = boiler_live_values(self.hass, settings)
+                    try:
+                        results[place_id]["consumption"] = consumption_summary(
+                            place, dt_util.utcnow(), self.hass.config.time_zone
+                        )
+                    except DataError as err:
+                        # Konfliktní starý profil nesmí odstavit živé W/průtok.
+                        results[place_id]["consumption"] = {
+                            "quality": "invalid",
+                            "reason": str(err),
+                        }
                 if revision == self.repository.data["revision"]:
                     # Repairs vysvětluje problém relace, nikoli zákaznické
                     # hodnoty. Archiv i dostupné místní entity zůstávají aktivní.
@@ -797,6 +835,10 @@ class MndCoordinator(DataUpdateCoordinator):
         """Správcovské formuláře volají jedinou validovanou transakční cestu."""
         from .editing import edit_place
 
+        if section == "boiler":
+            record = validated_boiler_settings(
+                self.hass, self.repository.data["places"][place_id]["settings"], record
+            )
         mutate = partial(
             edit_place,
             place_id=place_id,
@@ -806,7 +848,7 @@ class MndCoordinator(DataUpdateCoordinator):
             zone=self.hass.config.time_zone,
         )
         result = await self.repository.transact(mutate, expected_revision=expected_revision)
-        if section == "settings":
+        if section in ("settings", "boiler"):
             for unsubscribe in self._unsubscribers:
                 unsubscribe()
             self._unsubscribers.clear()

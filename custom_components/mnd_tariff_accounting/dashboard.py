@@ -54,5 +54,5 @@ def build_views(title, path, entities, entry_id, place_id):
         "config": expand(config),
         "missing_entities": sorted(missing),
         "requirements": [],
-        "comments": "Kompozice 3: skutečné účetní období MND, souhrn vyúčtování, průběh nákladů/záloh a měsíční měření HA. Originální faktura má přednost. Nativní horní lišta HA a čtecí detaily; správa z konkrétního zařízení. Aktualizace mění jen vlastní kartu stejného účtu a místa; před zápisem exportovat zálohu Overview.",
+        "comments": "Kompozice 4: právě teď, spotřeba a stručné vyúčtování; nejvýše jeden sedmidenní graf. Volitelný příkon kotle podle administrace místa; elektřina není součást účtu MND. Spotřeba obsahuje provozní graf a měsíční historii, účetnictví finanční tabulky a graf záloh. Originální faktura má přednost. Nativní horní lišta HA a čtecí detaily; správa z konkrétního zařízení. Aktualizace mění jen vlastní kartu stejného účtu a místa; před zápisem exportovat zálohu Overview.",
     }

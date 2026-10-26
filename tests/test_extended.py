@@ -388,7 +388,7 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(result["missing_entities"], [])
         views = result["config"]["views"]
         self.assertEqual(len(views), 6)
-        self.assertTrue(all(v["cards"][0]["layout_version"] == 3 for v in views))
+        self.assertTrue(all(v["cards"][0]["layout_version"] == 4 for v in views))
         self.assertTrue(
             all(v["subview"] and v["back_path"] == "/lovelace/synthetic-gas" for v in views[1:])
         )

@@ -21,6 +21,34 @@
   the MND integration and open its HACS repository, with installation and
   restart prerequisites. The existing alpha tag and installer are unchanged.
 
+## 0.1.0-alpha.5 — měření kotle a jednoduchý přehled
+
+### Čeština
+
+- Volitelné čtecí měření elektrického příkonu a energie kotle v administraci
+  každého místa; výběr zdrojů, převody W/kW a Wh/kWh, náhled a zachování
+  vazby při přejmenování entity. Elektřina se nezapočítává do plynu ani MND.
+- Zjednodušen hlavní přehled na aktuální odběr, dnešní/měsíční spotřebu
+  a výhled vyúčtování s jedním sedmidenním grafem. Detail Spotřeba obsahuje
+  provozní historii a měsíční sloupce, účetnictví zachovává finanční přehledy.
+- Živé hodnoty se obnovují z HA bez ztráty fokusu či rozepsaných formulářů.
+  Nula, zastaralý report a chybějící údaje mají odlišný význam. Souhrny
+  rozlišují známou část, pokrytí a čas poslední přijaté hodiny; změněn
+  současně generátor i přibalená kompozice dashboardu na verzi 4.
+
+### English
+
+- Added optional read-only boiler electricity monitoring per supply point,
+  with source selection, W/kW and Wh/kWh conversion, a configuration preview,
+  and entity-registry rename support. Electricity stays outside gas billing.
+- Simplified the overview to current usage, daily/monthly gas consumption,
+  and the billing outlook with a single seven-day chart. Consumption details
+  retain operating history and monthly bars; accounting retains financial data.
+- Live HA values update without losing focus or unsaved form content. Zero,
+  stale reports, and missing data remain distinct. Aggregates show partial
+  coverage and actual observation boundaries. Updated both the dashboard
+  generator and bundled composition to layout version 4.
+
 ## 0.1.0-alpha.4 — účetní období, náklady a měsíční měření
 
 ### Čeština

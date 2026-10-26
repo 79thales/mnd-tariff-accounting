@@ -128,6 +128,13 @@ def daily_profile(rows: list[dict], zone: str) -> list[dict]:
                 "received_hours": len(items),
                 "reasons": reasons,
                 "resolution": "hourly_aggregates",
+                # Konec známých platných přírůstků; pozdější neplatná hodina
+                # neprodlouží deklarované pokrytí známé části spotřeby.
+                "observed_to": datetime.fromtimestamp(
+                    max(item["end"] for item in items if not item["reason"]), timezone.utc
+                ).isoformat()
+                if any(not item["reason"] for item in items)
+                else None,
             }
         )
     return result

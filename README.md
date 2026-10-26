@@ -7,12 +7,19 @@ Samostatná integrace plynu podle [úplného zadání](ZADANI_MND_SOL_6_1.md).
 Runtime je Python, přibalený frontend JavaScript bez externí Lovelace
 závislosti. Nepotřebuje WPF, WebView2 ani REST token k vlastnímu HA.
 
-**Stav: vývojová verze 0.1.0-alpha.4.** Přehled pro skutečné účetní období MND,
-graf nákladů a záloh a měsíční měření popisuje [report alpha.4](docs/ALPHA_4.md).
+**Stav zdrojů: vývojová verze 0.1.0-alpha.5.** Volitelné měření kotle
+a jednodušší přehled popisuje [report alpha.5](docs/ALPHA_5.md).
+Předchozí účetní model, graf nákladů a záloh a měsíční měření popisuje
+[report alpha.4](docs/ALPHA_4.md). Níže uvedený veřejný instalátor alpha.4
+zůstává posledním zveřejněným balíčkem do samostatné publikace nové verze.
 Historii oprav uchovávají [alpha.3](docs/ALPHA_3.md), [alpha.2](docs/ALPHA_2.md)
 a [původní report](IMPLEMENTACE.md).
 Zdroj je ve veřejném repozitáři [79thales/mnd-tariff-accounting](https://github.com/79thales/mnd-tariff-accounting).
 Vydání instalátoru je oddělené od zveřejnění zdrojů.
+
+V nevydaných zdrojích je připravený [jednodušší přehled a volitelné měření
+elektřiny plynového kotle](docs/KOTEL_A_PREHLED.md). Výběr zásuvky je samostatný
+pro každé místo; její elektrická energie se nezapočítává do vyúčtování MND.
 
 ## Funkce
 

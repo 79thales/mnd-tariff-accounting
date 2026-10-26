@@ -54,7 +54,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 3,
+          "layout_version": 4,
           "billing_mode": "supplier"
         }
       ],
@@ -116,7 +116,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 3,
+          "layout_version": 4,
           "billing_mode": "supplier"
         }
       ]
@@ -177,7 +177,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 3,
+          "layout_version": 4,
           "billing_mode": "supplier"
         }
       ]
@@ -238,7 +238,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 3,
+          "layout_version": 4,
           "billing_mode": "supplier"
         }
       ]
@@ -299,7 +299,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 3,
+          "layout_version": 4,
           "admin_link": true,
           "billing_mode": "supplier"
         }
@@ -361,7 +361,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 3,
+          "layout_version": 4,
           "billing_mode": "supplier"
         }
       ]

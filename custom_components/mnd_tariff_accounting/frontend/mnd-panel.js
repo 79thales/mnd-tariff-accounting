@@ -73,6 +73,11 @@ h2{font-size:21px;line-height:1.35;margin:0 0 18px}h3{font-size:18px;margin:0 0 
 @media(max-width:650px){main{padding:14px}header{gap:16px;padding-bottom:16px}.brand strong{font-size:21px}.account-picker{width:100%}.account-picker label{flex:1;min-width:140px}.hero{padding:22px 20px}.hero h1{font-size:25px}.value{font-size:27px}nav{margin-bottom:18px}nav button,nav a{padding:12px}section,.card,form{padding:18px}.grid{gap:12px;grid-template-columns:repeat(auto-fit,minmax(155px,1fr))}.hero:after{opacity:.5}th,td{padding:12px 10px}}
 .billing-summary table{table-layout:fixed}.billing-summary td:first-child,.billing-summary th:first-child{width:64%;white-space:normal}.billing-summary td:last-child{font-weight:600;text-align:right;white-space:nowrap}.billing-summary .period{font-weight:600}.balance-value{font-size:34px;font-weight:700;letter-spacing:-.6px;margin:6px 0 22px}.billing-plot{width:100%;display:block;overflow:visible}.billing-plot text{font:19px Avenir,Arial,sans-serif;fill:var(--mnd-muted)}.billing-plot circle:focus,.billing-plot g:focus{outline:3px solid var(--mnd-focus);outline-offset:3px}.chart-legend{display:flex;justify-content:center;gap:12px 18px;flex-wrap:wrap;font-size:13px;margin:14px 0}.chart-legend span{display:inline-flex;align-items:center;gap:7px}.chart-legend i{display:inline-block;width:12px;height:12px;border-radius:50%}.axis-unit{font-size:13px;margin:0;color:var(--mnd-muted)}.metric.value{background:transparent;border:0;padding:0;text-align:left;min-height:44px;box-shadow:none;max-width:100%}.metric.value small{white-space:nowrap}.billing-summary .muted,.billing-chart .muted{font-size:13px;line-height:1.55}.billing-summary h3{margin:16px 0 4px}
 @media(max-width:650px){.billing-plot text{font-size:22px}.billing-summary td,.billing-summary th{padding:12px 6px}.billing-summary td:last-child{font-size:15px}.balance-value{font-size:31px}.metric.value{font-size:25px}.grid .label{font-size:13px}}
+/* Kompaktní kompozice patří pouze hlavnímu přehledu. Detailní účetní
+ * tabulky a administrační formuláře si ponechávají své dosavadní rozměry. */
+.overview-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-bottom:16px}.overview-grid>section{padding:16px;margin:0}.overview-grid h2{font-size:19px;margin-bottom:12px}.overview-grid h3{font-size:17px;margin-bottom:6px}.overview-grid p{margin:6px 0}.overview-grid .muted{font-size:13px;line-height:1.45}.overview-grid .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}.overview-grid .card{padding:12px}.overview-grid .card .value{font-size:22px;margin-top:8px}.overview-grid .balance-value{font-size:29px;margin:4px 0 10px}.overview-grid details{margin-top:10px}.overview-grid summary{cursor:pointer}.overview-grid+.weekly-consumption{padding:16px;margin-bottom:16px}.weekly-consumption .billing-plot{max-height:280px}
+@media(min-width:1050px){.overview-grid{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch}}
+@media(max-width:650px){.overview-grid>section,.overview-grid .card{padding:16px}.overview-grid .card .value{font-size:20px}.overview-grid .grid{gap:10px}.overview-grid+.weekly-consumption{padding:16px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}`;
 
 const TABS = {overview:"Přehled",readings:"Spotřeba",accounting:"Účetnictví",forecasts:"Prognózy",editor:"Editor",history:"Historie a doklady",dashboard:"Generate dashboard"};
@@ -168,8 +173,52 @@ Object.assign(EN,{
 const number = (value, unit="",locale="cs-CZ") => value === null || value === undefined ? "—" : `${new Intl.NumberFormat(locale,{maximumFractionDigits:3}).format(value)} ${unit}`;
 const table = (rows, columns) => `<div class="scroll"><table><thead><tr>${columns.map(([,label])=>`<th>${esc(label)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${columns.map(([key])=>`<td>${esc(r[key] ?? "—")}</td>`).join("")}</tr>`).join("") || `<tr><td colspan="${columns.length}">Žádné uložené záznamy.</td></tr>`}</tbody></table></div>`;
 const field = (name,label,type="text",options) => ({name,label,type,options});
+Object.assign(EN,{
+  "Elektrická spotřeba plynového kotle":"Gas boiler electricity monitoring",
+  "Zobrazovat elektrickou spotřebu kotle":"Show boiler electricity consumption",
+  "Senzor elektrického příkonu":"Electric power sensor",
+  "Kumulativní elektrická energie (volitelné)":"Cumulative electricity sensor (optional)",
+  "Požadavek na topení (volitelné)":"Heating demand entity (optional)",
+  "Platnost reportu kotle (sekundy)":"Boiler report validity (seconds)",
+  "Náhled vybraných zdrojů":"Selected sources preview",
+  "Právě teď":"Right now","Kotel":"Boiler","Plyn dnes":"Gas today",
+  "Plyn tento měsíc":"Gas this month","Podrobnosti spotřeby":"Consumption details",
+  "Podrobnosti účetnictví":"Accounting details","Jak se počítá":"How it is calculated",
+  "Odečet MND":"MND reading","Elektrický příkon kotle":"Boiler electric power",
+  "Známá část měření HA; data do":"Known HA measurements; data through",
+  "Plyn za posledních sedm dní":"Gas over the last seven days",
+  "Pro sedmidenní graf zatím chybí měření HA.":"HA measurements for the seven-day chart are not available yet.",
+  "Oranžová ukazuje pouze známou část dne. Mezery nejsou nulová spotřeba.":"Orange shows the known part of a day. Missing data is not zero consumption.",
+  "úplný den":"complete day","neúplný den":"partial day",
+  "Elektrická spotřeba kotle":"Boiler electricity consumption",
+  "Celkový stav elektroměru kotle":"Boiler cumulative electricity reading",
+  "Elektřina dnes":"Electricity today","Elektřina tento měsíc":"Electricity this month",
+  "Známá část; data do":"Known part; data through","Dnes":"Today","Tento měsíc":"This month",
+  "Průtok a provoz kotle – 24 hodin":"Gas flow and boiler operation – 24 hours",
+  "Průtok plynu – 24 hodin":"Gas flow – 24 hours",
+  "Požadavek topení zapnutý":"Heating demand on","Požadavek topení vypnutý":"Heating demand off",
+  "Požadavek topení nedostupný":"Heating demand unavailable",
+  "Otevřít historii v Home Assistantu":"Open history in Home Assistant",
+  "Graf historie není dostupný.":"History chart is unavailable.",
+  "Vyberte senzor elektrického příkonu kotle.":"Select the boiler electric power sensor.",
+  "Vybraný zdroj kotle není dostupný v registru nebo stavech HA.":"The selected boiler source is unavailable in the HA registry or states.",
+  "Příkon kotle vyžaduje senzor ve W nebo kW.":"Boiler electric power requires a sensor in W or kW.",
+  "Elektrická energie vyžaduje Wh/kWh a kumulativní třídu total nebo total_increasing.":"Electricity requires Wh/kWh and a total or total_increasing state class.",
+  "Požadavek topení musí být climate, switch nebo binary_sensor.":"Heating demand must be a climate, switch, or binary_sensor entity.",
+  "Platnost reportu kotle musí být 30 až 86 400 sekund.":"Boiler report validity must be between 30 and 86,400 seconds.",
+  "Zásuvka měří celý připojený kotel včetně elektroniky a čerpadla. Elektřina je oddělená od plynu a vyúčtování MND.":"The socket measures the connected boiler including electronics and pump. Electricity is separate from gas and MND billing.",
+  "Požadavek termostatu není samostatným důkazem hoření. Rozdílné jednotky mají samostatné grafy se stejnou časovou osou.":"Thermostat demand alone does not prove combustion. Different units use separate charts on the same time axis.",
+  "Odhad používá podklady MND a doložené ceny. Skutečné vyúčtování má přednost; elektřina kotle se do něj nezapočítává.":"The estimate uses MND records and documented prices. The supplier invoice takes priority; boiler electricity is excluded."
+});
 const COMMON_PERIOD = [field("from","Od (včetně)","date"),field("to","Do (bez tohoto dne)","date")];
 const FORMS = [
+  {section:"boiler",title:"Elektrická spotřeba plynového kotle",fields:[
+    field("boiler_enabled","Zobrazovat elektrickou spotřebu kotle","checkbox"),
+    field("boiler_power_entity","Senzor elektrického příkonu","power"),
+    field("boiler_energy_entity","Kumulativní elektrická energie (volitelné)","energy"),
+    field("boiler_demand_entity","Požadavek na topení (volitelné)","demand"),
+    field("boiler_max_age","Platnost reportu kotle (sekundy)","decimal")
+  ]},
   {section:"settings",title:"Období a zdroj měření",fields:[field("name","Název místa"),field("period_from","Začátek období","date"),field("period_to","Konec období (výlučně)","date"),field("opening_credit","Počáteční kredit / dluh (Kč)","decimal"),field("payments_complete","Úplnost skutečných úhrad potvrzena","checkbox"),field("allow_linear","Povolit odhad rozdělení podle dnů","checkbox"),field("source_mode","Místní zdroj","select",["manual","sensor"]),field("source_entity","Kumulativní senzor m³","sensor"),field("flow_entity","Senzor aktuálního průtoku","flow"),field("flow_max_age","Platnost reportu průtoku (sekundy)","decimal"),field("history_source_entity","Historický senzor objemu nebo pulsů","history"),field("history_unit_m3","Objem jednoho pulsu (m³)","decimal"),field("segment","Identita segmentu / plynoměru")]},
   {section:"readings",title:"Ruční fyzický odečet",fields:[field("meter","Číslo plynoměru"),field("segment","Segment (prázdné = číslo plynoměru)"),field("value","Kumulativní stav (m³)","decimal"),field("observed_at","Skutečný čas ISO 8601 včetně pásma"),field("note","Poznámka"),field("supersedes","ID opravovaného odečtu (volitelné)")]},
   {section:"events",title:"Platba / předpis / vratka",fields:[field("role","Druh","select",["payment","prescribed","assumed_paid","refund","credit","debit","transfer_in","transfer_out"]),field("amount","Částka Kč","decimal"),field("date","Datum události","date"),...COMMON_PERIOD,field("invoice","ID faktury (volitelné)"),field("counterpart","ID protistrany převodu (volitelné)"),field("supersedes","ID nahrazovaného záznamu (volitelné)"),field("note","Poznámka")]},
@@ -182,9 +231,16 @@ const FORMS = [
 
 class MndSurface extends Base {
   constructor(){super();this._admin=false;if(this.attachShadow)this.attachShadow({mode:"open"});this._tab="overview";this._message="";this._busy=false;this._request=0;}
-  set hass(value){this._hass=value;this.toggleAttribute?.("dark",Boolean(value?.themes?.darkMode));if(!this._loaded && this.isConnected)this.load();}
-  connectedCallback(){if(this._hass && !this._loaded)this.load();if(!this._timer)this._timer=setInterval(()=>{if(!this._busy&&this._tab!=="editor"&&!this.shadowRoot.activeElement)this.load();},30000);}
-  disconnectedCallback(){this._request++;this._loaded=false;clearInterval(this._timer);this._timer=null;}
+  set hass(value){this._hass=value;this.toggleAttribute?.("dark",Boolean(value?.themes?.darkMode));if(!this._loaded && this.isConnected)this.load();else this.updateLiveMetrics();}
+  connectedCallback(){
+    if(this._hass&&!this._loaded)this.load();
+    else if(this._loaded)void this.mountHistory();
+    // Živé metriky nemění formulář ani fokus. Účetní data se načtou zvlášť;
+    // samotné držení fokusu tlačítka už nezastaví obnovování dat.
+    if(!this._timer)this._timer=setInterval(()=>{if(!this._busy&&this._tab!=="editor")this.load({background:true});},30000);
+    if(!this._liveTimer)this._liveTimer=setInterval(()=>this.updateLiveMetrics(),1000);
+  }
+  disconnectedCallback(){this._request++;this._loaded=false;clearInterval(this._timer);clearInterval(this._liveTimer);this._timer=null;this._liveTimer=null;this._historyMountHost=null;this._historyCard=null;}
   number(value,unit=""){return number(value,(this._hass?.language||"cs").startsWith("en")&&unit==="Kč"?"CZK":unit,(this._hass?.language||"cs").startsWith("en")?"en-GB":"cs-CZ");}
   async command(action,payload={}){
     /* Odpověď původního místa se po přepnutí nesmí vložit do nového formuláře.
@@ -194,38 +250,55 @@ class MndSurface extends Base {
     if(action!=="entries"&&(entry!==this._entry||place!==this._place))throw new Error("selection_changed");
     return result;
   }
-  async load({force=false}={}){
+  async load({force=false,background=false}={}){
     if(!this._hass || (this._loading&&!force))return;
     const request=++this._request;this._loading=request;
     try{
-      const entries=await this.command("entries");if(request!==this._request)return;
+      const entries=background?this._entries:await this.command("entries");if(request!==this._request)return;
       const query=new URLSearchParams(globalThis.location?.search);
       this._entries=entries;this._entry=this._config?.entry_id || this._entry || query.get("entry_id") || (entries.length===1?entries[0].id:null);
       if(!this._entry){this._loaded=true;this._message=entries.length?"Vyberte účet":"Nejprve přidejte integraci v Nastavení → Zařízení a služby.";this.render();return;}
-      const summary=await this.command("summary");if(request!==this._request)return;
+      const summary=background?this._summary:await this.command("summary");if(request!==this._request)return;
       this._summary=summary;this._place=this._config?.place || this._place || query.get("place") || summary.places[0]?.id;
       if(!this._queryApplied){this._tab=this._config?.tab || query.get("tab") || this._tab;this._queryApplied=true;}
       if(this._place)this._detail=await this.command("detail");if(request!==this._request)return;
-      this._loaded=true;this._failed=false;this._message="";this.render();
-    }catch(error){if(request!==this._request)return;this._failed=true;this._loaded=true;this._message=this.errorText(error);this.render();}
+      this._loaded=true;this._failed=false;this._message="";
+      if(background&&this.shadowRoot.activeElement){this.updateLiveMetrics();this.backgroundLoadError("");}else this.render();
+    }catch(error){if(request!==this._request)return;this._failed=true;this._loaded=true;this._message=this.errorText(error);if(background&&this.shadowRoot.activeElement){this.updateLiveMetrics();this.backgroundLoadError(this._message);}else this.render();}
     finally{if(this._loading===request)this._loading=false;}
+  }
+  backgroundLoadError(message){
+    /* Ani chyba periodického načtení nesmí přepsat rozepsané pole nebo
+     * zaměřený prvek. Neinteraktivní upozornění zanikne po úspěšné obnově;
+     * běžný ruční retry nadále používá standardní stav komponenty. */
+    const main=this.shadowRoot.querySelector("main");if(!main)return;
+    let notice=this.shadowRoot.getElementById("background-load-error");
+    if(!message){notice?.remove();return;}
+    if(!notice){notice=document.createElement("div");notice.id="background-load-error";notice.className="notice error";notice.setAttribute("role","status");main.prepend(notice);}
+    notice.textContent=message;
   }
   errorText(error){
     /* Číslo z odmítnutého WS požadavku samo nevysvětluje chybu. Nezobrazujeme
      * surovou odpověď ani zákaznické hodnoty; opakování zůstává dostupné. */
     const code=String(error?.code||error?.message||"request_failed");
-    const labels={request_timeout:"Požadavek překročil časový limit.",entry_not_loaded:"Integrace není načtena. Ověřte její stav v Nastavení.",portal_auth_required:"Přihlášení MND vypršelo. Obnovte je v konfiguraci místa.",selection_changed:"Výběr odběrného místa se změnil.",portal_http_400:"MND odmítlo parametry požadavku.",portal_unavailable:"Portál MND není dostupný."};
-    return labels[code]||"Požadavek se nepodařilo dokončit. Zkuste jej opakovat. ("+(/^[a-zA-Z0-9_]{1,80}$/.test(code)?code:"request_failed")+")";
+    const labels={request_timeout:"Požadavek překročil časový limit.",entry_not_loaded:"Integrace není načtena. Ověřte její stav v Nastavení.",portal_auth_required:"Přihlášení MND vypršelo. Obnovte je v konfiguraci místa.",selection_changed:"Výběr odběrného místa se změnil.",portal_http_400:"MND odmítlo parametry požadavku.",portal_unavailable:"Portál MND není dostupný.",boiler_power_required:"Vyberte senzor elektrického příkonu kotle.",boiler_source_unavailable:"Vybraný zdroj kotle není dostupný v registru nebo stavech HA.",incompatible_boiler_sensor:"Příkon kotle vyžaduje senzor ve W nebo kW.",incompatible_boiler_energy:"Elektrická energie vyžaduje Wh/kWh a kumulativní třídu total nebo total_increasing.",incompatible_boiler_demand:"Požadavek topení musí být climate, switch nebo binary_sensor.",invalid_boiler_max_age:"Platnost reportu kotle musí být 30 až 86 400 sekund."};
+    return labels[code]?this.text(labels[code]):"Požadavek se nepodařilo dokončit. Zkuste jej opakovat. ("+(/^[a-zA-Z0-9_]{1,80}$/.test(code)?code:"request_failed")+")";
   }
   async run(action){if(this._busy)return;this._busy=true;this._failed=false;this._message="";try{await action();}catch(error){this._failed=true;this._message=this.errorText(error);}finally{this._busy=false;this.render();}}
   formMarkup(form){const settings=this._detail?.place.settings || {};return `<form data-section="${form.section}"><h3>${form.title}</h3>${form.fields.map(f=>{
-    const value=(form.section==="settings"||f.name==="segment")?settings[f.name]:(form.section==="invoices"&&f.name==="artifact"?this._invoiceArtifact:"");let input;
+    const value=(["settings","boiler"].includes(form.section)||f.name==="segment")?settings[f.name]:(form.section==="invoices"&&f.name==="artifact"?this._invoiceArtifact:"");let input;
     if(f.type==="checkbox")input=`<input name="${f.name}" type="checkbox" ${value?"checked":""}> ${esc(f.label)}`;
     else if(f.type==="select")input=`${esc(f.label)}<select name="${f.name}">${f.options.map(o=>`<option value="${o}" ${value===o?"selected":""}>${esc(o)}</option>`).join("")}</select>`;
+    else if(["power","energy","demand"].includes(f.type)){
+      const candidates=Object.values(this._hass.states||{}).filter(s=>f.type==="demand"?["switch","binary_sensor","climate"].includes(s.entity_id.split(".")[0]):s.entity_id.startsWith("sensor.")&&(f.type==="power"?["W","kW"].includes(s.attributes.unit_of_measurement):["Wh","kWh"].includes(s.attributes.unit_of_measurement)&&["total","total_increasing"].includes(s.attributes.state_class)));
+      // Výpadek nesmí formulářem tiše smazat uložený výběr.
+      if(value&&!candidates.some(s=>s.entity_id===value))candidates.push({entity_id:value,attributes:{friendly_name:value}});
+      input=`${esc(f.label)}<select name="${f.name}"><option value="">Nevybráno</option>${candidates.map(s=>`<option value="${esc(s.entity_id)}" ${value===s.entity_id?"selected":""}>${esc(s.attributes.friendly_name||s.entity_id)}</option>`).join("")}</select>`;
+    }
     else if(f.type==="flow")input=`${esc(f.label)}<select name="${f.name}"><option value="">Nevybráno</option>${Object.values(this._hass.states||{}).filter(s=>["m³/h","m3/h","L/min","l/min","L/h","l/h","m³/s","m3/s"].includes(s.attributes.unit_of_measurement)).map(s=>`<option value="${esc(s.entity_id)}" ${value===s.entity_id?"selected":""}>${esc(s.attributes.friendly_name||s.entity_id)}</option>`).join("")}</select>`;
     else if(["sensor","history"].includes(f.type))input=`${esc(f.label)}<select name="${f.name}"><option value="">Nevybráno</option>${Object.values(this._hass.states || {}).filter(s=>(f.type==="history"?["m³","m3","pulse","pulses","imp"]:["m³","m3"]).includes(s.attributes.unit_of_measurement)&&["total","total_increasing"].includes(s.attributes.state_class)).map(s=>`<option value="${esc(s.entity_id)}" ${value===s.entity_id?"selected":""}>${esc(s.attributes.friendly_name || s.entity_id)}</option>`).join("")}</select>`;
     else input=`${esc(f.label)}<input name="${f.name}" type="${f.type==="date"?"date":"text"}" ${f.type==="decimal"?'inputmode="decimal"':""} value="${esc(value)}">`;
-    return `<label>${input}</label>`;}).join("")}<button class="primary" type="submit">Uložit do evidence HA</button></form>`;}
+    return `<label>${input}</label>`;}).join("")}${form.section==="boiler"?`<p class="muted">${this.text("Zásuvka měří celý připojený kotel včetně elektroniky a čerpadla. Elektřina je oddělená od plynu a vyúčtování MND.")}</p><p data-boiler-preview aria-live="polite"></p>`:""}<button class="primary" type="submit">Uložit do evidence HA</button></form>`;}
   text(value){return (this._hass?.language||"cs").startsWith("en")?(EN[value]||value):value;}
   dateText(value,time=false){
     if(!value)return "—";
@@ -283,16 +356,109 @@ class MndSurface extends Base {
     }).join("");
     return `<section class="billing-chart"><h2>Měsíční odběr podle měření HA</h2><p class="axis-unit">m³</p><svg class="billing-plot" viewBox="0 0 600 280" role="img" aria-label="Měsíční odběr podle měření HA">${axes}${bars}</svg><div class="chart-legend"><span><i style="background:var(--mnd-actual)"></i>Úplný měsíc</span><span><i style="background:#ec941b"></i>Neúplný měsíc</span><span>— <span>Údaje chybí</span></span></div><p class="muted">Oranžové sloupce obsahují pouze známou část měsíce. Chybějící data nejsou nulová spotřeba. Celkový odběr pro vyúčtování přebírá MND; jeho souhrn nemusí odpovídat součtu sloupců HA.</p></section>`;
   }
-  overview(){
-    const r=this._detail?.result||{},b=r.billing;
-    if(!b?.from||(b.source==="configured"&&!this._detail?.place.portal_evidence?.advances))return this.legacyOverview();
-    const cards=[["Aktuální průtok",r.current_flow_m3h,"m³/h","current_flow_m3h"],["Naměřeno HA v období",b.known_volume_m3,"m³","billing_volume_m3"],["Poslední odečet MND",r.latest_mnd,"m³","latest_mnd"],["Předpis zálohy MND",r.current_deposit_czk,"Kč","current_deposit_czk"]];
-    return `<div class="grid">${cards.map(([label,value,unit,key])=>`<div class="card"><div class="label">${label}</div>${this._config?.entities?.[key]?`<button class="value metric" data-entity="${esc(this._config.entities[key])}" aria-label="${esc(label)}">${this.number(value)} <small>${unit}</small></button>`:`<div class="value">${this.number(value)} <small>${unit}</small></div>`}</div>`).join("")}</div><p class="muted">Odečet MND: ${this.dateText(r.latest_mnd_date)} · Průtok: ${esc(({current:"aktuální",stale:"zastaralý report",unavailable:"nedostupný"})[r.flow_status]||"nepřipojeno")}.</p>${this.billingSummary()}${this.cashChart()}${this.monthlyChart()}`;
+  liveMetrics(settings=this._detail?.place.settings||{}){
+    /* Živé stavy jsou nezávislé na třicetisekundovém účetním dotazu. Stáří
+     * počítáme z reportu/aktualizace, nikdy z last_changed. Nula je platné
+     * měření; chyba a nekompatibilní jednotka zůstávají nedostupností. */
+    const states=this._hass?.states||{},r=this._detail?.result||{};
+    const read=(entity,units,maxAge,mirror)=>{
+      const state=states[entity],at=state?.last_reported||state?.last_updated;
+      if(!state||state.state==null||String(state.state).trim()===""||["unknown","unavailable"].includes(state.state))return {value:null,quality:"unavailable",at};
+      if(!Object.hasOwn(units,state.attributes?.unit_of_measurement))return {value:null,quality:"incompatible_unit",at};
+      const value=Number(state.state);
+      // Frontend nemusí dostávat bezezměnové reporty. Serverový last_reported
+      // lze použít jen pro tutéž hodnotu; výpadek ani nové měření nezakrývá.
+      const reported=mirror?.quality==="current"&&Number(mirror.value)===value*units[state.attributes.unit_of_measurement]&&Date.parse(mirror.reported_at)>Date.parse(at)?mirror.reported_at:at;
+      const age=(Date.now()-Date.parse(reported))/1000;
+      if(!Number.isFinite(value)||value<0||!Number.isFinite(age))return {value:null,quality:"unavailable",at};
+      if(age<0||age>maxAge)return {value:null,quality:"stale",at:reported};
+      return {value:value*units[state.attributes.unit_of_measurement],quality:"current",at:reported};
+    };
+    const flowEntity=settings.flow_entity||this._config?.entities?.current_flow_m3h;
+    const flow=flowEntity?read(flowEntity,{"m³/h":1,"m3/h":1,"L/min":.06,"l/min":.06,"L/h":.001,"l/h":.001,"m³/s":3600,"m3/s":3600},settings.flow_max_age??900,{value:r.current_flow_m3h,quality:r.flow_status,reported_at:r.flow_at}):{value:r.current_flow_m3h??null,quality:r.flow_status||"unavailable",at:r.flow_at};
+    // Bez připojeného hass zdroje ověříme i stáří odpovědi serveru.
+    if(!flowEntity&&flow.at&&(Date.now()-Date.parse(flow.at))/1000>(settings.flow_max_age??900)){flow.value=null;flow.quality="stale";}
+    const power=read(settings.boiler_power_entity,{W:1,kW:1000},settings.boiler_max_age??900,r.boiler?.power);
+    const energy=read(settings.boiler_energy_entity,{Wh:.001,kWh:1},settings.boiler_max_age??900,r.boiler?.energy);
+    const demand=states[settings.boiler_demand_entity];
+    const action=demand?.attributes?.hvac_action;
+    const requested=!demand||["unavailable","unknown"].includes(demand.state)?null:action==="heating"||demand.state==="on"?true:["idle","off"].includes(action)||demand.state==="off"?false:null;
+    return {flow,power,energy,requested};
   }
-  legacyOverview(){
-    const r=this._detail?.result||{};
-    const cards=[["Aktuální průtok",r.current_flow_m3h,"m³/h","current_flow_m3h"],["Spotřeba vyhodnoceného období",r.volume_m3,"m³","volume_m3"],["Poslední odečet MND",r.latest_mnd,"m³","latest_mnd"],["Předpis zálohy MND",r.current_deposit_czk,"Kč","current_deposit_czk"],["Skutečně zaplaceno",r.paid_czk,"Kč","paid_czk"],["Známé náklady",r.known_cost_czk,"Kč","known_cost_czk"]];
-    return `<div class="grid">${cards.map(([label,v,u,key])=>`<div class="card"><div class="label">${label}</div>${this._config?.entities?.[key]?`<button class="value metric" data-entity="${esc(this._config.entities[key])}" aria-label="${esc(label)}">${this.number(v)} <small>${u}</small></button>`:`<div class="value">${this.number(v)} <small>${u}</small></div>`}</div>`).join("")}</div><p class="muted">Datum odečtu MND: ${esc(r.latest_mnd_date||"neznámé")} · Průtok: ${esc(({current:"aktuální",stale:"zastaralý report",unavailable:"nedostupný",incompatible_unit:"nepodporovaná jednotka"})[r.flow_status]||"nepřipojeno")} ${esc(r.flow_at||"")}</p>${r.current_meter!=null?`<p>Aktuální odvozený stav: ${this.number(r.current_meter,"m³")}</p>`:""}<p class="muted">${r.evaluated_from?`${esc(r.evaluated_from)} → ${esc(r.evaluated_to)}`:"Období a zdroje nastavte v konfiguraci odběrného místa."}</p>${this.chart()}`;
+  qualityText(quality){return this.text(({current:"aktuální",stale:"zastaralý report",incompatible_unit:"nepodporovaná jednotka"})[quality]||"nedostupný");}
+  updateLiveMetrics(){
+    if(!this.shadowRoot||!this._detail)return;
+    const settings=this._detail.place.settings||{},m=this.liveMetrics(settings);
+    const values={flow:this.number(m.flow.value,"m³/h"),flow_status:this.qualityText(m.flow.quality),flow_at:this.dateText(m.flow.at,true),
+      boiler_power:this.number(m.power.value,"W"),boiler_energy:this.number(m.energy.value,"kWh"),
+      boiler_status:this.qualityText(m.power.quality),boiler_at:this.dateText(m.power.at,true),
+      gas_at:this.dateText(this._detail.result.consumption?.month?.observed_to,true),boiler_demand:this.text(m.requested===true?"Požadavek topení zapnutý":m.requested===false?"Požadavek topení vypnutý":"Požadavek topení nedostupný")};
+    values.gas_today=this.number(this._detail.result.consumption?.today?.value_m3,"m³");
+    values.gas_month=this.number(this._detail.result.consumption?.month?.value_m3,"m³");
+    this.shadowRoot.querySelectorAll("[data-live]").forEach(node=>{if(Object.hasOwn(values,node.dataset.live))node.textContent=values[node.dataset.live];});
+    if(this._historyCard)this._historyCard.hass=this._hass;
+    const form=this.shadowRoot.querySelector('form[data-section="boiler"]');
+    const preview=form?.querySelector("[data-boiler-preview]");
+    if(preview){
+      const selected=Object.fromEntries(["power","energy","demand"].map(k=>[`boiler_${k}_entity`,form.elements.namedItem(`boiler_${k}_entity`).value]));
+      const live=this.liveMetrics({...settings,...selected});
+      preview.textContent=`${this.text("Náhled vybraných zdrojů")}: ${this.number(live.power.value,"W")} · ${this.qualityText(live.power.quality)} · ${this.number(live.energy.value,"kWh")}`;
+    }
+  }
+  metric(label,value,unit,{entity,live}={}){
+    const content=`<span ${live?`data-live="${live}"`:""}>${this.number(value,unit)}</span>`;
+    return `<div class="card"><div class="label">${this.text(label)}</div>${entity?`<button class="value metric" data-entity="${esc(entity)}" aria-label="${esc(this.text(label))}">${content}</button>`:`<div class="value">${content}</div>`}</div>`;
+  }
+  detailLink(tab,label){
+    const nav=this._config?.navigation?.find(n=>n.tab===tab);
+    return nav?`<a href="${esc(nav.path)}">${this.text(label)}</a>`:`<button data-tab="${tab}">${this.text(label)}</button>`;
+  }
+  weeklyChart(){
+    const rows=this._detail?.result.consumption?.days||[];
+    if(!rows.length||rows.every(r=>r.value_m3==null))return `<p class="muted">${this.text("Pro sedmidenní graf zatím chybí měření HA.")}</p>`;
+    const maximum=Math.max(1,...rows.map(r=>Number(r.value_m3)||0))*1.1;
+    const width=480/rows.length;
+    return `<section class="billing-chart weekly-consumption"><h2>${this.text("Plyn za posledních sedm dní")}</h2><svg class="billing-plot" viewBox="0 0 600 240" role="img" aria-label="${this.text("Plyn za posledních sedm dní")}"><text x="25" y="22">m³</text>${rows.map((r,i)=>{
+      const x=75+i*width,known=r.value_m3!=null,height=known?Number(r.value_m3)/maximum*160:0;
+      const label=`${this.dateText(r.date)} · ${this.number(r.value_m3,"m³")} · ${this.text(r.complete?"úplný den":"neúplný den")}`;
+      return `<g role="img" tabindex="0" aria-label="${esc(label)}"><title>${esc(label)}</title>${known?`<rect x="${x}" y="${185-height}" width="${width*.7}" height="${Math.max(2,height)}" rx="3" fill="${r.complete?"var(--mnd-actual)":"#ec941b"}"/>`:`<text x="${x}" y="180">—</text>`}<text x="${x}" y="214">${esc(String(r.date).slice(8))}</text></g>`;
+    }).join("")}</svg><p class="muted">${this.text("Oranžová ukazuje pouze známou část dne. Mezery nejsou nulová spotřeba.")}</p></section>`;
+  }
+  overview(){
+    const r=this._detail?.result||{},b=r.billing||{},s=this._detail?.place.settings||{},c=r.consumption||{};
+    const m=this.liveMetrics(),balance=b.forecast_balance_czk;
+    const title=b.confirmed_invoice?"Výsledek originálního vyúčtování":balance==null?"Odhad vyúčtování čeká na podklady":Number(balance)>=0?"Očekávaný přeplatek":"Očekávaný nedoplatek";
+    return `<div class="overview-grid"><section><h2>${this.text("Právě teď")}</h2><div class="grid">${this.metric("Aktuální průtok",m.flow.value,"m³/h",{entity:s.flow_entity||this._config?.entities?.current_flow_m3h,live:"flow"})}${s.boiler_enabled?this.metric("Elektrický příkon kotle",m.power.value,"W",{entity:s.boiler_power_entity,live:"boiler_power"}):""}</div><p class="muted"><span data-live="flow_status">${this.qualityText(m.flow.quality)}</span> · <span data-live="flow_at">${this.dateText(m.flow.at,true)}</span>${s.boiler_enabled?`<br>${this.text("Kotel")}: <span data-live="boiler_status"></span> · <span data-live="boiler_at"></span>`:""}</p></section>
+      <section><h2>${this.text("Spotřeba")}</h2><div class="grid">${this.metric("Plyn dnes",c.today?.value_m3,"m³",{live:"gas_today"})}${this.metric("Plyn tento měsíc",c.month?.value_m3,"m³",{live:"gas_month"})}</div><p class="muted">${this.text("Známá část měření HA; data do")}: <span data-live="gas_at">${this.dateText(c.month?.observed_to,true)}</span></p>${this.detailLink("readings","Podrobnosti spotřeby")}</section>
+      <section><h2>${this.text("Vyúčtování")}</h2><h3>${this.text(title)}</h3><p class="balance-value">${this.number(balance==null?null:String(balance).replace(/^-/ ,""),"Kč")}</p><p>${this.text("Účetní období MND")}: ${this.dateText(b.from)} → ${this.dateText(b.to)}</p><p class="muted">${this.text("Odečet MND")}: ${this.dateText(b.actual_through||r.latest_mnd_date)}</p>${this.detailLink("accounting","Podrobnosti účetnictví")}<details><summary>${this.text("Jak se počítá")}</summary><p>${this.text("Odhad používá podklady MND a doložené ceny. Skutečné vyúčtování má přednost; elektřina kotle se do něj nezapočítává.")}</p></details></section></div>${this.weeklyChart()}`;
+  }
+  boilerDetails(){
+    const s=this._detail?.place.settings||{},b=this._detail?.result.boiler||{},e=b.electricity||{};
+    const graph=`<section><h2>${this.text(s.boiler_enabled?"Průtok a provoz kotle – 24 hodin":"Průtok plynu – 24 hodin")}</h2><div id="boiler-history"></div>${s.boiler_enabled?`<p class="muted">${this.text("Požadavek termostatu není samostatným důkazem hoření. Rozdílné jednotky mají samostatné grafy se stejnou časovou osou.")}</p>`:""}</section>`;
+    if(!s.boiler_enabled)return s.flow_entity?graph:"";
+    const partial=row=>`${this.text("Známá část; data do")}: ${row?.observed_to?this.dateText(new Date(row.observed_to*1000).toISOString(),true):"—"} · ${row?.known_hours??"—"}/${row?.expected_closed_hours??"—"} h`;
+    return `<section><h2>${this.text("Elektrická spotřeba kotle")}</h2><div class="grid">${this.metric("Elektrický příkon kotle",null,"W",{entity:s.boiler_power_entity,live:"boiler_power"})}${s.boiler_energy_entity?this.metric("Celkový stav elektroměru kotle",null,"kWh",{entity:s.boiler_energy_entity,live:"boiler_energy"}):""}</div><p class="muted"><span data-live="boiler_status"></span> · <span data-live="boiler_at"></span></p>${s.boiler_demand_entity?'<p data-live="boiler_demand"></p>':""}${s.boiler_energy_entity?`<div class="grid">${this.metric("Elektřina dnes",e.today?.value_kwh,"kWh")}${this.metric("Elektřina tento měsíc",e.month?.value_kwh,"kWh")}</div><p class="muted">${this.text("Dnes")}: ${partial(e.today)}<br>${this.text("Tento měsíc")}: ${partial(e.month)}</p>`:""}<p class="muted">${this.text("Zásuvka měří celý připojený kotel včetně elektroniky a čerpadla. Elektřina je oddělená od plynu a vyúčtování MND.")}</p></section>${graph}`;
+  }
+  async mountHistory(){
+    /* Nativní čtecí karta zajišťuje Recorder graf i obsluhu změn hass.
+     * Opožděné načtení pomocníka nesmí vložit graf do jiné podstránky. */
+    const host=this.shadowRoot.getElementById("boiler-history");
+    // Jediný mount pro konkrétní host zabrání duplicitním kartám při
+    // souběžném načtení pomocníka; nový render dostane nový host.
+    if(host&&this._historyMountHost===host)return;
+    this._historyMountHost=host;this._historyCard=null;
+    if(!host)return;
+    const s=this._detail?.place.settings||{};
+    const entities=[s.flow_entity,...(s.boiler_enabled?[s.boiler_power_entity,s.boiler_demand_entity]:[])].filter(Boolean);
+    if(!entities.length)return;
+    if(typeof globalThis.loadCardHelpers!=="function"){
+      const link=document.createElement("a");link.href=`/history?entity_id=${encodeURIComponent(entities.join(","))}`;link.textContent=this.text("Otevřít historii v Home Assistantu");host.append(link);return;
+    }
+    try{
+      const helpers=await globalThis.loadCardHelpers();
+      if(!host.isConnected||this._historyMountHost!==host||this.shadowRoot.getElementById("boiler-history")!==host){if(this._historyMountHost===host)this._historyMountHost=null;return;}
+      const card=helpers.createCardElement({type:"history-graph",hours_to_show:24,entities});card.hass=this._hass;host.append(card);this._historyCard=card;
+    }catch{host.textContent=this.text("Graf historie není dostupný.");}
   }
   financeMarkup(){
     const evidence=this._detail?.place.portal_evidence||{};
@@ -339,11 +505,11 @@ class MndSurface extends Base {
       if(this._tab==="history")return this.financeMarkup();
       if(this._tab==="accounting")return this.billingSummary()+this.cashChart()+this.financeMarkup();
       if(this._tab==="forecasts")return this.chart()+`<section><h2>Ověřená porovnání prognóz</h2>${table(p.comparisons||[],[["from","Od"],["to","Do"],["difference","Odchylka MWh"],["percentage","Odchylka %"]])}<p>Porovnání vyžaduje dokončené shodné období a doloženou energetickou bázi. Průběžná spotřeba není chyba celoroční predikce.</p></section>`;
-      if(this._tab==="readings")return this.monthlyChart()+`<section><h2>Historie odečtů</h2>${table(p.readings,[["date","Den"],["value","m³"],["source","Zdroj"],["method","Metoda"]])}</section><section><h2>Porovnání senzoru s odečtem MND</h2>${table(this._detail.result.meter_comparisons||[],[["date","Den"],["expected","Senzor m³"],["actual","MND m³"],["difference","Rozdíl m³"],["percentage","Rozdíl %"],["reason","Stav porovnání"]])}</section>`;
+      if(this._tab==="readings")return this.boilerDetails()+this.monthlyChart()+`<section><h2>Historie odečtů</h2>${table(p.readings,[["date","Den"],["value","m³"],["source","Zdroj"],["method","Metoda"]])}</section><section><h2>Porovnání senzoru s odečtem MND</h2>${table(this._detail.result.meter_comparisons||[],[["date","Den"],["expected","Senzor m³"],["actual","MND m³"],["difference","Rozdíl m³"],["percentage","Rozdíl %"],["reason","Stav porovnání"]])}</section>`;
     }
     switch(this._tab){
       case "overview":return this.overview();
-      case "readings":return `<section><h2>Historie odečtů</h2>${table(p.readings,[["date","Den"],["observed_at","Přesný čas"],["value","m³"],["meter","Plynoměr"],["source","Zdroj"],["method","Metoda"],["status","Status"],["id","ID pro opravu"]])}</section>`;
+      case "readings":return this.boilerDetails()+this.monthlyChart()+`<section><h2>Historie odečtů</h2>${table(p.readings,[["date","Den"],["observed_at","Přesný čas"],["value","m³"],["meter","Plynoměr"],["source","Zdroj"],["method","Metoda"],["status","Status"],["id","ID pro opravu"]])}</section>`;
       case "accounting":return this.financeMarkup()+`<section><h2>Platby a předpisy</h2><p class="muted">Předpis a předpokládaná platba nezvyšují skutečně zaplacenou částku.</p>${table(p.events,[["date","Datum"],["role","Role"],["amount","Kč"],["verification","Ověření"],["id","ID"]])}</section><section><h2>Vyúčtování</h2>${table(p.invoices,[["number","Doklad"],["from","Od"],["to","Do výlučně"],["cost","Náklad Kč"],["result","Dokladové saldo Kč"],["id","ID"]])}</section><section><h2>Cenové úseky</h2>${table(p.tariffs,[["name","Tarif"],["from","Od"],["to","Do výlučně"],["commodity","Obchodní Kč/MWh"],["other","Ostatní Kč/MWh"],["fixed","Kč/měsíc"],["role","Role"],["id","ID"]])}</section>`;
       case "forecasts":return `<section><h2>Historie prognóz</h2><select id="snapshot">${p.snapshots.map((s,i)=>`<option value="${i}" ${i===(this._snapshotIndex??p.snapshots.length-1)?"selected":""}>${esc(s.retrieved_at)}</option>`).join("")}</select><p class="muted">Starší předpověď zůstává uložená. Přesnost lze hodnotit až za shodné dokončené období a doložené měření.</p></section>${this.chart()}`;
       case "editor":return `<div class="notice">Zápisy jsou místní evidence v HA. Časy odečtů zadávejte s výslovným UTC posunem. Pole bez údaje ponechte prázdná.</div>${this.advancesMarkup()}<div class="forms">${FORMS.map(f=>this.formMarkup(f)).join("")}</div>`;
@@ -376,8 +542,8 @@ main{padding:16px;padding-top:max(16px,env(safe-area-inset-top));padding-bottom:
     const snapshot=this.shadowRoot.getElementById("snapshot");if(snapshot)snapshot.onchange=()=>{this._snapshotIndex=Number(snapshot.value);this.render();};
     this.shadowRoot.querySelectorAll("form").forEach(form=>form.onsubmit=event=>{event.preventDefault();this.run(async()=>{
       const section=form.dataset.section;const definition=FORMS.find(f=>f.section===section);const record={};
-      for(const f of definition.fields){const input=form.elements.namedItem(f.name);if(f.type==="checkbox")record[f.name]=input.checked;else if(f.type==="flow")record[f.name]=input.value;else if(input.value.trim()!=="")record[f.name]=input.value.trim();else if((f.type==="decimal"&&f.name!=="flow_max_age") || (section==="settings"&&f.name==="opening_credit"))record[f.name]=null;}
-      if(!["settings","calibration"].includes(section))record.id=globalThis.crypto.randomUUID();
+      for(const f of definition.fields){const input=form.elements.namedItem(f.name);if(f.type==="checkbox")record[f.name]=input.checked;else if(["flow","power","energy","demand"].includes(f.type))record[f.name]=input.value;else if(input.value.trim()!=="")record[f.name]=input.value.trim();else if((f.type==="decimal"&&!["flow_max_age","boiler_max_age"].includes(f.name)) || (section==="settings"&&f.name==="opening_credit"))record[f.name]=null;}
+      if(!["settings","boiler","calibration"].includes(section))record.id=globalThis.crypto.randomUUID();
       await this.command("edit",{section,record,revision:this._detail.revision});this._detail=await this.command("detail");this._message="Záznam byl uložen.";
     });});
     on("preview-import",async()=>{const file=this.shadowRoot.getElementById("file").files[0];if(!file)throw new Error("Vyberte soubor.");this._importFile=file;this._importPreview=await this.upload(file,true);});
@@ -403,6 +569,9 @@ main{padding:16px;padding-top:max(16px,env(safe-area-inset-top));padding-bottom:
     on("local-forecast",async()=>{this._localForecast=await this.command("local_forecast",{start:this.shadowRoot.getElementById("forecast-from").value,end:this.shadowRoot.getElementById("forecast-to").value});});
     on("backup",async()=>{const include=this.shadowRoot.getElementById("backup-documents").checked;const response=await this._hass.fetchWithAuth(`/api/${DOMAIN}/backup/${encodeURIComponent(this._entry)}/${encodeURIComponent(this._place)}?documents=${include?1:0}`);if(!response.ok)throw new Error("Zálohu nelze vytvořit; ověřte dostupnost originálů.");this.download(await response.blob(),"mnd-private-backup.zip","application/zip");});
     on("csv",async()=>{const result=await this.command("csv");this.download(result.content,"mnd-readings.csv","text/csv;charset=utf-8");});
+    const boilerForm=this.shadowRoot.querySelector('form[data-section="boiler"]');
+    if(boilerForm)boilerForm.onchange=()=>this.updateLiveMetrics();
+    this.updateLiveMetrics();void this.mountHistory();
     if((this._hass?.language || "cs").startsWith("en")){const walk=node=>{for(const child of node.childNodes){if(child.nodeType===3&&node.tagName!=="TD"){const key=child.textContent.trim();if(EN[key])child.textContent=child.textContent.replace(key,EN[key]);else for(const [cs,en] of [["Neznámé díly nejsou nuly.","Unknown components are not zero."],["Řádků:","Rows:"],["odmítnutých:","rejected:"],["Chybějící entity:","Missing entities:"],["žádné","none"],["Odchylka výhledu minus skutečnost:","Forecast minus actual:"],["Odhad zbývajících nákladů:","Estimated remaining cost:"],["Odhad výsledku období:","Estimated period outcome:"],["Místní návrh měsíční zálohy:","Local suggested monthly advance:"],["Stáhnout ","Download "]])child.textContent=child.textContent.replace(cs,en);}else if(child.nodeType===1&&child.tagName!=="STYLE"&&child.tagName!=="TEXTAREA"&&child.tagName!=="PRE")walk(child);}};walk(this.shadowRoot);}
   }
   async upload(file,preview){if(file.size>64*1024*1024)throw new Error("Soubor je větší než 64 MiB.");const response=await this._hass.fetchWithAuth(`/api/${DOMAIN}/import/${encodeURIComponent(this._entry)}/${encodeURIComponent(this._place)}?filename=${encodeURIComponent(file.name)}&preview=${preview?1:0}`,{method:"POST",body:file});const result=await response.json();if(!response.ok)throw new Error(result.error || "Import selhal.");return result;}

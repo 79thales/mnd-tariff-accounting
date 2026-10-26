@@ -78,13 +78,11 @@ def finance_for_period(place, start, end, today):
     }
 
 
-def monthly_measurements(place, start, end, today):
-    """Sloupce pocházejí z HA, ne z rozdělení souhrnného odečtu MND.
+def selected_profile(place):
+    """Jediný kompatibilní profil pro hlavní souhrny i měsíční graf.
 
-    Jediný vybraný historický zdroj má přednost před jeho pozdější odvozenou
-    entitou. Nikdy se nesčítají dva senzory téhož plynoměru. Neúplný měsíc
-    ukazuje pouze známou část; prázdný měsíc zůstává None. Březen/leden apod.
-    se vybírají podle skutečného účetního intervalu včetně jeho částečných měsíců.
+    Zdroj, měřicí segment a převod pulsů se nesmějí mezi pohledy lišit.
+    Rozporné profily shodného dne se odmítnou místo výběru náhodné hodnoty.
     """
     settings = place["settings"]
     source = settings.get("history_registry_id") or settings.get("source_registry_id")
@@ -104,6 +102,16 @@ def monthly_measurements(place, start, end, today):
         if current in profile and profile[current] != row:
             raise DataError("billing_profile_conflict")
         profile[current] = row
+    return profile
+
+
+def monthly_measurements(place, start, end, today):
+    """Měsíční sloupce z HA; neúplné hodnoty nejsou úplným odběrem MND.
+
+    Použije jediný vybraný zdroj. Prázdný měsíc zůstává None; částečný měsíc
+    respektuje skutečný účetní interval a nesčítá původní a odvozený senzor.
+    """
+    profile = selected_profile(place)
     current = start.replace(day=1)
     months = []
     stop = min(end, today + timedelta(days=1))
