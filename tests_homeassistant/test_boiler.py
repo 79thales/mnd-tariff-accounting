@@ -147,7 +147,7 @@ async def test_waiting_energy_summary_does_not_query_after_unload(hass):
     coordinator._closed = True
     coordinator._boiler_energy_lock.release()
     assert await task == {"quality": "closed", "today": None, "month": None}
-    hass.config.components.discard("recorder")
+    hass.config.components.remove("recorder")
     await hass.config_entries.async_unload(entry.entry_id)
 
 
@@ -160,8 +160,15 @@ async def test_boiler_energy_is_read_on_demand_and_cached_without_mnd_call(hass)
         "boiler_energy_registry_id": source.id,
     }
     hass.config.components.add("recorder")
+
+    async def run_executor(job):
+        # Skutečné HA i Recorder API vracejí Future, nikoli coroutine.
+        # AsyncMock s neasynchronním side_effect by vrátil samotnou Future
+        # místo výsledku dotazu; obal ji musí výslovně awaitovat.
+        return await hass.async_add_executor_job(job)
+
     executor = SimpleNamespace(
-        async_add_executor_job=AsyncMock(side_effect=hass.async_add_executor_job)
+        async_add_executor_job=AsyncMock(side_effect=run_executor)
     )
     metadata = {source.entity_id: (1, {"unit_of_measurement": "Wh", "has_sum": True})}
     with (
@@ -179,5 +186,5 @@ async def test_boiler_energy_is_read_on_demand_and_cached_without_mnd_call(hass)
         assert first["month"]["value_kwh"] is None
         assert query.call_count == 1
         assert coordinator.cloud_status == "not_connected"
-    hass.config.components.discard("recorder")
+    hass.config.components.remove("recorder")
     await hass.config_entries.async_unload(entry.entry_id)
