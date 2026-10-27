@@ -21,6 +21,24 @@
   the MND integration and open its HACS repository, with installation and
   restart prerequisites. The existing alpha tag and installer are unchanged.
 
+## 0.1.0-beta.6 — přesnější vlastní výhled
+
+### Čeština
+
+- Živé přírůstky se přičtou jen při doloženém stavu na hranici uzavřené hodiny.
+- Významný rozpor historie HA s fyzickými odečty MND se zobrazí a dotčený
+  interval v sezónním profilu nahradí označený orientační odhad z MND.
+- Chybějící měsíční zálohy se při doloženém pravidelném rozvrhu zahrnou do
+  výhledu jako předpoklad, nikoli jako skutečná úhrada.
+
+### English
+
+- Live increments require evidence of the meter state at the closed-hour boundary.
+- Material differences between HA history and physical MND readings are shown;
+  affected seasonal intervals use explicitly estimated MND allocations.
+- Missing monthly advances are assumed only when a regular schedule is supported;
+  they are never presented as actual payments.
+
 ## 0.1.0-beta.5 — vývoj vlastního odhadu
 
 ### Čeština

@@ -6,7 +6,11 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 from custom_components.mnd_tariff_accounting.core.archive import new_place
-from custom_components.mnd_tariff_accounting.core.orientational import orientational_view
+from custom_components.mnd_tariff_accounting.core.orientational import (
+    _live_tail,
+    _season,
+    orientational_view,
+)
 from custom_components.mnd_tariff_accounting.core.projection import evaluate_place
 
 PLACE = "27ZG000Z0000000X"
@@ -35,7 +39,7 @@ def scenario():
         "entity": "pulse", "segment": "meter", "original_unit": "pulse", "volume_per_unit_m3": "0.01"})
     place["samples"] = [
         {"entity": "volume", "segment": "meter", "unit": "m3", "state_class": "total_increasing",
-         "at": "2026-10-16T10:59:00Z", "value": "100"},
+         "at": "2026-10-16T11:00:00Z", "value": "100"},
         {"entity": "volume", "segment": "meter", "unit": "m3", "state_class": "total_increasing",
          "at": NOW.isoformat(), "value": "100.1"},
     ]
@@ -52,6 +56,29 @@ def scenario():
 
 
 class OrientationalTests(unittest.TestCase):
+    def test_live_tail_rejects_overlap_and_accepts_proven_unchanged_boundary(self):
+        p, _ = scenario()
+        p["samples"][0]["at"] = "2026-10-16T10:50:00Z"
+        cutoff = datetime(2026, 10, 16, 11, tzinfo=timezone.utc)
+        tail, measured, status = _live_tail(p, cutoff, NOW, "UTC")
+        self.assertEqual((tail, measured, status), (Decimal(0), cutoff, "baseline_missing"))
+        p["samples"].insert(1, {**p["samples"][0], "at": "2026-10-16T11:05:00Z"})
+        tail, measured, status = _live_tail(p, cutoff, NOW, "UTC")
+        self.assertEqual((tail, measured, status), (Decimal("0.1"), NOW, "current"))
+
+    def test_conflicting_history_uses_mnd_interval_without_overwriting_source(self):
+        today = datetime(2027, 2, 1).date()
+        start = datetime(2026, 2, 1).date()
+        profile = {start + timedelta(days=i): {"complete": True, "m3": "10"} for i in range(28)}
+        points = [{"date": start + timedelta(days=3), "valid": True, "meter": "m", "value": Decimal(0)},
+                  {"date": start + timedelta(days=27), "valid": True, "meter": "m", "value": Decimal(100)}]
+        before = copy.deepcopy(profile)
+        months, coverage = _season(profile, points, "m", today, datetime(2027, 3, 1).date())
+        self.assertEqual(months[2].quantize(Decimal("0.01")), Decimal("5.00"))
+        self.assertEqual(coverage["interpolated_days"], 24)
+        self.assertEqual(len(coverage["history_conflicts"]), 1)
+        self.assertEqual(profile, before)
+
     def test_projection_reacts_without_manual_billing_period(self):
         p, billing = scenario()
         p["settings"]["source_mode"] = "sensor"
@@ -126,7 +153,7 @@ class OrientationalTests(unittest.TestCase):
         p["daily_profile"].append({"date": "2026-10-25", "known_m3": "0.5", "complete": False,
             "known_hours": 12, "reasons": [], "observed_to": "2026-10-25T10:00:00Z",
             "entity": "pulse", "segment": "meter", "original_unit": "pulse", "volume_per_unit_m3": "0.01"})
-        p["samples"][0]["at"] = "2026-10-25T09:59:00Z"
+        p["samples"][0]["at"] = "2026-10-25T10:00:00Z"
         p["samples"][1]["at"] = now.isoformat()
         result = orientational_view(PLACE, p, billing, now, "Europe/Prague", True)
         self.assertEqual(result["actual_m3"], Decimal("109.6"))

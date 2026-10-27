@@ -88,6 +88,10 @@ const EN = {"Přehled":"Overview","Spotřeba":"Consumption","Účetnictví":"Acc
 /* Zdrojové popisy dokladů a uživatelské texty se nepřekládají. Překlad
  * mění pouze popisky aplikace, nikdy hodnoty options posílané serveru. */
 Object.assign(EN,{
+  "Zálohy zahrnuté do výhledu":"Advances included in the forecast",
+  "Výhled zahrnuje předpokládanou zálohu, která dosud není v podkladech MND.":"The forecast includes an assumed advance not yet present in MND records.",
+  "Historie HA se rozchází s odečty MND. Pro dotčené intervaly se používá orientační rozdělení odečtů MND.":"HA history differs from MND readings. The affected intervals use an estimated allocation of MND readings.",
+  "Historie HA se rozchází s fyzickými odečty MND; zkontrolujte podklady měření.":"HA history differs from physical MND readings; check the measurement evidence.",
   "Potvrzuji, že historický i aktuální senzor měří stejný plynoměr":"I confirm that the historical and current sensors measure the same gas meter",
   "Náš odhad podle spotřeby":"Our consumption-based estimate",
   "Spotřeba podle měření dosud":"Measured consumption so far",
@@ -585,6 +589,7 @@ class MndSurface extends Base {
       sample_history_start_missing:"Chybí návazné vzorky zdroje od začátku období.",
       history_source_unverified:"Propojení historického a aktuálního zdroje měření není doloženo.",
       history_unit_changed:"Historický zdroj změnil jednotku nebo ji neuvádí; návaznost je třeba ověřit.",
+      history_sources_disagree:"Historie HA se rozchází s fyzickými odečty MND; zkontrolujte podklady měření.",
       conversion_period_missing_or_ambiguous:"Chybí jednoznačný převod m³ na energii pro celé období.",
       anchor_time_unpaired:"Chybí platná návaznost měření na plynoměr nebo aktuální údaj.",
       calibration_required:"Chybí platná návaznost měření na plynoměr nebo aktuální údaj.",
@@ -605,18 +610,23 @@ class MndSurface extends Base {
       ["period_start_reading_unverified","meter_changed","meter_decrease","reading_time_ambiguous"].includes(reason)?this.editorUrl("readings"):
       ["representative_year_missing","sample_history_start_missing"].includes(reason)?this.editorUrl("","","history"):
       reason==="conversion_period_missing_or_ambiguous"?this.editorUrl("conversions"):
-      ["history_source_unverified","history_unit_changed"].includes(reason)?this.editorUrl("settings","history_source_entity"):
+      ["history_source_unverified","history_unit_changed","history_sources_disagree"].includes(reason)?this.editorUrl("settings","history_source_entity"):
       this.editorUrl("settings","source_entity");
     if(own.status!=="estimated"||own.balance_czk==null){
       const coverage=own.profile_complete_days==null?"":`<p class="muted">${this.text("Pokrytí roční historie")}: ${esc(own.profile_complete_days)} / ${esc(own.profile_required_days)} ${this.text("dní")}${!compact&&own.profile_missing_months?.length?`<br>${this.text("Chybějící měsíce nebo jejich části")}: ${esc(own.profile_missing_months.join(", "))}`:""}</p>`;
       return `<h3>${this.text("Náš odhad podle spotřeby")}</h3><p>${this.text("Vlastní odhad zatím není dostupný.")}</p><p class="muted">${this.text(messages[reason]||"Ověřte dostupnost období, cen a plateb.")}</p>${coverage}<p><a href="${esc(target)}">${this.text("Zkontrolovat podklady")}</a></p>`;
     }
     const label=Number(own.balance_czk)>=0?"Očekávaný přeplatek":"Očekávaný nedoplatek";
-    const values=[[own.boundary_estimated?"Spotřeba dosud (orientačně)":"Spotřeba podle měření dosud",own.actual_mwh,"MWh"],["Odhad odběru celkem podle měření",own.total_mwh,"MWh"],["Orientační náklady dosud",own.known_cost_czk,"Kč"],["Odhad nákladů podle měření",own.forecast_cost_czk,"Kč"],["Uhrazené zálohy",own.paid_czk,"Kč"],["Očekávané budoucí zálohy",own.remaining_payments_czk,"Kč"],["Očekávané platby celkem",own.expected_payments_czk,"Kč"]];
+    const values=[[own.boundary_estimated?"Spotřeba dosud (orientačně)":"Spotřeba podle měření dosud",own.actual_mwh,"MWh"],["Odhad odběru celkem podle měření",own.total_mwh,"MWh"],["Orientační náklady dosud",own.known_cost_czk,"Kč"],["Odhad nákladů podle měření",own.forecast_cost_czk,"Kč"],["Uhrazené zálohy",own.paid_czk,"Kč"],["Zálohy zahrnuté do výhledu",own.remaining_payments_czk,"Kč"],["Očekávané platby celkem",own.expected_payments_czk,"Kč"]];
     const approximate=own.boundary_estimated?`<p class="muted">${this.text("Orientační odhad z odečtů MND a měření HA")}</p>`:"";
     const liveWarning=own.live_status&&own.live_status!=="current"?`<p class="muted">${this.text("Nejnovější vzorky nelze bezpečně navázat. Odhad používá poslední uzavřenou hodinu.")}</p>`:"";
+    // Předpokládaná záloha není dokladem o předpisu ani skutečné úhradě.
+    // Rozpor mezi zdroji se zobrazuje i v přehledu, nikoli až v administraci.
+    const assumed=own.assumed_advances||[],conflicts=own.history_conflicts||[];
+    const assumptions=assumed.length?`<p class="muted">${this.text("Výhled zahrnuje předpokládanou zálohu, která dosud není v podkladech MND.")}${compact?"":` ${assumed.map(row=>`${this.dateText(row.date)}: ${this.number(row.amount,"Kč")}`).join("; ")}`}</p>`:"";
+    const conflictWarning=conflicts.length?`<p class="muted">${this.text("Historie HA se rozchází s odečty MND. Pro dotčené intervaly se používá orientační rozdělení odečtů MND.")}${compact?"":` ${conflicts.map(row=>`${this.dateText(row.from)}–${this.dateText(row.to)}: MND ${this.number(row.mnd_m3,"m³")}, HA ${this.number(row.ha_min_m3,"m³")}–${this.number(row.ha_max_m3,"m³")}`).join("; ")}`}</p>`:"";
     const detail=compact?"":`<table><tbody>${values.map(([name,value,unit])=>`<tr><td>${this.text(name)}</td><td>${this.number(value,unit)}</td></tr>`).join("")}</tbody></table><p class="muted">${this.text("Odhad zahrnuje sezónní profil a orientační zbývající část dne.")}</p>${own.boundary_estimated?`<p class="muted">${this.text("Denní odečty MND jsou časově přibližné. Starší spotřeba mezi odečty je rozdělena rovnoměrně; chybějící hodiny nejsou nulová spotřeba.")}</p><p class="muted">${this.text("Dnů historického profilu doplněných odhadem z MND")}: ${esc(own.interpolated_days??0)}</p>`:""}${own.history_source_assumed?`<p class="muted">${this.text("Vazba zdrojů HA je předpokládaná; ověřte ji v nastavení.")} <a href="${esc(this.editorUrl("settings","history_link_confirmed"))}">${this.text("Potvrdit vazbu zdrojů")}</a></p>`:""}<p class="muted">${this.text("Stálá platba za dnešek není zahrnuta do dosavadních nákladů; celkový výhled ji obsahuje.")}</p>${own.conversion_estimated?`<p class="muted">${this.text("Použitý převod m³ na energii je orientační.")}</p>`:""}${own.warnings?.includes("future_regulated_price_assumed")?`<p class="muted">${this.text("Budoucí regulované ceny používají poslední známé sazby.")}</p>`:""}`;
-    return `<h3>${this.text("Náš odhad podle spotřeby")}</h3>${approximate}<p>${this.text(label)}</p><p class="balance-value">${this.number(String(own.balance_czk).replace(/^-/ ,""),"Kč")}</p><p class="muted">${this.text("Poslední měření")}: ${this.dateText(own.measured_at,true)}</p>${liveWarning}${detail}`;
+    return `<h3>${this.text("Náš odhad podle spotřeby")}</h3>${approximate}<p>${this.text(label)}</p><p class="balance-value">${this.number(String(own.balance_czk).replace(/^-/ ,""),"Kč")}</p><p class="muted">${this.text("Poslední měření")}: ${this.dateText(own.measured_at,true)}</p>${liveWarning}${assumptions}${conflictWarning}${detail}`;
   }
   overview(){
     const r=this._detail?.result||{},b=r.billing||{},s=this._detail?.place.settings||{},c=r.consumption||{};

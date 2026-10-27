@@ -111,6 +111,9 @@ class MndSensor(CoordinatorEntity, SensorEntity):
                 "profile_missing_months": own.get("profile_missing_months"),
                 "interpolated_days": own.get("interpolated_days"),
                 "month_days": own.get("month_days"),
+                # Počty uvádějí kvalitu výhledu bez vydávání předpokladů za platbu.
+                "assumed_advance_count": len(own.get("assumed_advances") or []),
+                "history_conflict_count": len(own.get("history_conflicts") or []),
                 "boundary_estimated": own.get("boundary_estimated"),
                 "history_source_assumed": own.get("history_source_assumed"),
                 "live_status": own.get("live_status"),

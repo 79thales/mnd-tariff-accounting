@@ -173,7 +173,7 @@ test("vlastní výhled a dodavatelský výhled se nepletou a neúplné údaje ma
   assert.match(content,/Výhled podle prognózy MND/);
   assert.match(content,/700/);assert.match(content,/800/);
   element._tab='accounting';element.render();
-  assert.match(element.shadowRoot.querySelector('.own-billing').textContent,/Očekávané budoucí zálohy/);
+  assert.match(element.shadowRoot.querySelector('.own-billing').textContent,/Zálohy zahrnuté do výhledu/);
   element._detail.result.own_billing={status:'incomplete',reason:'representative_year_missing',balance_czk:null};
   element.render();
   content=element.shadowRoot.querySelector('.own-billing').textContent;
@@ -296,6 +296,18 @@ test("chyba obnovy na pozadí zachová fokus a zotavení odstraní upozornění"
   assert.equal(element.shadowRoot.activeElement,button);
   assert.equal(element.shadowRoot.getElementById('background-load-error'),null);
   element.remove();
+});
+
+test("vlastní odhad přizná předpokládané zálohy a nesoulad historie",async()=>{
+  const data=detail();data.result.own_billing={status:'estimated',balance_czk:'100',actual_mwh:'1',total_mwh:'2',paid_czk:'500',remaining_payments_czk:'1000',expected_payments_czk:'1500',assumed_advances:[{date:'2026-11-15',amount:'500'}],history_conflicts:[{from:'2026-02-04',to:'2026-02-28',mnd_m3:'100',ha_min_m3:'110',ha_max_m3:'120'}]};
+  const {element}=await surface({config:{entry_id:'account-a',place:PLACE,tab:'accounting'},data});
+  assert.match(element.shadowRoot.textContent,/předpokládanou zálohu/);
+  assert.match(element.shadowRoot.textContent,/15\. 11\. 2026/);
+  assert.match(element.shadowRoot.textContent,/Historie HA se rozchází/);
+  assert.match(element.shadowRoot.textContent,/MND 100 m³/);
+  element._tab='overview';element.render();
+  assert.match(element.shadowRoot.textContent,/předpokládanou zálohu/);
+  assert.match(element.shadowRoot.textContent,/Historie HA se rozchází/);
 });
 
 test("historie vlastního odhadu používá registrovaný senzor a sedm dní",async()=>{

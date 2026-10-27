@@ -399,7 +399,7 @@ class DashboardTests(unittest.TestCase):
                 for v in views
             )
         )
-        self.assertTrue(all(v["cards"][0]["layout_version"] == 7 for v in views))
+        self.assertTrue(all(v["cards"][0]["layout_version"] == 8 for v in views))
         self.assertTrue(
             all(v["subview"] and v["back_path"] == "/lovelace/synthetic-gas" for v in views[1:])
         )

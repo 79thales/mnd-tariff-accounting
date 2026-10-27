@@ -129,6 +129,42 @@ def forecast_payments(place, start, end, today):
             overdue = True
         elif due >= today:
             remaining += outstanding
+    # Chybějící měsíce pokryjeme jen při doložené pravidelnosti: dva sousední
+    # předpisy mají stejný den i aktuální výši zálohy MND. Takto odvozené
+    # částky jsou předpokládané platby, včetně minulých měsíců; nejsou skutečně
+    # uhrazené ani předpis od dodavatele. Příchod dokladu předpoklad odstraní.
+    assumed = []
+    deposit = place.get("portal_evidence", {}).get("deposit") or {}
+    amount = decimal(deposit.get("ADV_VALUE"), optional=True, nonnegative=True)
+    rows = evidence.get("rows", [])
+    by_month = {}
+    for row in rows:
+        if row.get("due"):
+            due = day(row["due"])
+            by_month.setdefault((due.year, due.month), []).append(row)
+    days = set()
+    if amount:
+        for (year, month), previous_rows in sorted(by_month.items()):
+            next_year, next_month = (year + 1, 1) if month == 12 else (year, month + 1)
+            following_rows = by_month.get((next_year, next_month), [])
+            if len(previous_rows) != 1 or len(following_rows) != 1:
+                continue
+            before, after = previous_rows[0], following_rows[0]
+            before_due, after_due = day(before["due"]), day(after["due"])
+            if (before_due.day == after_due.day
+                and decimal(before.get("prescribed"), optional=True) == amount
+                and decimal(after.get("prescribed"), optional=True) == amount):
+                days.add(before_due.day)
+    if len(days) == 1:
+        due_day = next(iter(days))
+        month = start.replace(day=1)
+        while month < end:
+            if (month.year, month.month) not in by_month and due_day <= calendar.monthrange(month.year, month.month)[1]:
+                assumed_due = month.replace(day=due_day)
+                if start <= assumed_due < end:
+                    remaining += amount
+                    assumed.append({"date": assumed_due.isoformat(), "amount": money(amount)})
+            month = month.replace(year=month.year + 1, month=1) if month.month == 12 else month.replace(month=month.month + 1)
     # Místní a dodavatelské převody/vratky nelze automaticky sloučit bez
     # prokázaného přiřazení; zadržet celkový výsledek místo dvojího účtování.
     ambiguous_events = any(
@@ -142,6 +178,7 @@ def forecast_payments(place, start, end, today):
         "expected_czk": money(paid + remaining) if reason is None else None,
         "complete": reason is None,
         "reason": reason,
+        "assumed_advances": assumed,
     }
 
 
@@ -398,6 +435,7 @@ def own_outcome_from_energy(place, start, end, through, actual_mwh, future_mwh, 
         "confirmed_invoice": costs.get("confirmed_invoice", False),
         "warnings": costs.get("warnings", []),
         "payment_reason": payments["reason"],
+        "assumed_advances": payments.get("assumed_advances", []),
     }
     # Potvrzená faktura se zobrazí zvlášť, nikoli jako vlastní prognóza.
     if (

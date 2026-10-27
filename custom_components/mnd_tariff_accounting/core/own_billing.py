@@ -174,6 +174,15 @@ def _strict_own_billing_view(place_id, place, billing, measurement, now, zone):
     }
     if len(units) > 1 or None in units:
         return missing("history_unit_changed")
+    # Ani úplný profil HA nesmí dostat přednost před fyzickým odečtem MND,
+    # pokud rozdíl přesahuje nejistotu času obou denních hranic. Přesný
+    # režim se zastaví a volající může nabídnout označený orientační režim.
+    from .orientational import _points, _season
+
+    _, coverage = _season(profile, _points(place, place_id, segment, today), anchors[0].meter, today, end)
+    if coverage.get("history_conflicts"):
+        result["history_conflicts"] = coverage["history_conflicts"]
+        return missing("history_sources_disagree")
     prediction = seasonal_forecast(list(profile.values()), today, end)
     if not prediction["complete"]:
         return missing(prediction["reason"])

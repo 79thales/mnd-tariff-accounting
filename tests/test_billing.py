@@ -86,6 +86,41 @@ def place():
 
 
 class BillingTests(unittest.TestCase):
+    def test_missing_month_is_assumed_once_and_disappears_after_mnd_supplies_it(self):
+        p = place()
+        p["portal_evidence"]["deposit"] = {"ADV_VALUE": "1234"}
+        rows = p["portal_evidence"]["advances"]["rows"] = [
+            {"due": "2026-01-12", "prescribed": "1234", "payments_known": True,
+             "payments": [{"date": "2026-01-12", "amount": "1234"}]},
+            {"due": "2026-03-12", "prescribed": "1234", "payments_known": True, "payments": []},
+            {"due": "2026-04-12", "prescribed": "1234", "payments_known": True, "payments": []},
+        ]
+        start, end, today = day("2026-01-01"), day("2026-05-01"), day("2026-01-27")
+        result = forecast_payments(p, start, end, today)
+        self.assertEqual(result["paid_czk"], Decimal("1234.00"))
+        self.assertEqual(result["remaining_czk"], Decimal("3702.00"))
+        self.assertEqual(result["assumed_advances"], [{"date": "2026-02-12", "amount": Decimal("1234.00")}])
+        rows.append({"due": "2026-02-12", "prescribed": "1234", "payments_known": True, "payments": []})
+        result = forecast_payments(p, start, end, today)
+        self.assertEqual(result["remaining_czk"], Decimal("3702.00"))
+        self.assertEqual(result["assumed_advances"], [])
+
+    def test_missing_months_are_assumptions_even_after_due_and_require_regular_plan(self):
+        p = place()
+        p["portal_evidence"]["deposit"] = {"ADV_VALUE": "1234"}
+        rows = p["portal_evidence"]["advances"]["rows"] = [
+            {"due": "2026-01-12", "prescribed": "1234", "payments_known": True,
+             "payments": [{"date": "2026-01-12", "amount": "1234"}]},
+            {"due": "2026-03-12", "prescribed": "1234", "payments_known": True, "payments": []},
+            {"due": "2026-04-12", "prescribed": "1234", "payments_known": True, "payments": []},
+        ]
+        start, end = day("2026-01-01"), day("2026-07-01")
+        result = forecast_payments(p, start, end, day("2026-02-16"))
+        self.assertEqual([r["date"] for r in result["assumed_advances"]], ["2026-02-12", "2026-05-12", "2026-06-12"])
+        self.assertEqual(result["paid_czk"], Decimal("1234.00"))
+        rows[1]["prescribed"] = "1300"
+        self.assertEqual(forecast_payments(p, start, end, day("2026-01-27"))["assumed_advances"], [])
+
     def test_own_outcome_updates_with_measured_energy_and_preserves_supplier_forecast(self):
         p = place()
         p["price_evidence"].update(variable_mwh="1000", fixed_month="100")

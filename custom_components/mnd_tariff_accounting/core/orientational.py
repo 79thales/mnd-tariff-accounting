@@ -38,16 +38,37 @@ def _season(profile, points, meter, today, end):
     fyzickými odečty téhož měřidla, nejvýše 62 dnů od sebe. Tyto dny jsou
     odhad, nikoli nová měření. U každého budoucího měsíce požadujeme aspoň
     sedm dostupných dnů v posledních 365 dnech; jde o výslovnou ochrannou
-    hranici, nikoli důkaz reprezentativnosti. HA celé dny mají přednost.
+    hranici, nikoli důkaz reprezentativnosti. HA celé dny mají přednost,
+    pokud významně neodporují fyzickým odečtům na hranicích intervalu.
     """
     interpolated = {}
+    # Pokud ani neznámé časy odečtů v hraničních dnech nevysvětlí rozdíl,
+    # upřednostníme fyzický rozdíl MND před sporným profilem HA. Mez 2 m³
+    # toleruje celočíselné zaokrouhlení obou odečtů, neprokazuje chybu senzoru.
+    conflicts = []
+    prefer_mnd = set()
     for a, b in zip(points, points[1:]):
         count = (b["date"] - a["date"]).days
+        if b["date"] <= today - timedelta(days=365) or a["date"] >= today:
+            continue
         if not (a["valid"] and b["valid"] and a["meter"] == b["meter"] == meter):
             continue
         if not 0 < count <= 62 or b["value"] < a["value"]:
             continue
         amount = (b["value"] - a["value"]) / Decimal(count)
+        dates = [a["date"] + timedelta(days=i) for i in range(count + 1)]
+        rows = [profile.get(date) for date in dates]
+        if all(row and row.get("complete") is True and not row.get("estimated")
+               and row.get("m3") is not None for row in rows):
+            values = [decimal(row["m3"], nonnegative=True) for row in rows]
+            minimum = sum(values[1:-1], Decimal(0))
+            maximum = sum(values, Decimal(0))
+            measured = b["value"] - a["value"]
+            if measured < minimum - Decimal(2) or measured > maximum + Decimal(2):
+                conflicts.append({"from": a["date"], "to": b["date"],
+                                  "mnd_m3": measured, "ha_min_m3": minimum,
+                                  "ha_max_m3": maximum})
+                prefer_mnd.update(dates[:-1])
         for offset in range(count):
             date = a["date"] + timedelta(days=offset)
             if today - timedelta(days=365) <= date < today:
@@ -56,7 +77,9 @@ def _season(profile, points, meter, today, end):
     for i in range(1, 366):
         date = today - timedelta(days=i)
         row = profile.get(date)
-        if row and row.get("complete") is True and not row.get("estimated") and row.get("m3") is not None:
+        if date in prefer_mnd and date in interpolated:
+            selected[date] = (interpolated[date], "mnd_estimate")
+        elif row and row.get("complete") is True and not row.get("estimated") and row.get("m3") is not None:
             selected[date] = (decimal(row["m3"], nonnegative=True), "ha")
         elif date in interpolated:
             selected[date] = (interpolated[date], "mnd_estimate")
@@ -68,6 +91,7 @@ def _season(profile, points, meter, today, end):
             return None, {"missing_months": sorted(m for m in needed if sum(d.month == m for d in selected) < 7)}
         months[month] = sum((v for v, _ in rows), Decimal(0)) / Decimal(len(rows))
     return months, {"sample_days": len(selected), "interpolated_days": sum(s == "mnd_estimate" for _, s in selected.values()),
+                    "history_conflicts": conflicts,
                     "month_days": {str(m): sum(d.month == m for d in selected) for m in sorted(needed)}}
 
 
@@ -85,8 +109,9 @@ def _live_tail(place, cutoff, now, zone):
     if not before:
         return Decimal(0), cutoff, "baseline_missing"
     earliest = max(before)
-    # Starý vzorek není důkazem, že do hranice statistiky nepřibyly pulsy.
-    # Hodinová mez pouze odmítá nedoloženou návaznost, neovládá plynoměr.
+    # Vzorek před hranicí sám nedokazuje stav v hranici. Smíme ho použít
+    # pouze při přesné shodě času nebo když první následný spojitý vzorek
+    # prokazuje stejný stav přes hranici; jinak by vznikl překryv se statistikou.
     if cutoff - earliest > timedelta(hours=1):
         return Decimal(0), cutoff, "baseline_missing"
     try:
@@ -104,6 +129,9 @@ def _live_tail(place, cutoff, now, zone):
         last = ordered[-1]
         if last["at"] <= cutoff or local_day(last["at"], zone) != local_day(now, zone):
             return Decimal(0), cutoff, "awaiting_new_sample"
+        after = next((sample for sample in ordered if sample["at"] > cutoff), None)
+        if earliest < cutoff and (after is None or after["value"] != ordered[0]["value"]):
+            return Decimal(0), cutoff, "baseline_missing"
         return last["value"] - ordered[0]["value"], last["at"], "current"
     except DataError:
         return Decimal(0), cutoff, "sensor_gap"

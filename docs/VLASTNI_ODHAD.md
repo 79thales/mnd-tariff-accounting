@@ -26,7 +26,7 @@ a délce uchování Recorderu. Chybějící záznam není nulová hodnota.
   z nepravidelných fyzických odečtů MND. Rozdíl dvou odečtů se rozdělí
   rovnoměrně mezi dny jejich intervalu, nejvýše 62 dnů. Různé plynoměry,
   konflikty, reset a instalace měřidla interval přerušují. Měřené dny HA
-  mají přednost. Pro každý potřebný budoucí měsíc je třeba alespoň sedm
+  mají přednost, pokud nejsou ve významném rozporu s MND. Pro každý potřebný budoucí měsíc je třeba alespoň sedm
   dostupných dnů z posledního roku; nejde o záruku reprezentativnosti.
   Takto dopočtené dny se nikdy nevydávají za fyzicky změřené.
 - Převod kWh/m³ platný pro celé období nebo orientační převod z poslední
@@ -38,6 +38,14 @@ a délce uchování Recorderu. Chybějící záznam není nulová hodnota.
   není automaticky budoucí platbou; nejasné vratky či kredity výhled pozastaví.
   Zálohy se z MND znovu ručně neopisují a není nutné nastavovat období
   volitelné vlastní evidence.
+
+Chybějící měsíční předpisy výhled orientačně doplní aktuální výší zálohy,
+pokud jsou v seznamu dva sousední měsíce se shodným dnem splatnosti a částkou
+odpovídající aktuální záloze MND. Předpoklad se vztahuje jen na chybějící
+měsíce vybraného účetního období. Může zahrnovat i minulý měsíc, ale nikdy
+se nevydává za skutečně přijatou úhradu ani potvrzený předpis. Po načtení
+skutečného předpisu se jeho předpokládaná náhrada automaticky odstraní.
+Nepravidelný či nejasný rozvrh nelze tímto způsobem spolehlivě doplnit.
 
 Historický pulsní senzor a aktuální objemový senzor mohou být dvě entity
 jednoho plynoměru. V Editoru → Měření a vlastní evidence lze po ověření
@@ -56,10 +64,17 @@ období nebo den před ním je považován za počáteční hranici. Proto je ce
 součet pouze orientační. MND odečet s dnešním datem se pro tento odhad
 použije až další den, aby se nepřekrýval s dnešním měřením HA.
 
+Dny úplné HA historie porovnáváme s fyzickými odečty MND téhož měřidla.
+Pokud rozdíl překračuje všechny možné časy v hraničních dnech i toleranci
+2 m³ pro celočíselné odečty, sporný interval (nejvýše 62 dnů) v profilu
+orientačně nahradí rovnoměrně rozdělený rozdíl odečtů MND. Původní měření
+se nemění a nesoulad je zobrazen; příčinu z něj samotného nelze určit.
+
 Dnešní HA statistika musí pokrývat všechny uzavřené hodiny od půlnoci.
 Přírůstky aktuálního senzoru po uzavřené hodině se přidají jen při doložené
-návaznosti vzorků. Poslední vzorek před hranicí nesmí být starší než hodinu;
-delší odstup neprokazuje, že se čítač mezitím nezměnil. Pokud dojde k výpadku nebo resetu, výpočet zůstane k času
+návaznosti vzorků. Stav v hranici musí doložit přesný vzorek nebo shodné
+spojité vzorky před hranicí a po ní; samotný starší vzorek nestačí. Pokud dojde
+k výpadku nebo resetu, výpočet zůstane k času
 poslední uzavřené hodiny a zbývající čas zahrne do prognózy, nikoli do
 naměřené spotřeby. Budoucí m³ vycházejí ze sezónních měsíčních průměrů
 měření HA a případně interpolovaných intervalů MND. Zbývající část dne se
@@ -67,8 +82,8 @@ orientačně dělí podle skutečné délky dne v místním pásmu, včetně zm�
 není označena jako měřená spotřeba. Použitý čas měření a výpočtu se uvádí
 samostatně. Cena a předpisy jsou nezávislé na elektřině kotle.
 
-Očekávaný výsledek = skutečně doložené platby + zbývající očekávané budoucí
-zálohy − odhad celkových nákladů. Kladný výsledek znamená očekávaný
+Očekávaný výsledek = skutečně doložené platby + očekávané neuhrazené a
+předpokládané zálohy − odhad celkových nákladů. Kladný výsledek znamená očekávaný
 přeplatek, záporný nedoplatek. Originální faktura pokrytého intervalu
 nahrazuje model; neúčtuje se podruhé. Dnešní stálá platba je zahrnuta
 v celkovém výhledu, nikoli v orientačních nákladech do začátku dne.

@@ -48,6 +48,19 @@ def input_data():
 
 
 class OwnBillingTests(unittest.TestCase):
+    def test_precise_mode_rejects_unexplained_mnd_history_conflict(self):
+        p, billing, measurement = input_data()
+        p["readings"].extend([
+            {"id": "m1", "place": PLACE, "segment": "meter", "meter": "meter",
+             "date": "2026-03-01", "value": "110", "source": "mnd", "method": "Samoodečtem"},
+            {"id": "m2", "place": PLACE, "segment": "meter", "meter": "meter",
+             "date": "2026-03-20", "value": "150", "source": "mnd", "method": "Samoodečtem"},
+        ])
+        result = own_billing_view(PLACE, p, billing, measurement, NOW, "UTC")
+        self.assertEqual(result["reason"], "history_sources_disagree")
+        self.assertIsNone(result["balance_czk"])
+        self.assertEqual(len(result["history_conflicts"]), 1)
+
     def test_projection_updates_without_manual_ledger_period(self):
         p, _, _ = input_data()
         p["snapshots"] = [{"retrieved_at": "2026-10-16T10:00:00Z", "periods": [
