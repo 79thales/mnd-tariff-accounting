@@ -14,10 +14,12 @@ se skupiny řadí pod sebe.
 
 ## Prokliky
 
-Rozbalovací nápověda Neznámé údaje a nastavení je v přehledu, účetním detailu
-a editoru, pokud chybí místní období nebo platný průtok. Obsahuje odkazy:
+Od beta.3 přehled ani dodavatelské účetnictví neupozorňují na nevyplněné
+období volitelné vlastní evidence. U skutečně nedostupného průtoku zůstává
+nápověda Nedostupné měření průtoku. Pouze editor nabízí vysvětlení
+Vlastní evidence (volitelné), a to i při již vyplněném období. Odkazy:
 
-- Nastavit období otevře příslušné místo, rozbalí nastavení a zaměří začátek
+- Nastavit období vlastní evidence otevře příslušné místo, rozbalí nastavení a zaměří začátek
   období. Hodnoty nepředvyplňuje a nic automaticky neukládá.
 - Zkontrolovat zdroj průtoku otevře stejný formulář u výběru průtokového
   senzoru. Chybějící údaj se nenahrazuje nulou ani prodloužením platnosti.
@@ -25,14 +27,14 @@ a editoru, pokud chybí místní období nebo platný průtok. Obsahuje odkazy:
 
 Odkaz nese konkrétní účet a místo. Nový generátor i přibalená šablona mají
 stejnou adresu editoru; starší uložené karty ji bezpečně sestaví ze svých
-identit. Hlavní pohled, podstránky, navigace a kompozice 4 se zachovávají.
+identit. Hlavní pohled, podstránky, navigace se zachovávají; kompozice 5 mění jen umístění a význam nápovědy.
 
 ## Proč jsou některé entity neznámé
 
 Dodavatelské zálohy a skutečné úhrady MND sleduje vlastní čtecí přehled.
-Místní účetní kniha je samostatná evidence: bez jejího výslovně zadaného
+Vlastní evidence (dříve označená jako místní účetní kniha) je volitelná: bez jejího výslovně zadaného
 období zůstávají její saldo, platby a vyhodnocená spotřeba neznámé. Stav
-needs_configuration se týká této knihy, nikoli automaticky připojení MND
+needs_configuration se týká této vlastní evidence, nikoli automaticky připojení MND
 nebo ztráty jeho dodavatelských záloh. Zaplacené zálohy se nemají znovu
 ručně opisovat a tím započítat dvakrát.
 

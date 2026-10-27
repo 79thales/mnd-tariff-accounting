@@ -54,7 +54,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 4,
+          "layout_version": 5,
           "billing_mode": "supplier",
           "editor_url": "{{EDITOR_URL}}"
         }
@@ -117,7 +117,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 4,
+          "layout_version": 5,
           "billing_mode": "supplier",
           "editor_url": "{{EDITOR_URL}}"
         }
@@ -179,7 +179,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 4,
+          "layout_version": 5,
           "billing_mode": "supplier",
           "editor_url": "{{EDITOR_URL}}"
         }
@@ -241,7 +241,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 4,
+          "layout_version": 5,
           "billing_mode": "supplier",
           "editor_url": "{{EDITOR_URL}}"
         }
@@ -303,7 +303,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 4,
+          "layout_version": 5,
           "admin_link": true,
           "billing_mode": "supplier",
           "editor_url": "{{EDITOR_URL}}"
@@ -366,7 +366,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 4,
+          "layout_version": 5,
           "billing_mode": "supplier",
           "editor_url": "{{EDITOR_URL}}"
         }

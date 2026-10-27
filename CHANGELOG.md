@@ -21,6 +21,33 @@
   the MND integration and open its HACS repository, with installation and
   restart prerequisites. The existing alpha tag and installer are unchanged.
 
+## 0.1.0-beta.3 — vlastní evidence je volitelná
+
+### Čeština
+
+- Přehled a dodavatelské účetnictví už nehlásí chybějící období nepoužívané
+  vlastní evidence. Načtené období a zaplacené zálohy MND se dál zobrazují.
+- Editor jasně vysvětluje volitelnou vlastní evidenci ručních plateb, cen
+  a faktur. Zachovává prokliky na její období i sledované zálohy MND.
+- Nedostupný průtok má samostatnou nápovědu s odkazem na zdroj měření.
+  Neznámá hodnota se nadále nenahrazuje nulou.
+- Generátor a přibalená šablona používají kompozici 5 se stejnou navigací.
+  Účetní data, nastavení, importy a doklady se aktualizací nemění.
+
+**Po aktualizaci:** restartujte Home Assistant a obnovte prohlížeč.
+Pro používání přehledu MND není nutné vyplňovat vlastní evidenci ani
+znovu opisovat zaplacené zálohy.
+
+### English
+
+- The overview and supplier accounting no longer report the unused optional
+  ledger period as missing configuration. Imported MND periods and paid
+  advances remain available.
+- The editor explains optional own records and retains links to their period
+  and supplier advances. Unavailable flow has separate measurement help.
+- Generator and bundled template use composition 5 with unchanged navigation.
+  No accounting data, settings, imports or documents are migrated or copied.
+
 ## 0.1.0-beta.2 — přehledný editor a odkazy na nastavení
 
 ### Čeština

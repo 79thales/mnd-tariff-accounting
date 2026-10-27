@@ -327,17 +327,34 @@ test("sbalení zachová rozepsanou hodnotu a obnova zachová otevřenou úlohu",
   assert.equal(element.shadowRoot.querySelector('form[data-section="settings"] [name=name]').value,'Dům <test>');
 });
 
-test("nápověda rozliší místní knihu od plateb MND a odkazy nesou správné místo",async()=>{
+test("volitelná vlastní evidence je vysvětlena pouze v editoru a odkazy nesou správné místo",async()=>{
   const data=detail();delete data.place.settings.period_from;
   data.place.portal_evidence={advances:{rows:[]}};
   const {element,calls}=await surface({data});
-  const help=element.shadowRoot.querySelector('.configuration-help');
-  assert.match(help.textContent,/Zaplacené zálohy už sledujeme z MND/);
-  const links=[...help.querySelectorAll('a')].map(a=>new URL(a.href,'http://localhost'));
+  const help=element.shadowRoot;
+  assert.match(help.querySelector('.own-records-help').textContent,/Vlastní evidence \(volitelné\)/);
+  assert.match(help.textContent,/Zálohy MND znovu neopisujte/);
+  const links=[...help.querySelectorAll('.configuration-help a')].map(a=>new URL(a.href,'http://localhost'));
   for(const link of links){assert.equal(link.searchParams.get('entry_id'),'account-a');assert.equal(link.searchParams.get('place'),PLACE);}
   assert.ok(links.some(link=>link.searchParams.get('field')==='period_from'&&link.searchParams.get('section')==='settings'));
   assert.ok(links.some(link=>link.searchParams.get('field')==='flow_entity'));
   assert.ok(links.some(link=>link.searchParams.get('tab')==='accounting'&&link.hash==='#mnd-advances'));
+  assert.equal(calls.some(call=>call.action==='edit'),false);
+});
+
+test("prázdné vlastní období není chybou přehledu ani dodavatelského účetnictví",async()=>{
+  const data=detail();delete data.place.settings.period_from;delete data.place.settings.period_to;
+  const {element,calls}=await surface({data,config:{entry_id:'account-a',place:PLACE,tab:'overview',billing_mode:'supplier'}});
+  const before=structuredClone(data);
+  for(const tab of ['overview','accounting']){
+    element._tab=tab;element.render();
+    assert.equal(element.shadowRoot.querySelector('.own-records-help'),null);
+    assert.doesNotMatch(element.shadowRoot.textContent,/Místní účetní kniha|Nastavit období|Vlastní evidence/);
+    assert.match(element.shadowRoot.querySelector('.configuration-help').textContent,/Nedostupné měření průtoku/);
+  }
+  element.liveMetrics=()=>({flow:{value:0}});
+  assert.equal(element.configurationHelp(),'');
+  assert.deepEqual(data,before);
   assert.equal(calls.some(call=>call.action==='edit'),false);
 });
 

@@ -88,10 +88,13 @@ const EN = {"Přehled":"Overview","Spotřeba":"Consumption","Účetnictví":"Acc
 /* Zdrojové popisy dokladů a uživatelské texty se nepřekládají. Překlad
  * mění pouze popisky aplikace, nikdy hodnoty options posílané serveru. */
 Object.assign(EN,{
-  "Neznámé údaje a nastavení":"Unknown values and settings",
-  "Místní účetní kniha nemá zadané období. Její saldo, platby a spotřeba proto zůstávají neznámé.":"The local ledger has no configured period, so its balance, payments and consumption remain unknown.",
-  "Zaplacené zálohy už sledujeme z MND. Do místní knihy je znovu neopisujte.":"Paid advances are already tracked from MND. Do not enter them again in the local ledger.",
-  "Dodavatelské zálohy MND a místní účetní kniha jsou samostatné evidence.":"MND supplier advances and the local ledger are separate records.",
+  "Nedostupné měření průtoku":"Unavailable flow measurement",
+  "Vlastní evidence (volitelné)":"Own records (optional)",
+  "Pro přehled MND nemusíte nic vyplňovat. Období a zaplacené zálohy se zobrazují z načtených údajů MND.":"You do not need to fill anything in for the MND overview. The period and paid advances use imported MND data.",
+  "Vlastní evidence slouží jen pro ručně zadané platby, ceny, faktury a vlastní výpočet salda. Pokud ji chcete používat, nastavte její období. Zálohy MND znovu neopisujte.":"Own records are for manually entered payments, prices, invoices and your own balance calculation. Configure their period only if you want to use them. Do not enter MND advances again.",
+  "Nastavit období vlastní evidence":"Configure own records period",
+  "Měření a vlastní evidence":"Measurement and own records",
+  "Plynoměr, senzory objemu a průtoku; období pouze pro volitelnou vlastní evidenci.":"Gas meter, volume and flow sensors; the period is only for optional own records.",
   "Zdroj průtoku nemá platný aktuální údaj. Chybějící údaj není nulový odběr.":"The flow source has no valid current value. Missing data is not zero consumption.",
   "Nastavit období":"Configure period","Zobrazit zálohy MND":"Show MND advances","Zkontrolovat zdroj průtoku":"Check flow source",
   "Odběrné místo":"Supply point","Plyn · moje domácnost":"Gas · my home","Vaše energie pod kontrolou":"Your energy at a glance",
@@ -332,12 +335,19 @@ class MndSurface extends Base {
     return url.pathname+url.search;
   }
   configurationHelp(){
-    const p=this._detail?.place;if(!p)return "";
-    const missingPeriod=!p.settings.period_from||!p.settings.period_to;
+    if(!this._detail?.place)return "";
+    // Běžný přehled hlásí pouze problém živého měření. Nevyplněné období
+    // volitelné vlastní evidence není chybou dodavatelského přehledu MND.
     const missingFlow=this.liveMetrics().flow.value===null;
-    if(!missingPeriod&&!missingFlow)return "";
-    const link=(label,url)=>`<a href="${esc(url)}">${esc(this.text(label))}</a>`;
-    return `<details class="configuration-help"><summary>${this.text("Neznámé údaje a nastavení")}</summary>${missingPeriod?`<p>${this.text("Místní účetní kniha nemá zadané období. Její saldo, platby a spotřeba proto zůstávají neznámé.")}</p><p>${this.text(p.portal_evidence?.advances?"Zaplacené zálohy už sledujeme z MND. Do místní knihy je znovu neopisujte.":"Dodavatelské zálohy MND a místní účetní kniha jsou samostatné evidence.")}</p><p>${link("Nastavit období",this.editorUrl("settings","period_from"))} · ${link("Zobrazit zálohy MND",this.editorUrl("","","accounting")+"#mnd-advances")}</p>`:""}${missingFlow?`<p>${this.text("Zdroj průtoku nemá platný aktuální údaj. Chybějící údaj není nulový odběr.")}</p><p>${link("Zkontrolovat zdroj průtoku",this.editorUrl("settings","flow_entity"))}</p>`:""}</details>`;
+    if(!missingFlow)return "";
+    return `<details class="configuration-help"><summary>${this.text("Nedostupné měření průtoku")}</summary><p>${this.text("Zdroj průtoku nemá platný aktuální údaj. Chybějící údaj není nulový odběr.")}</p><p><a href="${esc(this.editorUrl("settings","flow_entity"))}">${this.text("Zkontrolovat zdroj průtoku")}</a></p></details>`;
+  }
+  ownRecordsHelp(){
+    /* Pouze editor vysvětluje dobrovolné ruční výpočty. Informace se zobrazí
+     * i při vyplněném období, aby nevznikal dojem, že jde o import z MND.
+     * Odkazy pouze navigují; nepřebírají období ani neúčtují platby podruhé.
+     */
+    return `<details class="configuration-help own-records-help"><summary>${this.text("Vlastní evidence (volitelné)")}</summary><p>${this.text("Pro přehled MND nemusíte nic vyplňovat. Období a zaplacené zálohy se zobrazují z načtených údajů MND.")}</p><p>${this.text("Vlastní evidence slouží jen pro ručně zadané platby, ceny, faktury a vlastní výpočet salda. Pokud ji chcete používat, nastavte její období. Zálohy MND znovu neopisujte.")}</p><p><a href="${esc(this.editorUrl("settings","period_from"))}">${this.text("Nastavit období vlastní evidence")}</a> · <a href="${esc(this.editorUrl("","","accounting")+"#mnd-advances")}">${this.text("Zobrazit zálohy MND")}</a></p></details>`;
   }
   editorMarkup(){
     /* Editor ukazuje nejprve účel jednotlivých úloh, nikoli všechna pole.
@@ -348,7 +358,7 @@ class MndSurface extends Base {
      * nebo uložení, zatímco dosavadní validace a revize zápisů zůstávají.
      */
     const descriptions={
-      settings:"Účetní období, plynoměr, senzor objemu a průtoku.",
+      settings:"Plynoměr, senzory objemu a průtoku; období pouze pro volitelnou vlastní evidenci.",
       boiler:"Volitelné měření elektřiny kotle; zásuvku ani termostat neovládá.",
       readings:"Zapište stav plynoměru a skutečný čas včetně UTC posunu.",
       calibration:"Propojte fyzický odečet a stav senzoru ve stejný okamžik.",
@@ -368,10 +378,10 @@ class MndSurface extends Base {
       const form=FORMS.find(f=>f.section===key);
       const content=key==="advances"?this.advancesMarkup():this.formMarkup(form);
       if(!content)return "";
-      const title=key==="advances"?"Měsíční zálohy a úhrady":form.title;
+      const title=key==="advances"?"Měsíční zálohy a úhrady":key==="settings"?"Měření a vlastní evidence":form.title;
       return `<details class="editor-item" name="mnd-editor" data-editor-section="${key}" ${this._editorOpen===key?"open":""}><summary><span><strong>${esc(this.text(title))}</strong><span class="editor-description">${esc(this.text(descriptions[key]))}</span></span></summary>${content}</details>`;
     };
-    return `<p class="muted editor-intro">${this.text("Vyberte, co chcete upravit. Změny se uloží až tlačítkem v otevřeném formuláři.")}</p>${this.configurationHelp()}<div class="editor-groups">${groups.map(([title,keys])=>`<div class="editor-group"><h2>${esc(this.text(title))}</h2>${keys.map(item).join("")}</div>`).join("")}</div>`;
+    return `<p class="muted editor-intro">${this.text("Vyberte, co chcete upravit. Změny se uloží až tlačítkem v otevřeném formuláři.")}</p>${this.configurationHelp()}${this.ownRecordsHelp()}<div class="editor-groups">${groups.map(([title,keys])=>`<div class="editor-group"><h2>${esc(this.text(title))}</h2>${keys.map(item).join("")}</div>`).join("")}</div>`;
   }
   formMarkup(form){const settings=this._detail?.place.settings || {};return `<form data-section="${form.section}"><h3>${form.title}</h3>${form.fields.map(f=>{
     const value=(["settings","boiler"].includes(form.section)||f.name==="segment")?settings[f.name]:(form.section==="invoices"&&f.name==="artifact"?this._invoiceArtifact:"");let input;
