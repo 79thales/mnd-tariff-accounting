@@ -199,6 +199,56 @@ async def test_registry_rename_keeps_uuid_and_records_intermediate_reset(hass):
     await hass.config_entries.async_unload(selected.entry_id)
 
 
+async def test_own_forecast_entity_reports_missing_period_without_replacing_supplier(hass):
+    selected = await ready(hass)
+    coordinator = selected.runtime_data
+    registry = er.async_get(hass)
+    unique = f"synthetic-account:{PLACE}:own_forecast_balance_czk"
+    own_id = registry.async_get_entity_id("sensor", DOMAIN, unique)
+    assert own_id is not None
+    own = hass.states.get(own_id)
+    assert own.state == "unknown"
+    assert own.attributes["reason"] == "billing_period_missing"
+    supplier_id = registry.async_get_entity_id(
+        "sensor", DOMAIN, f"synthetic-account:{PLACE}:billing_forecast_balance_czk"
+    )
+    assert supplier_id is not None and supplier_id != own_id
+    assert coordinator.data[PLACE]["own_billing"]["balance_czk"] is None
+    await hass.config_entries.async_unload(selected.entry_id)
+
+
+async def test_confirmed_history_binding_follows_registry_ids_and_invalidates_on_change(
+    hass, hass_ws_client
+):
+    selected = await ready(hass)
+    coordinator = selected.runtime_data
+    source_entry = MockConfigEntry(domain="test", data={})
+    source_entry.add_to_hass(hass)
+    registry = er.async_get(hass)
+    volume = registry.async_get_or_create("sensor", "test", "gas-volume", config_entry=source_entry)
+    pulses = registry.async_get_or_create("sensor", "test", "gas-pulses", config_entry=source_entry)
+    hass.states.async_set(volume.entity_id, "12", {"unit_of_measurement": "m3", "state_class": "total_increasing"})
+    hass.states.async_set(pulses.entity_id, "1200", {"unit_of_measurement": "pulse", "state_class": "total_increasing"})
+    client = await hass_ws_client(hass)
+    await client.send_json({"id": 1, "type": DOMAIN + "/command", "action": "edit",
+        "entry_id": selected.entry_id, "place": PLACE, "payload": {
+            "section": "settings", "revision": coordinator.repository.data["revision"],
+            "record": {"source_mode": "sensor", "source_entity": volume.entity_id,
+                       "history_source_entity": pulses.entity_id, "history_unit_m3": "0.01",
+                       "segment": "0001", "history_link_confirmed": True}}})
+    response = await client.receive_json()
+    assert response["success"], response
+    settings = coordinator.repository.data["places"][PLACE]["settings"]
+    assert settings["history_binding"]["source"] == volume.id
+    assert settings["history_binding"]["history"] == pulses.id
+    from custom_components.mnd_tariff_accounting.core.own_billing import history_binding_matches
+
+    assert history_binding_matches(settings)
+    assert not history_binding_matches({**settings, "history_unit_m3": "0.02"})
+    assert not history_binding_matches({**settings, "segment": "new-meter"})
+    await hass.config_entries.async_unload(selected.entry_id)
+
+
 async def test_service_rejects_non_admin_context(hass, hass_read_only_user):
     selected = await ready(hass)
     coordinator = selected.runtime_data

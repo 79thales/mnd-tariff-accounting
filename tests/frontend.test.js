@@ -147,6 +147,54 @@ test("hlavní přehled obsahuje tři bloky a nejvýše jeden graf",async()=>{
   assert.doesNotMatch(element.shadowRoot.textContent,/Elektrický příkon kotle/);
 });
 
+test("dodavatelská prognóza má vlastní označení a potvrzená faktura se za ni nevydává",async()=>{
+  const data=detail();
+  data.result.billing={from:'2026-03-31',to:'2027-04-08',forecast_balance_czk:'800',
+    forecast_mwh:'5',warnings:[],series:{},months:[]};
+  const {element}=await surface({config:{entry_id:'account-a',place:PLACE,tab:'overview'},data});
+  assert.match(element.shadowRoot.querySelector('.overview-grid').textContent,/Výhled podle prognózy MND/);
+  element._tab='accounting';element.render();
+  assert.match(element.shadowRoot.querySelector('.billing-summary').textContent,/Výhled podle prognózy MND/);
+  element._detail.result.billing.confirmed_invoice=true;
+  element.render();
+  assert.doesNotMatch(element.shadowRoot.querySelector('.billing-summary').textContent,/Výhled podle prognózy MND/);
+  assert.match(element.shadowRoot.querySelector('.billing-summary').textContent,/Výsledek originálního vyúčtování/);
+});
+
+test("vlastní výhled a dodavatelský výhled se nepletou a neúplné údaje mají proklik",async()=>{
+  const data=detail();
+  data.result.billing={from:'2026-03-31',to:'2027-04-08',forecast_balance_czk:'800',warnings:[],series:{},months:[]};
+  data.result.own_billing={status:'estimated',balance_czk:'700',measured_at:'2026-10-16T12:00:00Z',
+    actual_mwh:'1',total_mwh:'2',forecast_cost_czk:'4300',paid_czk:'2000',
+    remaining_payments_czk:'3000',expected_payments_czk:'5000'};
+  const {element}=await surface({config:{entry_id:'account-a',place:PLACE,tab:'overview'},data});
+  let content=element.shadowRoot.querySelector('.overview-grid').textContent;
+  assert.match(content,/Náš odhad podle spotřeby/);
+  assert.match(content,/Výhled podle prognózy MND/);
+  assert.match(content,/700/);assert.match(content,/800/);
+  element._tab='accounting';element.render();
+  assert.match(element.shadowRoot.querySelector('.own-billing').textContent,/Očekávané budoucí zálohy/);
+  element._detail.result.own_billing={status:'incomplete',reason:'representative_year_missing',balance_czk:null};
+  element.render();
+  content=element.shadowRoot.querySelector('.own-billing').textContent;
+  assert.match(content,/Chybí souvislá roční historie/);
+  assert.doesNotMatch(content,/800/);
+  assert.equal(new URL(element.shadowRoot.querySelector('.own-billing a').href).searchParams.get('tab'),'history');
+});
+
+test("průběžná obnova vlastního výhledu zachová fokus na jiném odkazu",async()=>{
+  const data=detail();
+  data.result.billing={from:'2026-03-31',to:'2027-04-08',forecast_balance_czk:'800',warnings:[],series:{},months:[]};
+  data.result.own_billing={status:'estimated',balance_czk:'700',measured_at:'2026-10-16T12:00:00Z'};
+  const {element}=await surface({config:{entry_id:'account-a',place:PLACE,tab:'overview',navigation:[{tab:'readings',path:'/lovelace/test'}]},data});
+  document.body.append(element);
+  const focus=element.shadowRoot.querySelector('nav a');focus.focus();
+  element._detail.result.own_billing.balance_czk='600';element.updateLiveMetrics();
+  assert.ok(element.shadowRoot.activeElement===focus);
+  assert.match(element.shadowRoot.querySelector('[data-own-billing="compact"]').textContent,/600/);
+  element.remove();
+});
+
 test("kompaktní wrapper patří pouze přehledu, ne účetnictví či administraci",async()=>{
   const {element}=await surface({config:{entry_id:'account-a',place:PLACE,tab:'accounting'}});
   assert.equal(element.shadowRoot.querySelector('.overview-grid'),null);
@@ -325,6 +373,17 @@ test("sbalení zachová rozepsanou hodnotu a obnova zachová otevřenou úlohu",
   assert.equal(element.shadowRoot.querySelector('[data-editor-section="settings"]').open,true);
   assert.equal(element.shadowRoot.querySelectorAll('[data-editor-section][open]').length,1);
   assert.equal(element.shadowRoot.querySelector('form[data-section="settings"] [name=name]').value,'Dům <test>');
+});
+
+test("změna senzoru nebo faktoru zruší potvrzení vazby historie",async()=>{
+  const data=detail();data.place.settings.history_link_confirmed=true;
+  const {element,calls}=await surface({data});
+  const form=element.shadowRoot.querySelector('form[data-section="settings"]');
+  const confirmed=form.elements.namedItem('history_link_confirmed');
+  assert.equal(confirmed.checked,true);
+  form.elements.namedItem('history_unit_m3').dispatchEvent(new window.Event('change',{bubbles:true}));
+  assert.equal(confirmed.checked,false);
+  assert.equal(calls.some(call=>call.action==='edit'),false);
 });
 
 test("volitelná vlastní evidence je vysvětlena pouze v editoru a odkazy nesou správné místo",async()=>{

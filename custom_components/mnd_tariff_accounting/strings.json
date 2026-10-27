@@ -173,6 +173,18 @@
       },
       "billing_volume_m3": {
         "name": "Known HA billing period volume"
+      },
+      "own_forecast_balance_czk": {
+        "name": "Own forecast billing result"
+      },
+      "own_forecast_cost_czk": {
+        "name": "Own forecast total cost"
+      },
+      "own_forecast_mwh": {
+        "name": "Own forecast total consumption"
+      },
+      "own_actual_mwh": {
+        "name": "Own consumption so far"
       }
     },
     "button": {

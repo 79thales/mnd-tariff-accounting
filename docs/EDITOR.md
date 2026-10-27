@@ -27,7 +27,7 @@ Vlastní evidence (volitelné), a to i při již vyplněném období. Odkazy:
 
 Odkaz nese konkrétní účet a místo. Nový generátor i přibalená šablona mají
 stejnou adresu editoru; starší uložené karty ji bezpečně sestaví ze svých
-identit. Hlavní pohled, podstránky, navigace se zachovávají; kompozice 5 mění jen umístění a význam nápovědy.
+identit. Hlavní pohled, podstránky, navigace se zachovávají; kompozice 6 navíc rozlišuje vlastní a dodavatelský výhled.
 
 ## Proč jsou některé entity neznámé
 
@@ -49,3 +49,5 @@ a stav vybraného zdrojového senzoru.
 MIT licence v kořeni, v instalačním adresáři MND a v referenci ČEZ Dynamic
 Tariff má shodný text i copyright. Beta.2 doplňuje viditelný odznak a odkaz
 v README; rozsah oprávnění a podmínky licence nemění.
+
+Podmínky a zdroje průběžné prognózy vysvětluje [vlastní odhad](VLASTNI_ODHAD.md).

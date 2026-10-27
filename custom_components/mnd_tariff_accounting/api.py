@@ -191,6 +191,11 @@ async def websocket_command(hass, connection, msg):
                 history_source = er.async_get(hass).async_get(history_id) if history_id else None
                 if history_source:
                     visible["settings"]["history_source_entity"] = history_source.entity_id
+                from .core.own_billing import history_binding_matches
+
+                visible["settings"]["history_link_confirmed"] = history_binding_matches(
+                    visible["settings"]
+                )
                 # Nastavení kotle se resolveuje podle UUID také pro formulář
                 # a nativní graf. Pouhá návštěva nic nekonfiguruje ani nezapíná.
                 from .boiler import async_energy_summary
@@ -268,6 +273,22 @@ async def websocket_command(hass, connection, msg):
                     ):
                         raise DataError("incompatible_sensor")
                     record["source_registry_id"] = source.id
+                if payload["section"] == "settings" and "history_link_confirmed" in record:
+                    confirmed = record.pop("history_link_confirmed")
+                    if not isinstance(confirmed, bool):
+                        raise DataError("invalid_boolean")
+                    merged = {**repo.data["places"][place_id]["settings"], **record}
+                    source_id = merged.get("source_registry_id")
+                    history_id = merged.get("history_registry_id") or source_id
+                    if confirmed and (not source_id or not history_id or not merged.get("segment")):
+                        raise DataError("history_link_sources_required")
+                    # Potvrzení svážeme s oběma identitami, segmentem a přesným
+                    # objemem pulsu. Pozdější změna kteréhokoli údaje je zneplatní.
+                    record["history_binding"] = (
+                        {"source": source_id, "history": history_id,
+                         "segment": merged["segment"], "factor": merged.get("history_unit_m3")}
+                        if confirmed else None
+                    )
                 result = await coordinator.async_edit(
                     place_id, payload["section"], record, payload["revision"]
                 )

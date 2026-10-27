@@ -43,6 +43,10 @@ SENSORS = {
     "billing_actual_mwh": ("MWh", "energy", None),
     "billing_forecast_mwh": ("MWh", "energy", None),
     "billing_volume_m3": ("m³", "gas", None),
+    "own_forecast_balance_czk": ("CZK", "monetary", None),
+    "own_forecast_cost_czk": ("CZK", "monetary", None),
+    "own_forecast_mwh": ("MWh", "energy", None),
+    "own_actual_mwh": ("MWh", "energy", None),
 }
 
 
@@ -92,6 +96,23 @@ class MndSensor(CoordinatorEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         data = (self.coordinator.data or {}).get(self.place_id, {})
+        if self.key.startswith("own_"):
+            own = data.get("own_billing", {})
+            return {
+                "period_from": own.get("period_from"),
+                "period_to_exclusive": own.get("period_to"),
+                "measured_at": own.get("measured_at"),
+                "calculated_at": own.get("calculated_at"),
+                "quality": own.get("status"),
+                "reason": own.get("reason"),
+                "method": own.get("method"),
+                "profile_complete_days": own.get("profile_complete_days"),
+                "profile_required_days": own.get("profile_required_days"),
+                "profile_missing_months": own.get("profile_missing_months"),
+                "conversion_estimated": own.get("conversion_estimated"),
+                "intraday_estimated": own.get("intraday_estimated"),
+                "warnings": own.get("warnings"),
+            }
         if self.key.startswith("billing_"):
             billing = data.get("billing", {})
             return {

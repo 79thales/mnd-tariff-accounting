@@ -11,7 +11,12 @@ from custom_components.mnd_tariff_accounting.core.backup import (
     parse_native,
     restore_place,
 )
-from custom_components.mnd_tariff_accounting.core.billing import billing_view, fixed_cost
+from custom_components.mnd_tariff_accounting.core.billing import (
+    billing_view,
+    fixed_cost,
+    forecast_payments,
+    own_outcome_from_energy,
+)
 from custom_components.mnd_tariff_accounting.core.common import DataError, canonical, day
 from custom_components.mnd_tariff_accounting.core.metering import validate_samples
 from custom_components.mnd_tariff_accounting.core.mnd_documents import (
@@ -81,6 +86,72 @@ def place():
 
 
 class BillingTests(unittest.TestCase):
+    def test_own_outcome_updates_with_measured_energy_and_preserves_supplier_forecast(self):
+        p = place()
+        p["price_evidence"].update(variable_mwh="1000", fixed_month="100")
+        p["portal_evidence"]["advances"]["rows"] = [
+            {"due": "2026-04-15", "prescribed": "2000", "payments_known": True,
+             "payments": [{"date": "2026-04-14", "amount": "2000"}]},
+            {"due": "2026-12-15", "prescribed": "3000", "payments_known": True,
+             "payments": []},
+        ]
+        start, end, through = day("2026-01-01"), day("2027-01-01"), day("2026-10-11")
+        before = copy.deepcopy(p)
+        first = own_outcome_from_energy(p, start, end, through, "1", "2", NOW.date())
+        second = own_outcome_from_energy(p, start, end, through, "1.1", "2", NOW.date())
+        self.assertEqual(first["forecast_cost_czk"], Decimal("4200.00"))
+        self.assertEqual(first["balance_czk"], Decimal("800.00"))
+        self.assertEqual(second["forecast_cost_czk"], Decimal("4300.00"))
+        self.assertEqual(second["balance_czk"], Decimal("700.00"))
+        self.assertEqual(p, before)
+
+    def test_own_outcome_never_fills_missing_future_with_supplier_forecast(self):
+        p = place()
+        result = own_outcome_from_energy(
+            p, day("2026-03-31"), day("2027-04-08"), day("2026-10-11"), "1", None,
+            NOW.date(),
+        )
+        self.assertIsNone(result["total_mwh"])
+        self.assertIsNone(result["forecast_cost_czk"])
+        self.assertIsNone(result["balance_czk"])
+
+    def test_forecast_payments_uses_actual_and_only_remaining_future_prescriptions(self):
+        p = place()
+        p["portal_evidence"]["advances"]["rows"][1]["payments"] = [
+            {"date": "2026-10-01", "amount": "400"}
+        ]
+        before = copy.deepcopy(p)
+        result = forecast_payments(p, day("2026-03-31"), day("2027-04-08"), NOW.date())
+        self.assertEqual(result["paid_czk"], Decimal("1400.00"))
+        self.assertEqual(result["remaining_czk"], Decimal("600.00"))
+        self.assertEqual(result["expected_czk"], Decimal("2000.00"))
+        self.assertTrue(result["complete"])
+        self.assertEqual(p, before)
+
+    def test_forecast_payments_does_not_assume_overdue_amount_or_double_overpayment(self):
+        p = place()
+        past, future = p["portal_evidence"]["advances"]["rows"][:2]
+        past["payments"][0]["amount"] = "500"
+        future["payments"] = [{"date": "2026-09-01", "amount": "1200"}]
+        result = forecast_payments(p, day("2026-03-31"), day("2027-04-08"), NOW.date())
+        self.assertEqual(result["paid_czk"], Decimal("1700.00"))
+        self.assertEqual(result["remaining_czk"], Decimal("0.00"))
+        self.assertIsNone(result["expected_czk"])
+        self.assertEqual(result["reason"], "overdue_advance")
+
+    def test_forecast_payments_refuses_partial_details_and_unresolved_refunds(self):
+        p = place()
+        p["portal_evidence"]["advances"]["rows"][0]["payments_stale"] = True
+        self.assertEqual(
+            forecast_payments(p, day("2026-03-31"), day("2027-04-08"), NOW.date())["reason"],
+            "advance_details_incomplete",
+        )
+        p["portal_evidence"]["advances"]["rows"][0]["payments_stale"] = False
+        p["events"] = [{"role": "refund"}]
+        result = forecast_payments(p, day("2026-03-31"), day("2027-04-08"), NOW.date())
+        self.assertIsNone(result["expected_czk"])
+        self.assertEqual(result["reason"], "credit_or_refund_unresolved")
+
     def test_unavailable_sample_without_attributes_remains_a_gap(self):
         sample = {"entity": "raw", "segment": "meter", "at": "2026-01-01T00:00:00Z", "value": None}
         self.assertIsNone(validate_samples([sample], entity="raw", segment="meter")[0]["value"])

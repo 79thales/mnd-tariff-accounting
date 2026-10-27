@@ -88,6 +88,38 @@ const EN = {"Přehled":"Overview","Spotřeba":"Consumption","Účetnictví":"Acc
 /* Zdrojové popisy dokladů a uživatelské texty se nepřekládají. Překlad
  * mění pouze popisky aplikace, nikdy hodnoty options posílané serveru. */
 Object.assign(EN,{
+  "Potvrzuji, že historický i aktuální senzor měří stejný plynoměr":"I confirm that the historical and current sensors measure the same gas meter",
+  "Náš odhad podle spotřeby":"Our consumption-based estimate",
+  "Spotřeba podle měření dosud":"Measured consumption so far",
+  "Vlastní odhad zatím není dostupný.":"The own estimate is not available yet.",
+  "Chybí přesně časovaný odečet plynoměru na začátku účetního období.":"A precisely timed meter reading at the beginning of the billing period is missing.",
+  "Chybí souvislá roční historie skutečného měření pro sezónní odhad.":"A continuous year of actual measurements is needed for the seasonal forecast.",
+  "Propojení historického a aktuálního zdroje měření není doloženo.":"The connection between historical and current measurement sources is not verified.",
+  "Chybí jednoznačný převod m³ na energii pro celé období.":"An unambiguous volume-to-energy conversion for the entire period is missing.",
+  "Chybí platná návaznost měření na plynoměr nebo aktuální údaj.":"A valid meter connection or current measurement is missing.",
+  "Ověřte dostupnost období, cen a plateb.":"Check the period, price and payment evidence.",
+  "Zkontrolovat podklady":"Check inputs",
+  "Poslední měření":"Last measurement",
+  "Odhad zahrnuje sezónní profil a orientační zbývající část dne.":"The estimate uses a seasonal profile and an approximate remaining part of today.",
+  "Odhad odběru celkem podle měření":"Total consumption forecast from measurements",
+  "Odhad nákladů podle měření":"Cost forecast from measurements",
+  "Očekávané budoucí zálohy":"Expected future advances",
+  "Očekávané platby celkem":"Expected total payments",
+  "Doložené odečty se rozcházejí nebo byl změněn plynoměr.":"The documented readings conflict or the meter has changed.",
+  "Úhrady nebo budoucí předpisy záloh nejsou dostatečně doložené.":"Payments or future advance prescriptions are not sufficiently documented.",
+  "Použitý převod m³ na energii je orientační.":"The volume-to-energy conversion is an estimate.",
+  "Budoucí regulované ceny používají poslední známé sazby.":"Future regulated prices use the last known rates.",
+  "Orientační náklady dosud":"Estimated cost so far",
+  "Stálá platba za dnešek není zahrnuta do dosavadních nákladů; celkový výhled ji obsahuje.":"Today's fixed charge is excluded from the cost so far but included in the total forecast.",
+  "Náklady – odhad MND":"Costs – MND-based estimate",
+  "Vlastní odhad nákladů":"Own cost estimate",
+  "Aktualizace podkladů MND":"MND data updated",
+  "Pokrytí roční historie":"Coverage of one-year history",
+  "Chybějící měsíce nebo jejich části":"Missing months or parts of months",
+  "dní":"days",
+  "Chybí návazné vzorky zdroje od začátku období.":"Continuous source samples from the start of the period are missing.",
+  "Historický zdroj změnil jednotku nebo ji neuvádí; návaznost je třeba ověřit.":"The historical source changed or does not report its unit; continuity must be verified.",
+  "Výhled podle prognózy MND":"Estimate based on MND forecast",
   "Nedostupné měření průtoku":"Unavailable flow measurement",
   "Vlastní evidence (volitelné)":"Own records (optional)",
   "Pro přehled MND nemusíte nic vyplňovat. Období a zaplacené zálohy se zobrazují z načtených údajů MND.":"You do not need to fill anything in for the MND overview. The period and paid advances use imported MND data.",
@@ -246,7 +278,7 @@ const FORMS = [
     field("boiler_demand_entity","Požadavek na topení (volitelné)","demand"),
     field("boiler_max_age","Platnost reportu kotle (sekundy)","decimal")
   ]},
-  {section:"settings",title:"Období a zdroj měření",fields:[field("name","Název místa"),field("period_from","Začátek období","date"),field("period_to","Konec období (výlučně)","date"),field("opening_credit","Počáteční kredit / dluh (Kč)","decimal"),field("payments_complete","Úplnost skutečných úhrad potvrzena","checkbox"),field("allow_linear","Povolit odhad rozdělení podle dnů","checkbox"),field("source_mode","Místní zdroj","select",["manual","sensor"]),field("source_entity","Kumulativní senzor m³","sensor"),field("flow_entity","Senzor aktuálního průtoku","flow"),field("flow_max_age","Platnost reportu průtoku (sekundy)","decimal"),field("history_source_entity","Historický senzor objemu nebo pulsů","history"),field("history_unit_m3","Objem jednoho pulsu (m³)","decimal"),field("segment","Identita segmentu / plynoměru")]},
+  {section:"settings",title:"Období a zdroj měření",fields:[field("name","Název místa"),field("period_from","Začátek období","date"),field("period_to","Konec období (výlučně)","date"),field("opening_credit","Počáteční kredit / dluh (Kč)","decimal"),field("payments_complete","Úplnost skutečných úhrad potvrzena","checkbox"),field("allow_linear","Povolit odhad rozdělení podle dnů","checkbox"),field("source_mode","Místní zdroj","select",["manual","sensor"]),field("source_entity","Kumulativní senzor m³","sensor"),field("flow_entity","Senzor aktuálního průtoku","flow"),field("flow_max_age","Platnost reportu průtoku (sekundy)","decimal"),field("history_source_entity","Historický senzor objemu nebo pulsů","history"),field("history_unit_m3","Objem jednoho pulsu (m³)","decimal"),field("history_link_confirmed","Potvrzuji, že historický i aktuální senzor měří stejný plynoměr","checkbox"),field("segment","Identita segmentu / plynoměru")]},
   {section:"readings",title:"Ruční fyzický odečet",fields:[field("meter","Číslo plynoměru"),field("segment","Segment (prázdné = číslo plynoměru)"),field("value","Kumulativní stav (m³)","decimal"),field("observed_at","Skutečný čas ISO 8601 včetně pásma"),field("note","Poznámka"),field("supersedes","ID opravovaného odečtu (volitelné)")]},
   {section:"events",title:"Platba / předpis / vratka",fields:[field("role","Druh","select",["payment","prescribed","assumed_paid","refund","credit","debit","transfer_in","transfer_out"]),field("amount","Částka Kč","decimal"),field("date","Datum události","date"),...COMMON_PERIOD,field("invoice","ID faktury (volitelné)"),field("counterpart","ID protistrany převodu (volitelné)"),field("supersedes","ID nahrazovaného záznamu (volitelné)"),field("note","Poznámka")]},
   {section:"transfer",title:"Převod kreditu do dalšího období",fields:[field("amount","Částka Kč","decimal"),field("date","Datum události","date"),...COMMON_PERIOD,field("target_from","Cílové období od","date"),field("target_to","Cílové období do výlučně","date"),field("invoice","ID faktury (volitelné)"),field("note","Poznámka")]},
@@ -413,7 +445,7 @@ class MndSurface extends Base {
     const balance=b.forecast_balance_czk;
     const label=b.confirmed_invoice?"Výsledek originálního vyúčtování":balance==null?"Odhad vyúčtování čeká na podklady":Number(balance)>=0?"Očekávaný přeplatek":"Očekávaný nedoplatek";
     const rows=[["Skutečný odběr MND dosud",b.actual_mwh,"MWh"],["Odhad odběru celkem",b.forecast_mwh,"MWh"],[b.known_cost_complete?"Známé náklady k odečtu":"Doložená část nákladů",b.known_cost_czk,"Kč"],["Odhad nákladů celkem",b.forecast_cost_czk,"Kč"],["Uhrazené zálohy",b.paid_czk,"Kč"],["Plán záloh celkem",b.planned_czk,"Kč"]];
-    return `<section class="billing-summary"><h2>Účetní období MND</h2><p class="period">${this.dateText(b.from)} → ${this.dateText(b.to)}</p><h3>${label}</h3>${balance==null?"":`<p class="balance-value">${this.number(String(balance).replace(/^-/ ,""),"Kč")}</p>`}<table><thead><tr><th>Za účetní období</th><th>Hodnota</th></tr></thead><tbody>${rows.map(([name,value,unit])=>`<tr><td><span>${name}</span></td><td>${this.number(value,unit)}</td></tr>`).join("")}</tbody></table><p class="muted">Uhrazené zálohy jsou skutečné platby z MND, nikoli předepsané částky. Známé náklady jsou výpočet z doložené ceny a odběru; originální vyúčtování má přednost.</p><p class="muted"><span>Spotřeba MND k odečtu</span> ${this.dateText(b.actual_through)}. <span>Novější měření HA je samostatně v měsíčních sloupcích.</span></p>${b.invoice_count&&!b.known_cost_complete?`<p class="notice">Originální faktura má přednost. Zbytek nákladů zatím nelze bezpečně oddělit.</p>`:""}${b.warnings?.includes("invoice_boundary_mismatch")?`<p class="notice">Období faktury přesahuje vybrané účetní období. Částku nerozdělujeme odhadem.</p>`:""}${b.warnings?.includes("verified_price_missing")?`<p class="notice">Náklady čekají na ověření originálního ceníku. Platby už jsou dostupné.</p>`:""}${b.warnings?.includes("fixed_calendar_proration_assumed")?`<p class="muted">Poměr stálých měsíčních plateb podle dnů je orientační. Rozhodující je originální vyúčtování.</p>`:""}${b.warnings?.includes("future_regulated_price_assumed")?`<p class="muted">Odhad používá prognózu MND a doložený ceník. Budoucí regulované ceny zatím vycházejí z posledních známých sazeb.</p>`:""}${b.warnings?.includes("payments_partial")?`<p class="notice">Historie úhrad není úplná. Zobrazený součet obsahuje jen doložené platby.</p>`:""}</section>`;
+    return `<section class="billing-summary"><h2>Účetní období MND</h2><p class="period">${this.dateText(b.from)} → ${this.dateText(b.to)}</p>${b.confirmed_invoice?"":`<p class="muted">${this.text("Výhled podle prognózy MND")}</p>`}<h3>${label}</h3>${balance==null?"":`<p class="balance-value">${this.number(String(balance).replace(/^-/ ,""),"Kč")}</p>`}<table><thead><tr><th>Za účetní období</th><th>Hodnota</th></tr></thead><tbody>${rows.map(([name,value,unit])=>`<tr><td><span>${name}</span></td><td>${this.number(value,unit)}</td></tr>`).join("")}</tbody></table><p class="muted">Uhrazené zálohy jsou skutečné platby z MND, nikoli předepsané částky. Známé náklady jsou výpočet z doložené ceny a odběru; originální vyúčtování má přednost.</p><p class="muted"><span>Poslední odečet MND</span> ${this.dateText(b.actual_through)}. <span>Novější měření HA je samostatně v měsíčních sloupcích.</span></p>${b.invoice_count&&!b.known_cost_complete?`<p class="notice">Originální faktura má přednost. Zbytek nákladů zatím nelze bezpečně oddělit.</p>`:""}${b.warnings?.includes("invoice_boundary_mismatch")?`<p class="notice">Období faktury přesahuje vybrané účetní období. Částku nerozdělujeme odhadem.</p>`:""}${b.warnings?.includes("verified_price_missing")?`<p class="notice">Náklady čekají na ověření originálního ceníku. Platby už jsou dostupné.</p>`:""}${b.warnings?.includes("fixed_calendar_proration_assumed")?`<p class="muted">Poměr stálých měsíčních plateb podle dnů je orientační. Rozhodující je originální vyúčtování.</p>`:""}${b.warnings?.includes("future_regulated_price_assumed")?`<p class="muted">Odhad používá prognózu MND a doložený ceník. Budoucí regulované ceny zatím vycházejí z posledních známých sazeb.</p>`:""}${b.warnings?.includes("payments_partial")?`<p class="notice">Historie úhrad není úplná. Zobrazený součet obsahuje jen doložené platby.</p>`:""}</section>`;
   }
   cashChart(){
     /* Peněžní hodnoty se zde pouze promítají na pixely. Účetní aritmetika
@@ -424,8 +456,14 @@ class MndSurface extends Base {
     const numeric=v=>v==null||v===""||!Number.isFinite(Number(v))?null:Number(v);
     const first=Date.parse(b.from+"T00:00:00Z"),last=Date.parse(b.to+"T00:00:00Z");
     if(!(last>first))return "";
-    const definitions=[["known_cost","Známé náklady","#ec941b",false],["forecast_cost","Odhad nákladů","#2a976c",false],["paid","Zaplacené zálohy","#6669ad",true],["planned","Plán záloh","#a0a1c2",true]];
-    const groups=definitions.map(([key,label,color,step])=>({key,label,color,step,points:(b.series?.[key]||[]).filter(p=>numeric(p.value)!==null&&Number.isFinite(Date.parse(p.date))).map(p=>({...p,n:numeric(p.value)}))}));
+    const own=this._detail?.result.own_billing||{};
+    // Vlastní i dodavatelská čára ukazují jen doložené krajní body; ani
+    // jedna nesmí vytvářet dojem změřeného průběhu budoucích měsíců.
+    const ownSeries=own.status==="estimated"&&own.known_cost_czk!=null&&own.forecast_cost_czk!=null?
+      [{date:b.today,value:own.known_cost_czk},{date:b.to,value:own.forecast_cost_czk}]:[];
+    const seriesData={...b.series,own_forecast_cost:ownSeries};
+    const definitions=[["known_cost","Známé náklady","#ec941b",false],["forecast_cost","Náklady – odhad MND","#2a976c",false],["own_forecast_cost","Vlastní odhad nákladů","#d28aef",false],["paid","Zaplacené zálohy","#6669ad",true],["planned","Plán záloh","#a0a1c2",true]];
+    const groups=definitions.map(([key,label,color,step])=>({key,label,color,step,points:(seriesData?.[key]||[]).filter(p=>numeric(p.value)!==null&&Number.isFinite(Date.parse(p.date))).map(p=>({...p,n:numeric(p.value)}))}));
     const maximum=Math.max(1,...groups.flatMap(g=>g.points.map(p=>p.n)))*1.12;
     const x=d=>84+Math.max(0,Math.min(1,(Date.parse(d)-first)/(last-first)))*486;
     const y=n=>234-n/maximum*198;
@@ -435,11 +473,11 @@ class MndSurface extends Base {
     const series=groups.map(g=>{
       let path="";
       for(const [i,p] of g.points.entries())path+=i?(g.step?` H${x(p.date)} V${y(p.n)}`:` L${x(p.date)} ${y(p.n)}`):`M${x(p.date)} ${y(p.n)}`;
-      const dashed=g.key==="forecast_cost"?"7 6":g.key==="planned"?"3 7":"";
+      const dashed=["forecast_cost","own_forecast_cost"].includes(g.key)?"7 6":g.key==="planned"?"3 7":"";
       return `${g.points.length>1?`<path d="${path}" fill="none" stroke="${g.color}" stroke-width="3" ${dashed?`stroke-dasharray="${dashed}"`:""}/>`:""}${g.points.map(p=>`<circle cx="${x(p.date)}" cy="${y(p.n)}" r="4.5" fill="${g.color}" tabindex="0" role="img" aria-label="${esc(this.text(g.label)+": "+this.dateText(p.date)+", "+this.number(p.value,"Kč"))}"><title>${esc(this.text(g.label)+": "+this.dateText(p.date)+" · "+this.number(p.value,"Kč"))}</title></circle>`).join("")}`;
     }).join("");
     const today=x(b.today),marker=`<line x1="${today}" x2="${today}" y1="22" y2="234" stroke="#1396ac" stroke-dasharray="4 4"/><text x="${today}" y="16" text-anchor="middle" fill="#1396ac">Dnes</text>`;
-    return `<section class="billing-chart"><h2>Náklady a zálohy za účetní období</h2><p class="axis-unit">Kč</p><svg class="billing-plot" viewBox="0 0 600 288" role="img" aria-label="Náklady a zálohy za účetní období">${axes}${series}${marker}${labels}</svg><div class="chart-legend">${groups.map(g=>`<span><i style="background:${g.color}"></i>${this.text(g.label)}${g.points.length?"":" · "+this.text("údaje chybí")}</span>`).join("")}</div><p class="muted">Čárkovaná spojnice ukazuje celkový výhled MND, nikoli doloženou měsíční předpověď. Platby mají skutečné datum úhrady. Předpis není platba.</p></section>`;
+    return `<section class="billing-chart"><h2>Náklady a zálohy za účetní období</h2><p class="axis-unit">Kč</p><svg class="billing-plot" viewBox="0 0 600 288" role="img" aria-label="Náklady a zálohy za účetní období">${axes}${series}${marker}${labels}</svg><div class="chart-legend">${groups.map(g=>`<span><i style="background:${g.color}"></i>${this.text(g.label)}${g.points.length?"":" · "+this.text("údaje chybí")}</span>`).join("")}</div><p class="muted">Čárkované spojnice ukazují pouze krajní body obou odhadů, nikoli doložené měsíční náklady. Platby mají skutečné datum úhrady. Předpis není platba.</p></section>`;
   }
   monthlyChart(){
     const rows=this._detail?.result.billing?.months||[];
@@ -494,6 +532,13 @@ class MndSurface extends Base {
     values.gas_today=this.number(this._detail.result.consumption?.today?.value_m3,"m³");
     values.gas_month=this.number(this._detail.result.consumption?.month?.value_m3,"m³");
     this.shadowRoot.querySelectorAll("[data-live]").forEach(node=>{if(Object.hasOwn(values,node.dataset.live))node.textContent=values[node.dataset.live];});
+    // Průběžný detail se může změnit i při zaměřeném jiném ovladači.
+    // Nahrazujeme pouze vlastní neinteraktivní obsah, nikdy aktivní proklik.
+    this.shadowRoot.querySelectorAll("[data-own-billing]").forEach(node=>{
+      if(node.contains(this.shadowRoot.activeElement))return;
+      const markup=this.ownBillingContent(node.dataset.ownBilling==="compact");
+      if(node._mndOwnMarkup!==markup){node.innerHTML=markup;node._mndOwnMarkup=markup;}
+    });
     if(this._historyCard)this._historyCard.hass=this._hass;
     const form=this.shadowRoot.querySelector('form[data-section="boiler"]');
     const preview=form?.querySelector("[data-boiler-preview]");
@@ -522,13 +567,54 @@ class MndSurface extends Base {
       return `<g role="img" tabindex="0" aria-label="${esc(label)}"><title>${esc(label)}</title>${known?`<rect x="${x}" y="${185-height}" width="${width*.7}" height="${Math.max(2,height)}" rx="3" fill="${r.complete?"var(--mnd-actual)":"#ec941b"}"/>`:`<text x="${x}" y="180">—</text>`}<text x="${x}" y="214">${esc(String(r.date).slice(8))}</text></g>`;
     }).join("")}</svg><p class="muted">${this.text("Oranžová ukazuje pouze známou část dne. Mezery nejsou nulová spotřeba.")}</p></section>`;
   }
+  ownBillingContent(compact=false){
+    /* Výsledek se vykreslí jen z odděleného vlastního kontraktu. Neúplný
+     * výpočet uvádí konkrétní příčinu a proklik, nikdy hodnotu od dodavatele
+     * pod názvem vlastního odhadu. Odkazy nic neukládají. */
+    const own=this._detail?.result?.own_billing||{},reason=own.reason;
+    const messages={
+      period_start_reading_unverified:"Chybí přesně časovaný odečet plynoměru na začátku účetního období.",
+      representative_year_missing:"Chybí souvislá roční historie skutečného měření pro sezónní odhad.",
+      sample_history_start_missing:"Chybí návazné vzorky zdroje od začátku období.",
+      history_source_unverified:"Propojení historického a aktuálního zdroje měření není doloženo.",
+      history_unit_changed:"Historický zdroj změnil jednotku nebo ji neuvádí; návaznost je třeba ověřit.",
+      conversion_period_missing_or_ambiguous:"Chybí jednoznačný převod m³ na energii pro celé období.",
+      anchor_time_unpaired:"Chybí platná návaznost měření na plynoměr nebo aktuální údaj.",
+      calibration_required:"Chybí platná návaznost měření na plynoměr nebo aktuální údaj.",
+      sensor_gap:"Chybí platná návaznost měření na plynoměr nebo aktuální údaj.",
+      sensor_reset:"Chybí platná návaznost měření na plynoměr nebo aktuální údaj.",
+      measurement_not_current_day:"Chybí platná návaznost měření na plynoměr nebo aktuální údaj.",
+      meter_changed:"Doložené odečty se rozcházejí nebo byl změněn plynoměr.",
+      meter_decrease:"Doložené odečty se rozcházejí nebo byl změněn plynoměr.",
+      reading_time_ambiguous:"Doložené odečty se rozcházejí nebo byl změněn plynoměr.",
+      overdue_advance:"Úhrady nebo budoucí předpisy záloh nejsou dostatečně doložené.",
+      advances_missing:"Úhrady nebo budoucí předpisy záloh nejsou dostatečně doložené.",
+      advance_due_missing:"Úhrady nebo budoucí předpisy záloh nejsou dostatečně doložené.",
+      advance_details_incomplete:"Úhrady nebo budoucí předpisy záloh nejsou dostatečně doložené.",
+      credit_or_refund_unresolved:"Úhrady nebo budoucí předpisy záloh nejsou dostatečně doložené."
+    };
+    const paymentReasons=["overdue_advance","advances_missing","advance_due_missing","advance_details_incomplete","credit_or_refund_unresolved","price_or_payment_incomplete"];
+    const target=paymentReasons.includes(reason)?this.editorUrl("","","accounting")+"#mnd-advances":
+      ["period_start_reading_unverified","meter_changed","meter_decrease","reading_time_ambiguous"].includes(reason)?this.editorUrl("readings"):
+      ["representative_year_missing","sample_history_start_missing"].includes(reason)?this.editorUrl("","","history"):
+      reason==="conversion_period_missing_or_ambiguous"?this.editorUrl("conversions"):
+      ["history_source_unverified","history_unit_changed"].includes(reason)?this.editorUrl("settings","history_source_entity"):
+      this.editorUrl("settings","source_entity");
+    if(own.status!=="estimated"||own.balance_czk==null){
+      const coverage=own.profile_complete_days==null?"":`<p class="muted">${this.text("Pokrytí roční historie")}: ${esc(own.profile_complete_days)} / ${esc(own.profile_required_days)} ${this.text("dní")}${!compact&&own.profile_missing_months?.length?`<br>${this.text("Chybějící měsíce nebo jejich části")}: ${esc(own.profile_missing_months.join(", "))}`:""}</p>`;
+      return `<h3>${this.text("Náš odhad podle spotřeby")}</h3><p>${this.text("Vlastní odhad zatím není dostupný.")}</p><p class="muted">${this.text(messages[reason]||"Ověřte dostupnost období, cen a plateb.")}</p>${coverage}<p><a href="${esc(target)}">${this.text("Zkontrolovat podklady")}</a></p>`;
+    }
+    const label=Number(own.balance_czk)>=0?"Očekávaný přeplatek":"Očekávaný nedoplatek";
+    const values=[["Spotřeba podle měření dosud",own.actual_mwh,"MWh"],["Odhad odběru celkem podle měření",own.total_mwh,"MWh"],["Orientační náklady dosud",own.known_cost_czk,"Kč"],["Odhad nákladů podle měření",own.forecast_cost_czk,"Kč"],["Uhrazené zálohy",own.paid_czk,"Kč"],["Očekávané budoucí zálohy",own.remaining_payments_czk,"Kč"],["Očekávané platby celkem",own.expected_payments_czk,"Kč"]];
+    return `<h3>${this.text("Náš odhad podle spotřeby")}</h3><p>${this.text(label)}</p><p class="balance-value">${this.number(String(own.balance_czk).replace(/^-/ ,""),"Kč")}</p><p class="muted">${this.text("Poslední měření")}: ${this.dateText(own.measured_at,true)}</p>${compact?"":`<table><tbody>${values.map(([name,value,unit])=>`<tr><td>${this.text(name)}</td><td>${this.number(value,unit)}</td></tr>`).join("")}</tbody></table><p class="muted">${this.text("Odhad zahrnuje sezónní profil a orientační zbývající část dne.")}</p><p class="muted">${this.text("Stálá platba za dnešek není zahrnuta do dosavadních nákladů; celkový výhled ji obsahuje.")}</p>${own.conversion_estimated?`<p class="muted">${this.text("Použitý převod m³ na energii je orientační.")}</p>`:""}${own.warnings?.includes("future_regulated_price_assumed")?`<p class="muted">${this.text("Budoucí regulované ceny používají poslední známé sazby.")}</p>`:""}`}`;
+  }
   overview(){
     const r=this._detail?.result||{},b=r.billing||{},s=this._detail?.place.settings||{},c=r.consumption||{};
     const m=this.liveMetrics(),balance=b.forecast_balance_czk;
     const title=b.confirmed_invoice?"Výsledek originálního vyúčtování":balance==null?"Odhad vyúčtování čeká na podklady":Number(balance)>=0?"Očekávaný přeplatek":"Očekávaný nedoplatek";
     return `<div class="overview-grid"><section><h2>${this.text("Právě teď")}</h2><div class="grid">${this.metric("Aktuální průtok",m.flow.value,"m³/h",{entity:s.flow_entity||this._config?.entities?.current_flow_m3h,live:"flow"})}${s.boiler_enabled?this.metric("Elektrický příkon kotle",m.power.value,"W",{entity:s.boiler_power_entity,live:"boiler_power"}):""}</div><p class="muted"><span data-live="flow_status">${this.qualityText(m.flow.quality)}</span> · <span data-live="flow_at">${this.dateText(m.flow.at,true)}</span>${s.boiler_enabled?`<br>${this.text("Kotel")}: <span data-live="boiler_status"></span> · <span data-live="boiler_at"></span>`:""}</p></section>
       <section><h2>${this.text("Spotřeba")}</h2><div class="grid">${this.metric("Plyn dnes",c.today?.value_m3,"m³",{live:"gas_today"})}${this.metric("Plyn tento měsíc",c.month?.value_m3,"m³",{live:"gas_month"})}</div><p class="muted">${this.text("Známá část měření HA; data do")}: <span data-live="gas_at">${this.dateText(c.month?.observed_to,true)}</span></p>${this.detailLink("readings","Podrobnosti spotřeby")}</section>
-      <section><h2>${this.text("Vyúčtování")}</h2><h3>${this.text(title)}</h3><p class="balance-value">${this.number(balance==null?null:String(balance).replace(/^-/ ,""),"Kč")}</p><p>${this.text("Účetní období MND")}: ${this.dateText(b.from)} → ${this.dateText(b.to)}</p><p class="muted">${this.text("Odečet MND")}: ${this.dateText(b.actual_through||r.latest_mnd_date)}</p>${this.detailLink("accounting","Podrobnosti účetnictví")}<details><summary>${this.text("Jak se počítá")}</summary><p>${this.text("Odhad používá podklady MND a doložené ceny. Skutečné vyúčtování má přednost; elektřina kotle se do něj nezapočítává.")}</p></details></section></div>${this.weeklyChart()}`;
+      <section><h2>${this.text("Vyúčtování")}</h2>${b.confirmed_invoice?"":`<div data-own-billing="compact">${this.ownBillingContent(true)}</div>`}${b.confirmed_invoice?"":`<p class="muted">${this.text("Výhled podle prognózy MND")}${b.snapshot_at?` · ${this.text("Aktualizace podkladů MND")}: ${this.dateText(b.snapshot_at,true)}`:""}</p>`}<h3>${this.text(title)}</h3><p class="balance-value">${this.number(balance==null?null:String(balance).replace(/^-/ ,""),"Kč")}</p><p>${this.text("Účetní období MND")}: ${this.dateText(b.from)} → ${this.dateText(b.to)}</p><p class="muted">${this.text("Odečet MND")}: ${this.dateText(b.actual_through||r.latest_mnd_date)}</p>${this.detailLink("accounting","Podrobnosti účetnictví")}<details><summary>${this.text("Jak se počítá")}</summary><p>${this.text("Odhad používá podklady MND a doložené ceny. Skutečné vyúčtování má přednost; elektřina kotle se do něj nezapočítává.")}</p></details></section></div>${this.weeklyChart()}`;
   }
   boilerDetails(){
     const s=this._detail?.place.settings||{},b=this._detail?.result.boiler||{},e=b.electricity||{};
@@ -601,7 +687,7 @@ class MndSurface extends Base {
     if(!this._admin){
       if(this._tab==="editor"||this._config?.admin_link)return `<section><h2>Konfigurace odběrného místa</h2><a href="${esc(this._detail.device_url||"/config/devices")}">Otevřít zařízení MND v Nastavení</a></section>`;
       if(this._tab==="history")return this.financeMarkup();
-      if(this._tab==="accounting")return this.configurationHelp()+this.billingSummary()+this.cashChart()+this.financeMarkup();
+      if(this._tab==="accounting")return this.configurationHelp()+(this._detail?.result?.billing?.confirmed_invoice?"":`<section class="own-billing" data-own-billing="detail">${this.ownBillingContent()}</section>`)+this.billingSummary()+this.cashChart()+this.financeMarkup();
       if(this._tab==="forecasts")return this.chart()+`<section><h2>Ověřená porovnání prognóz</h2>${table(p.comparisons||[],[["from","Od"],["to","Do"],["difference","Odchylka MWh"],["percentage","Odchylka %"]])}<p>Porovnání vyžaduje dokončené shodné období a doloženou energetickou bázi. Průběžná spotřeba není chyba celoroční predikce.</p></section>`;
       if(this._tab==="readings")return this.boilerDetails()+this.monthlyChart()+`<section><h2>Historie odečtů</h2>${table(p.readings,[["date","Den"],["value","m³"],["source","Zdroj"],["method","Metoda"]])}</section><section><h2>Porovnání senzoru s odečtem MND</h2>${table(this._detail.result.meter_comparisons||[],[["date","Den"],["expected","Senzor m³"],["actual","MND m³"],["difference","Rozdíl m³"],["percentage","Rozdíl %"],["reason","Stav porovnání"]])}</section>`;
     }
@@ -671,6 +757,15 @@ main{padding:16px;padding-top:max(16px,env(safe-area-inset-top));padding-bottom:
     on("local-forecast",async()=>{this._localForecast=await this.command("local_forecast",{start:this.shadowRoot.getElementById("forecast-from").value,end:this.shadowRoot.getElementById("forecast-to").value});});
     on("backup",async()=>{const include=this.shadowRoot.getElementById("backup-documents").checked;const response=await this._hass.fetchWithAuth(`/api/${DOMAIN}/backup/${encodeURIComponent(this._entry)}/${encodeURIComponent(this._place)}?documents=${include?1:0}`);if(!response.ok)throw new Error("Zálohu nelze vytvořit; ověřte dostupnost originálů.");this.download(await response.blob(),"mnd-private-backup.zip","application/zip");});
     on("csv",async()=>{const result=await this.command("csv");this.download(result.content,"mnd-readings.csv","text/csv;charset=utf-8");});
+    // Po změně zdrojů se potvrzení vztahu musí znovu výslovně zaškrtnout;
+    // pouhé přejmenování entity nemění uloženou registry identitu.
+    const settingsForm=this.shadowRoot.querySelector('form[data-section="settings"]');
+    if(settingsForm)for(const name of ["source_entity","source_mode","history_source_entity","history_unit_m3","segment"]){
+      const invalidate=()=>{
+        settingsForm.elements.namedItem("history_link_confirmed").checked=false;
+      };
+      for(const event of ["input","change"])settingsForm.elements.namedItem(name)?.addEventListener(event,invalidate);
+    }
     const boilerForm=this.shadowRoot.querySelector('form[data-section="boiler"]');
     if(boilerForm)boilerForm.onchange=()=>this.updateLiveMetrics();
     this.updateLiveMetrics();void this.mountHistory();

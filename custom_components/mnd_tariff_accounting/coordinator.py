@@ -706,6 +706,16 @@ class MndCoordinator(DataUpdateCoordinator):
                         "billing_volume_m3": "known_volume_m3",
                     }.items():
                         results[place_id][sensor] = billing.get(key)
+                    # Vlastní odhad má samostatné entity; původní dodavatelské
+                    # entity a jejich historie se změnou významu nepřepisují.
+                    own = result.get("own_billing", {})
+                    for sensor, key in {
+                        "own_forecast_balance_czk": "balance_czk",
+                        "own_forecast_cost_czk": "forecast_cost_czk",
+                        "own_forecast_mwh": "total_mwh",
+                        "own_actual_mwh": "actual_mwh",
+                    }.items():
+                        results[place_id][sensor] = own.get(key)
                     settings = place["settings"]
                     registry = er.async_get(self.hass)
                     flow = registry.async_get(

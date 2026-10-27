@@ -21,6 +21,34 @@
   the MND integration and open its HACS repository, with installation and
   restart prerequisites. The existing alpha tag and installer are unchanged.
 
+## 0.1.0-beta.4 — vlastní odhad podle spotřeby
+
+### Čeština
+
+- Vlastní výhled používá doložený stav plynoměru, místní sezónní historii,
+  doložené ceny a zálohy MND. Průběžně reaguje na nová měření; dodavatelská
+  prognóza a potvrzená faktura zůstávají samostatně označené.
+- Výpočet vyžaduje doloženou časovou kotvu, návazné měření, 365 úplných dnů,
+  převod m³ na energii a další podklady. Když chybí, zobrazí důvod a pokrytí;
+  nové údaje neproměňuje v nulu ani neopisuje předpis jako skutečnou platbu.
+- Editor umožňuje výslovně potvrdit vazbu historického a aktuálního zdroje
+  téhož plynoměru. Změna zdroje, segmentu či faktoru potvrzení zneplatní.
+- Nové entity vlastního odhadu nezmění význam původních dodavatelských entit.
+  Graf odlišuje oba výhledy; spojnice ukazují pouze krajní body.
+
+**Po aktualizaci:** restartujte Home Assistant a obnovte prohlížeč. Na kartě
+Vyúčtování zkontrolujte kvalitu a případné chybějící podklady vlastního odhadu.
+Podrobný postup je v dokumentu Vlastní odhad podle měření.
+
+### English
+
+- Added a separately identified consumption-based estimate using an evidenced
+  meter baseline, observed seasonal history, prices and MND payments.
+- Missing timestamps, history, conversion or financial evidence result in
+  an explicit reason instead of a fabricated value. Optional confirmation
+  binds distinct history and live sources to their registry IDs and factor.
+- New entities do not change the meaning or history of supplier entities.
+
 ## 0.1.0-beta.3 — vlastní evidence je volitelná
 
 ### Čeština

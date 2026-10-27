@@ -377,6 +377,10 @@ class DashboardTests(unittest.TestCase):
             "billing_actual_mwh",
             "billing_forecast_mwh",
             "billing_volume_m3",
+            "own_forecast_balance_czk",
+            "own_forecast_cost_czk",
+            "own_forecast_mwh",
+            "own_actual_mwh",
         )
         result = build_views(
             "Synthetic MND",
@@ -395,7 +399,7 @@ class DashboardTests(unittest.TestCase):
                 for v in views
             )
         )
-        self.assertTrue(all(v["cards"][0]["layout_version"] == 5 for v in views))
+        self.assertTrue(all(v["cards"][0]["layout_version"] == 6 for v in views))
         self.assertTrue(
             all(v["subview"] and v["back_path"] == "/lovelace/synthetic-gas" for v in views[1:])
         )

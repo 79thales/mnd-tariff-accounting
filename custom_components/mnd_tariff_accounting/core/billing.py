@@ -78,6 +78,73 @@ def finance_for_period(place, start, end, today):
     }
 
 
+def forecast_payments(place, start, end, today):
+    """Doložené úhrady a očekávané dosud nesplatné zálohy v Kč.
+
+    Období je [start, end), příslušnost určuje splatnost předpisu MND.
+    Skutečná úhrada se počítá ke svému datu a jen jednou; předčasná či
+    vyšší úhrada sníží zbývající část pouze jejího vlastního předpisu.
+    Minulý nesplacený předpis nepředstíráme jako budoucí platbu: vyžaduje
+    rozhodnutí uživatele, proto výhled zůstane neúplný. Neúplný seznam,
+    chybějící částky, zastaralé detaily ani neevidované kredity/vratky nelze
+    považovat za nulu. Funkce nic neukládá a nemění zdrojovou evidenci.
+    """
+    evidence = place.get("portal_evidence", {}).get("advances")
+    result = {
+        "paid_czk": None,
+        "remaining_czk": None,
+        "expected_czk": None,
+        "complete": False,
+        "reason": "advances_missing",
+    }
+    if not evidence or evidence.get("list_complete") is not True:
+        return result
+    paid = Decimal(0)
+    remaining = Decimal(0)
+    overdue = False
+    for row in evidence.get("rows", []):
+        if not row.get("due"):
+            return {**result, "reason": "advance_due_missing"}
+        due = day(row["due"])
+        if not start <= due < end:
+            continue
+        if (
+            row.get("payments_known") is not True
+            or row.get("payments_stale", False)
+            or row.get("prescribed") is None
+        ):
+            return {**result, "reason": "advance_details_incomplete"}
+        prescribed = decimal(row["prescribed"], nonnegative=True)
+        row_paid = sum(
+            (
+                decimal(payment["amount"], nonnegative=True)
+                for payment in row.get("payments", [])
+                if day(payment["date"]) <= today
+            ),
+            Decimal(0),
+        )
+        paid += row_paid
+        outstanding = max(prescribed - row_paid, Decimal(0))
+        if due < today and outstanding:
+            overdue = True
+        elif due >= today:
+            remaining += outstanding
+    # Místní a dodavatelské převody/vratky nelze automaticky sloučit bez
+    # prokázaného přiřazení; zadržet celkový výsledek místo dvojího účtování.
+    ambiguous_events = any(
+        row.get("role") in {"refund", "credit", "debit", "transfer_in", "transfer_out"}
+        for row in place.get("events", [])
+    )
+    reason = "overdue_advance" if overdue else "credit_or_refund_unresolved" if ambiguous_events else None
+    return {
+        "paid_czk": money(paid),
+        "remaining_czk": money(remaining),
+        "expected_czk": money(paid + remaining) if reason is None else None,
+        "complete": reason is None,
+        "reason": reason,
+    }
+
+
 def selected_profile(place):
     """Jediný kompatibilní profil pro hlavní souhrny i měsíční graf.
 
@@ -299,6 +366,48 @@ def cost_evidence(place, start, end, through, energy, forecast):
             warnings.append("future_regulated_price_assumed")
     else:
         warnings.append("price_period_not_covered")
+    return result
+
+
+def own_outcome_from_energy(place, start, end, through, actual_mwh, future_mwh, today):
+    """Ocení předem ověřené energetické vstupy vlastního modelu v MWh a Kč.
+
+    Funkce nestanovuje metodu ani pokrytí měření: volající smí dodat MWh až
+    po ověření totožnosti měřidla, návaznosti na MND, převodu a oddělení
+    minulého a budoucího úseku. Chybějící hodnota zůstává None. Doložené
+    originální faktury mají přednost díky společnému cost_evidence; jejich
+    nesoulad s hranicí zastaví odhad místo dvojího přičtení. Používá se
+    pouze existující platný cenový doklad, budoucí regulovaná sazba má
+    stávající varování. Neúplné platby nikdy nevytvoří výsledný přeplatek.
+    """
+    actual = decimal(actual_mwh, optional=True, nonnegative=True)
+    future = decimal(future_mwh, optional=True, nonnegative=True)
+    total = actual + future if actual is not None and future is not None else None
+    costs = cost_evidence(place, start, end, through, actual, total)
+    payments = forecast_payments(place, start, end, today)
+    result = {
+        "actual_mwh": actual,
+        "future_mwh": future,
+        "total_mwh": total,
+        "known_cost_czk": costs.get("known_cost_czk"),
+        "forecast_cost_czk": costs.get("forecast_cost_czk"),
+        "paid_czk": payments["paid_czk"],
+        "remaining_payments_czk": payments["remaining_czk"],
+        "expected_payments_czk": payments["expected_czk"],
+        "balance_czk": None,
+        "confirmed_invoice": costs.get("confirmed_invoice", False),
+        "warnings": costs.get("warnings", []),
+        "payment_reason": payments["reason"],
+    }
+    # Potvrzená faktura se zobrazí zvlášť, nikoli jako vlastní prognóza.
+    if (
+        not result["confirmed_invoice"]
+        and result["forecast_cost_czk"] is not None
+        and payments["complete"]
+    ):
+        result["balance_czk"] = money(
+            payments["expected_czk"] - result["forecast_cost_czk"]
+        )
     return result
 
 

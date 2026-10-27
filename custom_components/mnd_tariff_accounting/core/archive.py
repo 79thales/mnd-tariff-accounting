@@ -69,6 +69,15 @@ def validate_archive(data: dict, account: str):
         if any(not isinstance(record, dict) for section in SECTIONS for record in content[section]):
             raise DataError("archive_invalid_record")
         calibration = settings.get("calibration")
+        binding = settings.get("history_binding")
+        if binding is not None:
+            if (
+                not isinstance(binding, dict)
+                or set(binding) != {"source", "history", "segment", "factor"}
+                or any(not isinstance(binding.get(k), str) or not binding[k] for k in ("source", "history", "segment"))
+            ):
+                raise DataError("invalid_history_binding")
+            decimal(binding["factor"], optional=True, nonnegative=True)
         if calibration is not None:
             if not isinstance(calibration, dict) or any(
                 key not in calibration

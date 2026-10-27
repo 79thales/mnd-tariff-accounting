@@ -30,7 +30,11 @@
             "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
             "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
             "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
-            "billing_volume_m3": "{{entity:billing_volume_m3}}"
+            "billing_volume_m3": "{{entity:billing_volume_m3}}",
+            "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
+            "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
+            "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
+            "own_actual_mwh": "{{entity:own_actual_mwh}}"
           },
           "navigation": [
             {
@@ -54,7 +58,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 5,
+          "layout_version": 6,
           "billing_mode": "supplier",
           "editor_url": "{{EDITOR_URL}}"
         }
@@ -93,7 +97,11 @@
             "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
             "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
             "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
-            "billing_volume_m3": "{{entity:billing_volume_m3}}"
+            "billing_volume_m3": "{{entity:billing_volume_m3}}",
+            "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
+            "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
+            "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
+            "own_actual_mwh": "{{entity:own_actual_mwh}}"
           },
           "navigation": [
             {
@@ -117,7 +125,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 5,
+          "layout_version": 6,
           "billing_mode": "supplier",
           "editor_url": "{{EDITOR_URL}}"
         }
@@ -155,7 +163,11 @@
             "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
             "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
             "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
-            "billing_volume_m3": "{{entity:billing_volume_m3}}"
+            "billing_volume_m3": "{{entity:billing_volume_m3}}",
+            "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
+            "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
+            "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
+            "own_actual_mwh": "{{entity:own_actual_mwh}}"
           },
           "navigation": [
             {
@@ -179,7 +191,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 5,
+          "layout_version": 6,
           "billing_mode": "supplier",
           "editor_url": "{{EDITOR_URL}}"
         }
@@ -217,7 +229,11 @@
             "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
             "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
             "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
-            "billing_volume_m3": "{{entity:billing_volume_m3}}"
+            "billing_volume_m3": "{{entity:billing_volume_m3}}",
+            "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
+            "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
+            "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
+            "own_actual_mwh": "{{entity:own_actual_mwh}}"
           },
           "navigation": [
             {
@@ -241,7 +257,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 5,
+          "layout_version": 6,
           "billing_mode": "supplier",
           "editor_url": "{{EDITOR_URL}}"
         }
@@ -279,7 +295,11 @@
             "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
             "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
             "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
-            "billing_volume_m3": "{{entity:billing_volume_m3}}"
+            "billing_volume_m3": "{{entity:billing_volume_m3}}",
+            "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
+            "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
+            "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
+            "own_actual_mwh": "{{entity:own_actual_mwh}}"
           },
           "navigation": [
             {
@@ -303,7 +323,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 5,
+          "layout_version": 6,
           "admin_link": true,
           "billing_mode": "supplier",
           "editor_url": "{{EDITOR_URL}}"
@@ -342,7 +362,11 @@
             "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
             "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
             "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
-            "billing_volume_m3": "{{entity:billing_volume_m3}}"
+            "billing_volume_m3": "{{entity:billing_volume_m3}}",
+            "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
+            "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
+            "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
+            "own_actual_mwh": "{{entity:own_actual_mwh}}"
           },
           "navigation": [
             {
@@ -366,7 +390,7 @@
               "path": "/lovelace/{{PATH}}-historie"
             }
           ],
-          "layout_version": 5,
+          "layout_version": 6,
           "billing_mode": "supplier",
           "editor_url": "{{EDITOR_URL}}"
         }

@@ -12,6 +12,7 @@ from .billing import billing_view
 from .common import DataError, instant, local_day, wire
 from .live import anchor_comparisons
 from .metering import Reading, active_readings, consumption_intervals, current_state
+from .own_billing import own_billing_view
 from .temporal_accounting import boundary
 
 
@@ -106,6 +107,7 @@ def evaluate_place(place_id: str, place: dict, zone: str, now: datetime | None =
         )
     if not segment and relevant:
         segment = max(relevant, key=lambda r: r.date).segment
+    state = {"value": None, "reason": "meter_segment_missing"}
     if segment:
         samples = [
             s
@@ -160,6 +162,14 @@ def evaluate_place(place_id: str, place: dict, zone: str, now: datetime | None =
                     }
                 )
             )
+    # Vlastní výhled používá dodavatelské období, ne volitelné období ruční
+    # evidence. Poškozené podklady nesmějí skrýt samotný přehled dodavatele.
+    try:
+        result["own_billing"] = own_billing_view(
+            place_id, place, result.get("billing", {}), state, now, zone
+        )
+    except DataError as error:
+        result["own_billing"] = {"status": "incomplete", "reason": str(error), "balance_czk": None}
     if not settings.get("period_from") or not settings.get("period_to"):
         return wire(result)
     intervals = consumption_intervals(readings, place_id)

@@ -135,6 +135,7 @@ def edit_place(data, *, place_id, section, record, now: datetime, zone: str):
             "history_source_entity",
             "history_registry_id",
             "history_unit_m3",
+            "history_binding",
             "segment",
         )
         _fields(record, BOILER_FIELDS if section == "boiler" else allowed)
@@ -151,10 +152,19 @@ def edit_place(data, *, place_id, section, record, now: datetime, zone: str):
             if not 30 <= record["flow_max_age"] <= 86400:
                 raise DataError("invalid_flow_max_age")
         if "history_unit_m3" in record:
-            factor = decimal(record["history_unit_m3"], nonnegative=True)
-            if not 0 < factor <= 1000:
+            factor = decimal(record["history_unit_m3"], optional=True, nonnegative=True)
+            if factor is not None and not 0 < factor <= 1000:
                 raise DataError("invalid_history_volume_factor")
             record["history_unit_m3"] = factor
+        if record.get("history_binding") is not None:
+            binding = record["history_binding"]
+            if (
+                not isinstance(binding, dict)
+                or set(binding) != {"source", "history", "segment", "factor"}
+                or any(not isinstance(binding.get(k), str) or not binding[k] for k in ("source", "history", "segment"))
+            ):
+                raise DataError("invalid_history_binding")
+            decimal(binding["factor"], optional=True, nonnegative=True)
         merged = {**place["settings"], **record}
         if merged.get("boiler_enabled") and not merged.get("boiler_power_entity"):
             raise DataError("boiler_power_required")

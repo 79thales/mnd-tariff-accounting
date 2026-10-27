@@ -173,6 +173,18 @@
       },
       "billing_volume_m3": {
         "name": "Doložený objem HA za účetní období"
+      },
+      "own_forecast_balance_czk": {
+        "name": "Vlastní odhad výsledku vyúčtování"
+      },
+      "own_forecast_cost_czk": {
+        "name": "Vlastní odhad nákladů celkem"
+      },
+      "own_forecast_mwh": {
+        "name": "Vlastní odhad spotřeby celkem"
+      },
+      "own_actual_mwh": {
+        "name": "Vlastní spotřeba dosud"
       }
     },
     "button": {
