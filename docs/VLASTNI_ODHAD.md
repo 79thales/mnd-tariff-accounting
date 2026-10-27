@@ -6,18 +6,23 @@ Vlastní odhad je orientační: žádný z výhledů nenahrazuje fakturu.
 
 ## Potřebné podklady
 
-- Dodavatelské účetní období a fyzický odečet na jeho přesné počáteční
-  hranici. Přesně časovaný odečet MND má přednost; shodně doložený ruční
-  fyzický odečet se použije, pokud přesná kotva MND chybí. Odečet se nesmí
-  zpětně vymyslet. Datum MND bez času nelze prohlásit za půlnoc.
+- Dodavatelské účetní období a fyzické odečty. Přesně časovaná kotva má
+  přednost; bez ní lze použít odečet MND z počátku období nebo z předchozího
+  dne a poslední fyzický odečet před dneškem. Předpokládané denní hranice
+  jsou orientační, protože čas odečtu MND není známý.
 - Aktuální kumulativní měření navázané na stejné měřidlo a jeho segment.
   Poslední použitý vzorek musí být z aktuálního místního dne. Výpadek,
   reset, nesoulad měřidla nebo časově nejednoznačné odečty výpočet přeruší.
-- Profil 365 souvislých dokončených měřených dnů. Chybějící den ani zima
-  nejsou nulové. Při neúplném profilu se uvádí počet dostupných dnů a měsíce
-  s mezerami; MND výhled zůstává dostupný zvlášť.
-- Doložený převod kWh/m³ platný pro celé období a ověřený ceník pokrývající
-  období. Odhadovaný převod a převzetí poslední známé regulované ceny pro
+- Pokud není 365 souvislých měřených dnů, chybějící sezónu lze odhadnout
+  z nepravidelných fyzických odečtů MND. Rozdíl dvou odečtů se rozdělí
+  rovnoměrně mezi dny jejich intervalu, nejvýše 62 dnů. Různé plynoměry,
+  konflikty, reset a instalace měřidla interval přerušují. Měřené dny HA
+  mají přednost. Pro každý potřebný budoucí měsíc je třeba alespoň sedm
+  dostupných dnů z posledního roku; nejde o záruku reprezentativnosti.
+  Takto dopočtené dny se nikdy nevydávají za fyzicky změřené.
+- Převod kWh/m³ platný pro celé období nebo orientační převod z poslední
+  doložené faktury a ověřený ceník pokrývající období. Převod z faktury
+  se za přesný budoucí koeficient nevydává. Převzetí poslední regulované ceny pro
   budoucnost se výslovně označují. Pokud se převod či cena v období mění
   a dostupné podklady nelze bezpečně rozdělit, výsledek zůstane neznámý.
 - Úplný seznam předpisů a dostupné úhrady MND. Minulá nezaplacená záloha
@@ -30,12 +35,25 @@ jednoho plynoměru. V Editoru → Měření a vlastní evidence lze po ověřen�
 výslovně potvrdit jejich vztah. Potvrzení platí pro aktuální registry identity,
 segment a zadaný objem pulsu. Změna některého z nich ho zneplatní a vyžaduje
 nové potvrzení. Samotné přejmenování entity identitu registry nemění.
+Bez potvrzení je u orientační varianty vztah zdrojů výslovně označen jako
+předpoklad. Pro přesnou variantu je potvrzení různých zdrojů nutné.
 
 ## Výpočet a aktualizace
 
-Ze změny fyzického stavu od doložené počáteční kotvy a navazujících měření
-vzniká odběr dosud. Budoucí m³ vycházejí ze sezónních měsíčních průměrů
-úplných denních měření před dneškem. Zbývající část aktuálního dne se
+Ze změny fyzického stavu mezi MND odečty a navazujících měření HA vzniká
+odběr dosud. Orientační varianta považuje poslední MND odečet před dneškem
+za konec jeho dne; HA přičítá až od následujícího dne. Odečet na počátku
+období nebo den před ním je považován za počáteční hranici. Proto je celý
+součet pouze orientační. MND odečet s dnešním datem se pro tento odhad
+použije až další den, aby se nepřekrýval s dnešním měřením HA.
+
+Dnešní HA statistika musí pokrývat všechny uzavřené hodiny od půlnoci.
+Přírůstky aktuálního senzoru po uzavřené hodině se přidají jen při doložené
+návaznosti vzorků. Poslední vzorek před hranicí nesmí být starší než hodinu;
+delší odstup neprokazuje, že se čítač mezitím nezměnil. Pokud dojde k výpadku nebo resetu, výpočet zůstane k času
+poslední uzavřené hodiny a zbývající čas zahrne do prognózy, nikoli do
+naměřené spotřeby. Budoucí m³ vycházejí ze sezónních měsíčních průměrů
+měření HA a případně interpolovaných intervalů MND. Zbývající část dne se
 orientačně dělí podle skutečné délky dne v místním pásmu, včetně změny času;
 není označena jako měřená spotřeba. Použitý čas měření a výpočtu se uvádí
 samostatně. Cena a předpisy jsou nezávislé na elektřině kotle.

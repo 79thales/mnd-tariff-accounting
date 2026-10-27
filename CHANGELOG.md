@@ -28,9 +28,10 @@
 - Vlastní výhled používá doložený stav plynoměru, místní sezónní historii,
   doložené ceny a zálohy MND. Průběžně reaguje na nová měření; dodavatelská
   prognóza a potvrzená faktura zůstávají samostatně označené.
-- Výpočet vyžaduje doloženou časovou kotvu, návazné měření, 365 úplných dnů,
-  převod m³ na energii a další podklady. Když chybí, zobrazí důvod a pokrytí;
-  nové údaje neproměňuje v nulu ani neopisuje předpis jako skutečnou platbu.
+- Výpočet přednostně používá přesnou kotvu a měřený roční profil. Pokud
+  chybí, může použít orientační denní návaznost MND, doplnit sezónu z intervalů
+  fyzických odečtů a převod z poslední faktury. Předpoklady jsou viditelné;
+  chybějící hodiny a nedoložené platby se nevydávají za nulu.
 - Editor umožňuje výslovně potvrdit vazbu historického a aktuálního zdroje
   téhož plynoměru. Změna zdroje, segmentu či faktoru potvrzení zneplatní.
 - Nové entity vlastního odhadu nezmění význam původních dodavatelských entit.
@@ -44,8 +45,9 @@ Podrobný postup je v dokumentu Vlastní odhad podle měření.
 
 - Added a separately identified consumption-based estimate using an evidenced
   meter baseline, observed seasonal history, prices and MND payments.
-- Missing timestamps, history, conversion or financial evidence result in
-  an explicit reason instead of a fabricated value. Optional confirmation
+- Missing exact timestamps and seasonal data can use explicitly labelled
+  approximations from MND readings and the latest verified invoice. Missing
+  hours or financial evidence do not become zero. Optional confirmation
   binds distinct history and live sources to their registry IDs and factor.
 - New entities do not change the meaning or history of supplier entities.
 

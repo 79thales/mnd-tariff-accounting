@@ -195,6 +195,22 @@ test("průběžná obnova vlastního výhledu zachová fokus na jiném odkazu",a
   element.remove();
 });
 
+test("orientační výhled vysvětlí odečty, vazbu zdrojů a výpadek",async()=>{
+  const data=detail();
+  data.result.billing={from:'2026-03-31',to:'2027-04-08',forecast_balance_czk:'800',warnings:[],series:{},months:[]};
+  data.result.own_billing={status:'estimated',balance_czk:'700',measured_at:'2026-10-16T11:00:00Z',
+    boundary_estimated:true,history_source_assumed:true,conversion_estimated:true,
+    interpolated_days:22,live_status:'sensor_gap',warnings:[]};
+  const {element}=await surface({config:{entry_id:'account-a',place:PLACE,tab:'accounting'},data});
+  const own=element.shadowRoot.querySelector('.own-billing');
+  assert.match(own.textContent,/Orientační odhad z odečtů MND a měření HA/);
+  assert.match(own.textContent,/rozdělena rovnoměrně/);
+  assert.match(own.textContent,/poslední uzavřenou hodinu/);
+  assert.match(own.textContent,/Vazba zdrojů HA je předpokládaná/);
+  assert.match(own.textContent,/převod m³ na energii je orientační/);
+  assert.equal(new URL(own.querySelector('a').href).searchParams.get('field'),'history_link_confirmed');
+});
+
 test("kompaktní wrapper patří pouze přehledu, ne účetnictví či administraci",async()=>{
   const {element}=await surface({config:{entry_id:'account-a',place:PLACE,tab:'accounting'}});
   assert.equal(element.shadowRoot.querySelector('.overview-grid'),null);

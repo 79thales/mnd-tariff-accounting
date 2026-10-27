@@ -16,8 +16,9 @@
 
 Přehled rozlišuje vlastní odhad podle měření a výhled MND. Výsledek se
 průběžně přepočítává z doloženého odběru, sezónní historie, cen a záloh.
-Při chybějících podkladech zobrazí konkrétní důvod; historie, platby ani
-prognóza MND se nevydávají za nulové hodnoty. [Podmínky a postup](docs/VLASTNI_ODHAD.md).
+Starší nepravidelné odečty MND mohou doplnit zimní profil orientačním
+rozdělením spotřeby. Časové a cenové předpoklady jsou výslovně označené;
+při nedostatečných podkladech zůstane výsledek neznámý. [Podmínky a postup](docs/VLASTNI_ODHAD.md).
 
 ## O integraci
 

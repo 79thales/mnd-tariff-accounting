@@ -42,7 +42,7 @@ def history_binding_matches(settings):
         return False
 
 
-def own_billing_view(place_id, place, billing, measurement, now, zone):
+def _strict_own_billing_view(place_id, place, billing, measurement, now, zone):
     """Sestaví vlastní odhad nad existující revizí archivu bez zápisu do HA.
 
     Účetní hranice jsou místní dny [od, do), plynoměr m³, energie MWh a
@@ -217,3 +217,24 @@ def own_billing_view(place_id, place, billing, measurement, now, zone):
         return missing(result.get("payment_reason") or "price_or_payment_incomplete")
     result.update(status="estimated", reason=None)
     return result
+
+
+def own_billing_view(place_id, place, billing, measurement, now, zone):
+    """Upřednostní přesnou návaznost; alternativu vždy označí orientačně.
+
+    Nepravidelné fyzické odečty a předpokládané denní hranice jsou odlišná
+    metoda od přesné kotvy. Selhání alternativy ponechá původní důvod a
+    nevyrobí nulu; nepřebírá číselnou prognózu spotřeby od dodavatele.
+    """
+    result = _strict_own_billing_view(place_id, place, billing, measurement, now, zone)
+    if result.get("status") == "estimated" or not billing.get("from") or not billing.get("to"):
+        return result
+    from .orientational import orientational_view
+
+    try:
+        alternative = orientational_view(
+            place_id, place, billing, now, zone, history_binding_matches(place["settings"])
+        )
+    except DataError:
+        return result
+    return alternative or result
