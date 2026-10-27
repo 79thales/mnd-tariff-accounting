@@ -4,6 +4,15 @@ Hlavní přehled rozlišuje **Náš odhad podle spotřeby** a samostatný výhle
 vypočtený z prognózy MND. Potvrzené originální vyúčtování má přednost.
 Vlastní odhad je orientační: žádný z výhledů nenahrazuje fakturu.
 
+## Historie výsledku
+
+Podrobnosti účetnictví obsahují sedmidenní graf uložených stavů vlastního
+odhadu a proklik do historie Home Assistantu. Kladná hodnota znamená
+očekávaný přeplatek, záporná očekávaný nedoplatek v Kč. Graf zachycuje
+historické verze odhadu, nikoli zpětně vypočtené skutečné vyúčtování.
+Záznam začíná až po vytvoření senzoru a jeho dostupnost závisí na nastavení
+a délce uchování Recorderu. Chybějící záznam není nulová hodnota.
+
 ## Potřebné podklady
 
 - Dodavatelské účetní období a fyzické odečty. Přesně časovaná kotva má

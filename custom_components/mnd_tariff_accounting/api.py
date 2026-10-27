@@ -157,6 +157,14 @@ async def websocket_command(hass, connection, msg):
                     "place": copy.deepcopy(repo.data["places"][place_id]),
                     "result": copy.deepcopy(coordinator.data.get(place_id, {})),
                 }
+                # Registr vrací aktuální ID i po přejmenování senzoru uživatelem.
+                # Identita je ohraničena účtem a místem; chybějící senzor je None.
+                unique_id = f"{coordinator.entry.data['account_id']}:{place_id}:own_forecast_balance_czk"
+                result["entities"] = {
+                    "own_forecast_balance_czk": er.async_get(hass).async_get_entity_id(
+                        "sensor", DOMAIN, unique_id
+                    )
+                }
                 device = _place_device(hass, coordinator.entry, place_id)
                 result["device_url"] = (
                     f"/config/devices/device/{device.id}" if device else "/config/devices"

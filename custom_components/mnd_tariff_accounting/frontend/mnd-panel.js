@@ -633,25 +633,32 @@ class MndSurface extends Base {
     const partial=row=>`${this.text("Známá část; data do")}: ${row?.observed_to?this.dateText(new Date(row.observed_to*1000).toISOString(),true):"—"} · ${row?.known_hours??"—"}/${row?.expected_closed_hours??"—"} h`;
     return `<section><h2>${this.text("Elektrická spotřeba kotle")}</h2><div class="grid">${this.metric("Elektrický příkon kotle",null,"W",{entity:s.boiler_power_entity,live:"boiler_power"})}${s.boiler_energy_entity?this.metric("Celkový stav elektroměru kotle",null,"kWh",{entity:s.boiler_energy_entity,live:"boiler_energy"}):""}</div><p class="muted"><span data-live="boiler_status"></span> · <span data-live="boiler_at"></span></p>${s.boiler_demand_entity?'<p data-live="boiler_demand"></p>':""}${s.boiler_energy_entity?`<div class="grid">${this.metric("Elektřina dnes",e.today?.value_kwh,"kWh")}${this.metric("Elektřina tento měsíc",e.month?.value_kwh,"kWh")}</div><p class="muted">${this.text("Dnes")}: ${partial(e.today)}<br>${this.text("Tento měsíc")}: ${partial(e.month)}</p>`:""}<p class="muted">${this.text("Zásuvka měří celý připojený kotel včetně elektroniky a čerpadla. Elektřina je oddělená od plynu a vyúčtování MND.")}</p></section>${graph}`;
   }
+  balanceHistory(){
+    // Graf čte uložené stavy výsledku, nikoli zpětně dopočítané odhady.
+    // Kladné Kč jsou přeplatek, záporné Kč nedoplatek; mezery nejsou nula.
+    const entity=this._detail?.entities?.own_forecast_balance_czk;
+    return `<section><h2>Vývoj vlastního odhadu</h2><p class="muted">Kladná hodnota znamená přeplatek, záporná nedoplatek. Graf ukazuje uloženou historii za posledních 7 dní. Starší odhady nelze zpětně doplnit; dostupnost historie závisí na nastavení Home Assistantu.</p>${entity?`<div id="balance-history"></div><p><a href="/history?entity_id=${encodeURIComponent(entity)}">Otevřít podrobnou historii</a></p>`:`<p>Historie zatím není dostupná: senzor vlastního odhadu nebyl nalezen.</p>`}</section>`;
+  }
   async mountHistory(){
     /* Nativní čtecí karta zajišťuje Recorder graf i obsluhu změn hass.
      * Opožděné načtení pomocníka nesmí vložit graf do jiné podstránky. */
-    const host=this.shadowRoot.getElementById("boiler-history");
+    const host=this.shadowRoot.getElementById("boiler-history")||this.shadowRoot.getElementById("balance-history");
     // Jediný mount pro konkrétní host zabrání duplicitním kartám při
     // souběžném načtení pomocníka; nový render dostane nový host.
     if(host&&this._historyMountHost===host)return;
     this._historyMountHost=host;this._historyCard=null;
     if(!host)return;
     const s=this._detail?.place.settings||{};
-    const entities=[s.flow_entity,...(s.boiler_enabled?[s.boiler_power_entity,s.boiler_demand_entity]:[])].filter(Boolean);
+    const balance=host.id==="balance-history";
+    const entities=(balance?[this._detail?.entities?.own_forecast_balance_czk]:[s.flow_entity,...(s.boiler_enabled?[s.boiler_power_entity,s.boiler_demand_entity]:[])]).filter(Boolean);
     if(!entities.length)return;
     if(typeof globalThis.loadCardHelpers!=="function"){
       const link=document.createElement("a");link.href=`/history?entity_id=${encodeURIComponent(entities.join(","))}`;link.textContent=this.text("Otevřít historii v Home Assistantu");host.append(link);return;
     }
     try{
       const helpers=await globalThis.loadCardHelpers();
-      if(!host.isConnected||this._historyMountHost!==host||this.shadowRoot.getElementById("boiler-history")!==host){if(this._historyMountHost===host)this._historyMountHost=null;return;}
-      const card=helpers.createCardElement({type:"history-graph",hours_to_show:24,entities});card.hass=this._hass;host.append(card);this._historyCard=card;
+      if(!host.isConnected||this._historyMountHost!==host||this.shadowRoot.getElementById(host.id)!==host){if(this._historyMountHost===host)this._historyMountHost=null;return;}
+      const card=helpers.createCardElement({type:"history-graph",hours_to_show:balance?168:24,entities});card.hass=this._hass;host.append(card);this._historyCard=card;
     }catch{host.textContent=this.text("Graf historie není dostupný.");}
   }
   financeMarkup(){
@@ -697,7 +704,7 @@ class MndSurface extends Base {
     if(!this._admin){
       if(this._tab==="editor"||this._config?.admin_link)return `<section><h2>Konfigurace odběrného místa</h2><a href="${esc(this._detail.device_url||"/config/devices")}">Otevřít zařízení MND v Nastavení</a></section>`;
       if(this._tab==="history")return this.financeMarkup();
-      if(this._tab==="accounting")return this.configurationHelp()+(this._detail?.result?.billing?.confirmed_invoice?"":`<section class="own-billing" data-own-billing="detail">${this.ownBillingContent()}</section>`)+this.billingSummary()+this.cashChart()+this.financeMarkup();
+      if(this._tab==="accounting")return this.configurationHelp()+(this._detail?.result?.billing?.confirmed_invoice?"":`<section class="own-billing" data-own-billing="detail">${this.ownBillingContent()}</section>`)+this.balanceHistory()+this.billingSummary()+this.cashChart()+this.financeMarkup();
       if(this._tab==="forecasts")return this.chart()+`<section><h2>Ověřená porovnání prognóz</h2>${table(p.comparisons||[],[["from","Od"],["to","Do"],["difference","Odchylka MWh"],["percentage","Odchylka %"]])}<p>Porovnání vyžaduje dokončené shodné období a doloženou energetickou bázi. Průběžná spotřeba není chyba celoroční predikce.</p></section>`;
       if(this._tab==="readings")return this.boilerDetails()+this.monthlyChart()+`<section><h2>Historie odečtů</h2>${table(p.readings,[["date","Den"],["value","m³"],["source","Zdroj"],["method","Metoda"]])}</section><section><h2>Porovnání senzoru s odečtem MND</h2>${table(this._detail.result.meter_comparisons||[],[["date","Den"],["expected","Senzor m³"],["actual","MND m³"],["difference","Rozdíl m³"],["percentage","Rozdíl %"],["reason","Stav porovnání"]])}</section>`;
     }

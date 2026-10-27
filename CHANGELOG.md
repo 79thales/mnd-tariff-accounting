@@ -21,6 +21,19 @@
   the MND integration and open its HACS repository, with installation and
   restart prerequisites. The existing alpha tag and installer are unchanged.
 
+## 0.1.0-beta.5 — vývoj vlastního odhadu
+
+### Čeština
+
+- Podrobnosti účetnictví zobrazují sedmidenní historii vlastního odhadu
+  přeplatku či nedoplatku a odkaz na historii v Home Assistantu. Hodnoty
+  vycházejí z uložených stavů senzoru a respektují nastavení Recorderu.
+
+### English
+
+- Accounting details show seven days of recorded own forecast balances and
+  link to Home Assistant history. Availability depends on Recorder settings.
+
 ## 0.1.0-beta.4 — vlastní odhad podle spotřeby
 
 ### Čeština

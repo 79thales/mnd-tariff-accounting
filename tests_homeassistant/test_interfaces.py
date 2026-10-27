@@ -217,6 +217,23 @@ async def test_own_forecast_entity_reports_missing_period_without_replacing_supp
     await hass.config_entries.async_unload(selected.entry_id)
 
 
+async def test_detail_resolves_renamed_forecast_entity(hass, hass_ws_client):
+    """Historie používá skutečné ID entity i po jejím přejmenování v HA."""
+    selected = await ready(hass)
+    registry = er.async_get(hass)
+    unique = f"synthetic-account:{PLACE}:own_forecast_balance_czk"
+    original = registry.async_get_entity_id("sensor", DOMAIN, unique)
+    assert original is not None
+    registry.async_update_entity(original, new_entity_id="sensor.renamed_forecast")
+    client = await hass_ws_client(hass)
+    await client.send_json({"id": 1, "type": DOMAIN + "/command", "action": "detail",
+                            "entry_id": selected.entry_id, "place": PLACE, "payload": {}})
+    response = await client.receive_json()
+    assert response["success"], response
+    assert response["result"]["entities"]["own_forecast_balance_czk"] == "sensor.renamed_forecast"
+    await hass.config_entries.async_unload(selected.entry_id)
+
+
 async def test_confirmed_history_binding_follows_registry_ids_and_invalidates_on_change(
     hass, hass_ws_client
 ):

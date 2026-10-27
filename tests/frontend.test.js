@@ -298,6 +298,20 @@ test("chyba obnovy na pozadí zachová fokus a zotavení odstraní upozornění"
   element.remove();
 });
 
+test("historie vlastního odhadu používá registrovaný senzor a sedm dní",async()=>{
+  const data=detail();data.entities={own_forecast_balance_czk:'sensor.renamed_forecast'};
+  let config,element;
+  globalThis.loadCardHelpers=async()=>({createCardElement:value=>{config=value;return document.createElement('div');}});
+  try{
+    ({element}=await surface({config:{entry_id:'account-a',place:PLACE,tab:'accounting'},data}));
+    document.body.append(element);
+    await new Promise(resolve=>setImmediate(resolve));
+    assert.deepEqual(config,{type:'history-graph',hours_to_show:168,entities:['sensor.renamed_forecast']});
+    assert.match(element.shadowRoot.textContent,/záporná nedoplatek/);
+    assert.equal(element.shadowRoot.querySelector('a[href^="/history?"]').getAttribute('href'),'/history?entity_id=sensor.renamed_forecast');
+  }finally{element?.remove();delete globalThis.loadCardHelpers;}
+});
+
 test("nativní historie má jediný souběžný mount a dostává aktuální hass",async()=>{
   let release,calls=0,created=0;
   globalThis.loadCardHelpers=()=>{calls++;return new Promise(resolve=>release=resolve);};
