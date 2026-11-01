@@ -7,6 +7,7 @@ nepoužívají; původní stavy cizího senzoru nesmí místní účetnictví m�
 from collections.abc import Mapping
 
 import pytest
+from homeassistant.components.lovelace import LOVELACE_DATA
 from homeassistant.core import Context
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
@@ -33,6 +34,46 @@ async def ready(hass):
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
     return entry
+
+
+async def test_dashboard_module_is_registered_once_in_lovelace(hass):
+    """Skutečná storage kolekce musí evidovat modul i bez otevření panelu."""
+    from custom_components.mnd_tariff_accounting.api import async_setup_api
+
+    selected = await ready(hass)
+    resources = hass.data[LOVELACE_DATA].resources
+    await resources.async_get_info()
+    before = list(resources.async_items())
+    own = [r for r in before if r["url"].startswith(f"/{DOMAIN}/mnd-panel.js?v=")]
+    assert len(own) == 1
+    assert own[0]["type"] == "module"
+    await async_setup_api(hass)
+    assert list(resources.async_items()) == before
+    # Skutečná kolekce ověřuje také res_type -> type a zachování ID při
+    # změně obsahu souboru; mock těchto metod by kompatibilitu HA nedoložil.
+    from custom_components.mnd_tariff_accounting.frontend_resource import ensure_resource
+
+    updated_url = f"/{DOMAIN}/mnd-panel.js?v=synthetic-next"
+    assert await ensure_resource(resources, updated_url) == "updated"
+    own_after = [r for r in resources.async_items() if r["id"] == own[0]["id"]]
+    assert len(own_after) == 1
+    assert own_after[0]["url"] == updated_url
+    assert own_after[0]["type"] == "module"
+    assert await ensure_resource(resources, updated_url) == "unchanged"
+    assert len(list(resources.async_items())) == len(before)
+    await hass.config_entries.async_unload(selected.entry_id)
+
+
+async def test_yaml_resources_are_not_modified_by_setup(hass, caplog):
+    """Ruční YAML zůstane zdrojem pravdy; log obsahuje konkrétní cestu."""
+    assert await async_setup_component(
+        hass, "lovelace", {"lovelace": {"resource_mode": "yaml", "resources": []}}
+    )
+    selected = await ready(hass)
+    assert list(hass.data[LOVELACE_DATA].resources.async_items()) == []
+    assert f"/{DOMAIN}/mnd-panel.js?v=" in caplog.text
+    assert "type: module" in caplog.text
+    await hass.config_entries.async_unload(selected.entry_id)
 
 
 async def test_flow_sensor_conversion_rename_and_unload(hass):

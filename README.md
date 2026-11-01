@@ -4,7 +4,7 @@
 [![Integrace HACS](https://img.shields.io/badge/HACS-Integrace-41BDF5?logo=home-assistant-community-store&logoColor=white&style=flat)](https://my.home-assistant.io/redirect/hacs_repository/?owner=79thales&repository=mnd-tariff-accounting&category=integration)
 [![Nejnovější vydání](https://img.shields.io/github/v/release/79thales/mnd-tariff-accounting?include_prereleases&label=Vyd%C3%A1n%C3%AD&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases)
 [![Stažení instalátoru celkem](https://img.shields.io/github/downloads/79thales/mnd-tariff-accounting/mnd_tariff_accounting.zip?label=Sta%C5%BEen%C3%AD%20celkem&displayAssetName=false&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases)
-[![Stažení instalátoru nejnovější verze](https://img.shields.io/github/downloads/79thales/mnd-tariff-accounting/v1.0.1-rc.1/mnd_tariff_accounting.zip?label=Sta%C5%BEen%C3%AD%20verze&displayAssetName=false&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v1.0.1-rc.1)
+[![Stažení instalátoru nejnovější verze](https://img.shields.io/github/downloads/79thales/mnd-tariff-accounting/v1.0.1/mnd_tariff_accounting.zip?label=Sta%C5%BEen%C3%AD%20verze&displayAssetName=false&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v1.0.1)
 [![Kontroly](https://img.shields.io/github/check-suites/79thales/mnd-tariff-accounting/master_HA?label=Kontroly&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/actions)
 [![Licence GPL-3.0](https://img.shields.io/github/license/79thales/mnd-tariff-accounting?label=Licence&style=flat)](LICENSE)
 
@@ -12,11 +12,14 @@
   <img src="https://raw.githubusercontent.com/79thales/mnd-tariff-accounting/master_HA/custom_components/mnd_tariff_accounting/brand/icon@2x.png" alt="MND Tariff & Accounting" width="180">
 </p>
 
-## Nově ve verzi 1.0.1-rc.1
+## Nově ve verzi 1.0.1
 
-První release candidate pro verzi 1.0.1 sjednocuje dosavadní beta úpravy
-a přechází na **GPL-3.0-only**. Připravuje přijetí do oficiálního katalogu
-HACS; určení pro Českou republiku je uvedené také v `hacs.json`.
+- Automatická registrace karty MND opravuje chybu „Custom element doesn't exist: mnd-accounting-card“. Po aktualizaci restartujte HA a znovu načtěte aplikaci.
+- Generátor i přibalená šablona zachovávají obal pro opožděné načtení karty a všechny detailní pohledy.
+
+Verze 1.0.1 navazuje na dosavadní beta úpravy a vydání rc.1
+pod **GPL-3.0-only**. Připravuje přijetí do oficiálního katalogu HACS;
+určení pro Českou republiku je uvedené také v `hacs.json`.
 
 Výhled bezpečně navazuje živá měření, upozorňuje na nesoulad historie a při doloženém pravidelném rozvrhu orientačně zahrnuje chybějící měsíční zálohy. Předpokládaná záloha není skutečná úhrada.
 
@@ -36,10 +39,9 @@ uchovává jejich původ a rozlišuje skutečné platby, předpisy záloh a prog
 Běžný dashboard slouží k prohlížení; správa odběrného místa je v konfiguraci
 příslušného zařízení MND.
 
-[Vydání 1.0.1-rc.1](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v1.0.1-rc.1)
+[Vydání 1.0.1](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v1.0.1)
 
-**Stav: release candidate.** Verze 1.0.1-rc.1 je kandidát na vydání 1.0.1
-a v GitHubu zůstává označená jako **prerelease**.
+**Stav: stabilní vydání 1.0.1.** Číslování používá stejné schéma jako ČEZ: `major.minor.patch`; opravy zvyšují poslední číslo.
 Přípravu a živé ověření funkcí popisuje [report](docs/ALPHA_5.md).
 Historii ověřování popisují [alpha.4](docs/ALPHA_4.md), [alpha.3](docs/ALPHA_3.md),
 [alpha.2](docs/ALPHA_2.md) a [původní report](IMPLEMENTACE.md).
@@ -47,7 +49,7 @@ Historii ověřování popisují [alpha.4](docs/ALPHA_4.md), [alpha.3](docs/ALPH
 Odznaky stažení počítají pouze instalační přílohu `mnd_tariff_accounting.zip`,
 včetně aktualizací a ručního stažení. Nejde o počet uživatelů ani aktivních
 instalací. Celkový odznak sčítá přílohy všech vydání; odznak verze patří
-verzi 1.0.1-rc.1. Zdrojové archivy a instalace z větve se nezapočítávají.
+verzi 1.0.1. Zdrojové archivy a instalace z větve se nezapočítávají.
 Údaje mohou být dočasně uložené v mezipaměti; integrace kvůli nim neposílá
 telemetrii.
 
@@ -85,16 +87,16 @@ telemetrii.
 Tlačítko **Přidat integraci** otevře přímo konfiguraci MND ve vašem
 Home Assistantu. Nejdříve nainstalujte integrační soubory a restartujte HA.
 Tlačítko **HACS** otevře tento repozitář jako integraci, stejně jako u ČEZ.
-Testovací [vydání v1.0.1-rc.1](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v1.0.1-rc.1)
-je dostupné jako **prerelease**. V HACS obnovte informace repozitáře, zapněte
-zobrazení beta verzí a při stahování vyberte **v1.0.1-rc.1**. V dialogu má
+[Vydání v1.0.1](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v1.0.1)
+je stabilní vydání. V HACS obnovte informace repozitáře a při stahování
+vyberte **v1.0.1**. V dialogu má
 být uvedena tato verze, nikoli commit výchozí větve. Po instalaci restartujte HA.
 
 Do přijetí do oficiálního katalogu přidejte v HACS repozitář
 `79thales/mnd-tariff-accounting` jako **Vlastní repozitář → Integrace**.
 Přihláška do katalogu sama o sobě neznamená přijetí.
 
-Pro ruční instalaci použijte [instalační ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v1.0.1-rc.1/mnd_tariff_accounting.zip).
+Pro ruční instalaci použijte [instalační ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v1.0.1/mnd_tariff_accounting.zip).
 
 Quality, HACS a Hassfest se ověřují pro každý tag. Skutečné HA testy používají
 minimum 2026.3.1 a aktuální stabilní verzi s přesně odpovídajícím pluginem.

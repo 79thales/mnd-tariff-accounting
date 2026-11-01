@@ -1,6 +1,20 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {addViews,mergeViews} from "../custom_components/mnd_tariff_accounting/frontend/mnd-panel.js";
+import {accountingCard,addViews,mergeViews} from "../custom_components/mnd_tariff_accounting/frontend/mnd-panel.js";
+
+test("obal migruje přímou kartu a opakovaná aktualizace zachová místní entity",()=>{
+  const card={type:"custom:mnd-accounting-card",entry_id:"synthetic",place:"synthetic",entities:{local:"sensor.synthetic"}};
+  const next=[{path:"mnd",cards:[{type:"vertical-stack",cards:[{...card,entities:{new:"sensor.new"}}]}]}];
+  const current={views:[{path:"mnd",cards:[card,{type:"markdown",content:"Poznámka"}]}]};
+  const first=mergeViews(current,next,{update:true});
+  const second=mergeViews(first,next,{update:true});
+  assert.deepEqual(first,second);
+  assert.equal(first.views[0].cards[0].type,"vertical-stack");
+  assert.deepEqual(accountingCard(first.views[0].cards[0]).entities,{local:"sensor.synthetic",new:"sensor.new"});
+  assert.deepEqual(first.views[0].cards[1],current.views[0].cards[1]);
+  const ambiguous={views:[{path:"mnd",cards:[{type:"vertical-stack",cards:[card,card]}]}]};
+  assert.throws(()=>mergeViews(ambiguous,next,{update:true}),/foreign_view_conflict/);
+});
 
 test("přidání zachová celý cizí pohled a konfiguraci",()=>{
   const current={title:"Home",theme:"local",views:[{path:"home",cards:[{type:"custom:local"}]}]};

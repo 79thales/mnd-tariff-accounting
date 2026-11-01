@@ -12,6 +12,12 @@ const esc = (value) => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;
 const canonical = value => JSON.stringify(value && typeof value === "object" ?
   (Array.isArray(value) ? value.map(v => JSON.parse(canonical(v))) : Object.fromEntries(Object.keys(value).sort().map(k => [k, JSON.parse(canonical(value[k]))]))) : value);
 
+/* Nativní stack vytváří hui-card, který obnoví kartu po pozdní registraci.
+ * Rozbalujeme pouze jediného potomka: uživatelské složené karty nelze
+ * bezpečně převzít jako generovanou kartu jednoho účtu a místa. */
+export const accountingCard = card => card?.type === "vertical-stack" && card.cards?.length === 1
+  ? accountingCard(card.cards[0]) : card;
+
 export function mergeViews(current, views, {update=false}={}) {
   /* Jediné uložení přidává celou sadu. Cizí views a nastavení zůstanou stejné.
    * Kolize nejsou pokyn ke smazání, nahrazení ani slepému opakování zápisu. */
@@ -26,12 +32,19 @@ export function mergeViews(current, views, {update=false}={}) {
     const replacements=new Map(views.map(v=>[v.path,v]));
     const merged=current.views.map(old=>{
       const next=replacements.get(old.path);if(!next)return old;
-      const card=next.cards?.[0];
-      const own=old.cards?.filter(c=>c.type==="custom:mnd-accounting-card"&&c.entry_id===card?.entry_id&&c.place===card?.place)||[];
+      const card=accountingCard(next.cards?.[0]);
+      const own=old.cards?.filter(c=>{const inner=accountingCard(c);return inner?.type==="custom:mnd-accounting-card"&&inner.entry_id===card?.entry_id&&inner.place===card?.place;})||[];
       if(own.length!==1)throw new Error("foreign_view_conflict:"+old.path);
       replacements.delete(old.path);
       return {...old,subview:next.subview??false,...(next.back_path?{back_path:next.back_path}:{}),
-        cards:old.cards.map(c=>c===own[0]?{...c,...card,entities:{...c.entities,...card.entities}}:c)};
+        cards:old.cards.map(c=>{
+          if(c!==own[0])return c;
+          const inner=accountingCard(c);
+          const merged={...inner,...card,entities:{...inner.entities,...card.entities}};
+          // Starší přímou kartu migrujeme; existující obal zachová lokální volby.
+          return next.cards[0].type==="vertical-stack"
+            ? {...(c.type==="vertical-stack"?c:{}),...next.cards[0],cards:[merged]} : merged;
+        })};
     });
     return {...current,views:[...merged,...replacements.values()]};
   }
@@ -744,7 +757,7 @@ class MndSurface extends Base {
 main{padding:16px;padding-top:max(16px,env(safe-area-inset-top));padding-bottom:max(16px,env(safe-area-inset-bottom))}header{padding-bottom:12px}.brand strong{font-size:20px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.card{min-width:0}.card .value{overflow-wrap:anywhere}.value{font-size:25px}.mark{width:36px;height:36px}nav{margin-bottom:16px}h1{font-size:20px;margin:0}</style><main>${this._admin?`<p><a href="${esc(this._detail?.device_url||"/config/devices")}">← Zpět na zařízení MND</a></p>`:""}<header><div class="brand"><div class="mark" aria-hidden="true">${BRAND_ICON}</div><div><strong>MND</strong><h1>${esc(this._admin?"Konfigurace odběrného místa":(p?.name||this._config?.title||"Přehled"))}</h1></div></div>${this._admin&&!this._place?`<div class="account-picker"><label>Registrovaný účet<select id="entry"><option value="">Vyberte účet</option>${(this._entries||[]).map(e=>`<option value="${esc(e.id)}" ${e.id===this._entry?"selected":""}>${esc(e.name)}</option>`).join("")}</select></label><label>Odběrné místo<select id="place">${(this._summary?.places||[]).map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("")}</select></label></div>`:""}</header>${this.navigation()}${this._message?`<div role="status" class="notice ${this._failed?"error":""}">${esc(this._message)}${this._failed?'<p><button id="retry-load">Zkusit znovu</button></p>':""}</div>`:""}${this.body()}${this.extraMarkup()}${this.portalMarkup()}${this._admin?`<footer class="muted">Revize archivu ${esc(this._detail?.revision??"—")}</footer>`:""}</main>`;
     this.shadowRoot.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{this._tab=b.dataset.tab;this.render();});
     this.shadowRoot.querySelectorAll("[data-entity]").forEach(b=>b.onclick=()=>this.dispatchEvent(new CustomEvent("hass-more-info",{bubbles:true,composed:true,detail:{entityId:b.dataset.entity}})));
-    const visual=this.shadowRoot.getElementById("dashboard-visual");if(visual){const card=document.createElement("mnd-accounting-card");card.setConfig(this._preview.config.views[0].cards[0]);card.setAttribute("inert","");card.hass=this._hass;visual.append(card);}
+    const visual=this.shadowRoot.getElementById("dashboard-visual");if(visual){const card=document.createElement("mnd-accounting-card");card.setConfig(accountingCard(this._preview.config.views[0].cards[0]));card.setAttribute("inert","");card.hass=this._hass;visual.append(card);}
     const on=(id,handler)=>{const element=this.shadowRoot.getElementById(id);if(element)element.onclick=()=>this.run(handler);};
     on("retry-load",()=>this.load({force:true}));
     on("accept-advances",async()=>{await this.command("accept_advances",{confirm:this.shadowRoot.getElementById("confirm-finance").checked,revision:this._detail.revision});this._detail=await this.command("detail");});

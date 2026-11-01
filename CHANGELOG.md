@@ -21,6 +21,33 @@
   the MND integration and open its HACS repository, with installation and
   restart prerequisites. The existing alpha tag and installer are unchanged.
 
+## 1.0.1 — oprava načítání dashboardu
+
+### Čeština
+
+- Běžné vydání používá na přání uživatele stejné verzování jako ČEZ:
+  `major.minor.patch`, bez přípony rc. Starší publikované verze se nemění.
+- Integrace automaticky registruje vlastní kartu MND mezi zdroji Lovelace
+  jako JavaScript module. Opakované spuštění nevytváří duplicity a změna
+  souboru aktualizuje hash v URL; YAML režim vypíše přesný pokyn do logu.
+- Generátor, přibalená šablona i náhled používají nativní obal karty pro
+  opožděné načtení. Aktualizace zachová místní entity, navigaci a cizí karty.
+- Po aktualizaci restartujte Home Assistant a znovu načtěte aplikaci;
+  zdroj dashboardu se zaregistruje při spuštění integrace.
+
+### English
+
+- Use regular `major.minor.patch` releases, following the user's ČEZ
+  versioning policy. Previously published versions remain unchanged.
+- Automatically register the MND card as a Lovelace JavaScript module.
+  Repeated setup avoids duplicates, file updates refresh the URL hash,
+  and YAML resource mode logs the required manual configuration.
+- Use a native wrapper in generated dashboards, the bundled template and
+  preview to support late loading while preserving local entities,
+  navigation and unrelated cards during updates.
+- Restart Home Assistant and reload the app after updating; integration
+  setup registers the dashboard module automatically.
+
 ## 1.0.1-rc.1 — kandidát pro katalog HACS
 
 ### Čeština
