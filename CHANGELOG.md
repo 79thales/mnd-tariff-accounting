@@ -21,6 +21,32 @@
   the MND integration and open its HACS repository, with installation and
   restart prerequisites. The existing alpha tag and installer are unchanged.
 
+## 1.0.1-rc.1 — kandidát pro katalog HACS
+
+### Čeština
+
+- První release candidate pro verzi 1.0.1; tag `v1.0.1-rc.1` odpovídá
+  manifestu a vydání je označené jako prerelease.
+- Licence projektu změněna na GPL-3.0-only. Úplný text GPL je v repozitáři
+  i instalátoru; původní MIT oznámení převzatých částí ČEZ zůstává zachované.
+  Starší vydané verze se nemění.
+- Doplněno určení `country: CZ` pro oficiální katalog HACS, aktualizován
+  český úvod, instalační odkazy a postup přihlášení do katalogu podle ČEZ.
+- Zachovány dosavadní beta funkce včetně vlastního odhadu podle spotřeby,
+  historie odhadu a výslovného označení předpokládaných záloh.
+
+### English
+
+- First release candidate for 1.0.1; tag `v1.0.1-rc.1` matches the manifest
+  and the GitHub release is marked as a prerelease.
+- Changed the project license to GPL-3.0-only. The repository and installer
+  include the full GPL text and retain the original MIT notices for parts
+  derived from ČEZ. Previously published versions are unchanged.
+- Added `country: CZ` for the official HACS directory and updated the Czech
+  overview, installation links and submission procedure following ČEZ.
+- Preserved the beta features, including the consumption-based estimate,
+  estimate history and explicit labels for assumed advance payments.
+
 ## 0.1.0-beta.6 — přesnější vlastní výhled
 
 ### Čeština

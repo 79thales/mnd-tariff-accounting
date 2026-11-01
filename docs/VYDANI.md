@@ -47,6 +47,34 @@ Existující asset ověří, nikdy ho nenahradí. Chybějící instalátor publi
 releasu je chyba kontroly. Oprava vyžaduje novou verzi, nikoli přepsání tagu.
 Publikace draftu a nasazení do živého HA mají samostatné oprávnění.
 
+## Release candidate 1.0.1 a katalog HACS
+
+Uživatel pro přihlášení do katalogu zvolil `1.0.1-rc.1` a GPL-3.0-only.
+Manifest a neměnný tag `v1.0.1-rc.1` musí souhlasit. Pomocník releasu pozná
+příponu `-rc.1` a vytvoří **draft s `prerelease: true`**; nevydává stabilní
+1.0.1. ZIP obsahuje plný `LICENSE` a `THIRD_PARTY_NOTICES.md` s původním
+MIT oznámením převzatých částí. Kořenový a přibalený GPL text musí být shodné.
+
+Přihlášení navazuje na přijatý PR ČEZ
+[hacs/default#10242](https://github.com/hacs/default/pull/10242). Podle
+[aktuálních podmínek HACS](https://www.hacs.xyz/docs/publish/include/)
+je pořadí následující:
+
+1. Ověřit přesný commit: Quality, HACS bez `ignore`, Hassfest a instalační ZIP.
+2. Po úspěšných kontrolách vytvořit tag a draft s ověřeným instalátorem.
+3. Po autorizaci zveřejnit kompletní draft jako prerelease a ověřit veřejné
+   API i anonymní stažení. Zápis licence se na GitHubu musí rozpoznat jako GPL-3.0.
+4. V osobním forku `79thales/default` založit novou větev z aktuálního
+   `hacs/default:master`. Do souboru `integration` přidat jedinou položku
+   `79thales/mnd-tariff-accounting` na abecedně správné místo.
+5. Otevřít editovatelný PR do `hacs/default:master` s vyplněnou aktuální
+   šablonou, odkazem na vydání a konkrétní úspěšné běhy HACS/Hassfest.
+   Checkboxy označit až podle doložené skutečnosti; nevyžadovat review.
+
+`hacs.json` obsahuje `country: CZ`, protože portál MND je určený pro Českou
+republiku. Přijetí do katalogu závisí na HACS; release candidate ani odeslání
+PR nejsou potvrzením přijetí nebo úplnosti všech historických živých testů.
+
 Build potvrzuje obsah proti commitu, nikoli skutečné přihlášení, shodu
 zákaznického vyúčtování nebo vzhled v provozním HA. Počet stažení není počet
 instalací a integrace nemá telemetrii instalací.

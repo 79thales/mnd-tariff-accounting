@@ -4,15 +4,19 @@
 [![Integrace HACS](https://img.shields.io/badge/HACS-Integrace-41BDF5?logo=home-assistant-community-store&logoColor=white&style=flat)](https://my.home-assistant.io/redirect/hacs_repository/?owner=79thales&repository=mnd-tariff-accounting&category=integration)
 [![Nejnovější vydání](https://img.shields.io/github/v/release/79thales/mnd-tariff-accounting?include_prereleases&label=Vyd%C3%A1n%C3%AD&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases)
 [![Stažení instalátoru celkem](https://img.shields.io/github/downloads/79thales/mnd-tariff-accounting/mnd_tariff_accounting.zip?label=Sta%C5%BEen%C3%AD%20celkem&displayAssetName=false&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases)
-[![Stažení instalátoru nejnovější verze](https://img.shields.io/github/downloads/79thales/mnd-tariff-accounting/v0.1.0-beta.6/mnd_tariff_accounting.zip?label=Sta%C5%BEen%C3%AD%20verze&displayAssetName=false&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-beta.6)
+[![Stažení instalátoru nejnovější verze](https://img.shields.io/github/downloads/79thales/mnd-tariff-accounting/v1.0.1-rc.1/mnd_tariff_accounting.zip?label=Sta%C5%BEen%C3%AD%20verze&displayAssetName=false&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v1.0.1-rc.1)
 [![Kontroly](https://img.shields.io/github/check-suites/79thales/mnd-tariff-accounting/master_HA?label=Kontroly&logo=github&style=flat)](https://github.com/79thales/mnd-tariff-accounting/actions)
-[![Licence MIT](https://img.shields.io/github/license/79thales/mnd-tariff-accounting?label=Licence&style=flat)](LICENSE)
+[![Licence GPL-3.0](https://img.shields.io/github/license/79thales/mnd-tariff-accounting?label=Licence&style=flat)](LICENSE)
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/79thales/mnd-tariff-accounting/master_HA/custom_components/mnd_tariff_accounting/brand/icon@2x.png" alt="MND Tariff & Accounting" width="180">
 </p>
 
-## Nově ve verzi 0.1.0-beta.6
+## Nově ve verzi 1.0.1-rc.1
+
+První release candidate pro verzi 1.0.1 sjednocuje dosavadní beta úpravy
+a přechází na **GPL-3.0-only**. Připravuje přijetí do oficiálního katalogu
+HACS; určení pro Českou republiku je uvedené také v `hacs.json`.
 
 Výhled bezpečně navazuje živá měření, upozorňuje na nesoulad historie a při doloženém pravidelném rozvrhu orientačně zahrnuje chybějící měsíční zálohy. Předpokládaná záloha není skutečná úhrada.
 
@@ -32,9 +36,10 @@ uchovává jejich původ a rozlišuje skutečné platby, předpisy záloh a prog
 Běžný dashboard slouží k prohlížení; správa odběrného místa je v konfiguraci
 příslušného zařízení MND.
 
-[Aktuální vydání](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-beta.6)
+[Vydání 1.0.1-rc.1](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v1.0.1-rc.1)
 
-**Stav: beta.** Verze je určená k testování, nikoli označená jako stabilní.
+**Stav: release candidate.** Verze 1.0.1-rc.1 je kandidát na vydání 1.0.1
+a v GitHubu zůstává označená jako **prerelease**.
 Přípravu a živé ověření funkcí popisuje [report](docs/ALPHA_5.md).
 Historii ověřování popisují [alpha.4](docs/ALPHA_4.md), [alpha.3](docs/ALPHA_3.md),
 [alpha.2](docs/ALPHA_2.md) a [původní report](IMPLEMENTACE.md).
@@ -42,7 +47,7 @@ Historii ověřování popisují [alpha.4](docs/ALPHA_4.md), [alpha.3](docs/ALPH
 Odznaky stažení počítají pouze instalační přílohu `mnd_tariff_accounting.zip`,
 včetně aktualizací a ručního stažení. Nejde o počet uživatelů ani aktivních
 instalací. Celkový odznak sčítá přílohy všech vydání; odznak verze patří
-veřejné beta.6. Zdrojové archivy a instalace z větve se nezapočítávají.
+verzi 1.0.1-rc.1. Zdrojové archivy a instalace z větve se nezapočítávají.
 Údaje mohou být dočasně uložené v mezipaměti; integrace kvůli nim neposílá
 telemetrii.
 
@@ -80,12 +85,16 @@ telemetrii.
 Tlačítko **Přidat integraci** otevře přímo konfiguraci MND ve vašem
 Home Assistantu. Nejdříve nainstalujte integrační soubory a restartujte HA.
 Tlačítko **HACS** otevře tento repozitář jako integraci, stejně jako u ČEZ.
-Testovací [vydání v0.1.0-beta.6](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v0.1.0-beta.6)
+Testovací [vydání v1.0.1-rc.1](https://github.com/79thales/mnd-tariff-accounting/releases/tag/v1.0.1-rc.1)
 je dostupné jako **prerelease**. V HACS obnovte informace repozitáře, zapněte
-zobrazení beta verzí a při stahování vyberte **v0.1.0-beta.6**. V dialogu má
+zobrazení beta verzí a při stahování vyberte **v1.0.1-rc.1**. V dialogu má
 být uvedena tato verze, nikoli commit výchozí větve. Po instalaci restartujte HA.
 
-Pro ruční instalaci je dostupný [instalační ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v0.1.0-beta.6/mnd_tariff_accounting.zip).
+Do přijetí do oficiálního katalogu přidejte v HACS repozitář
+`79thales/mnd-tariff-accounting` jako **Vlastní repozitář → Integrace**.
+Přihláška do katalogu sama o sobě neznamená přijetí.
+
+Pro ruční instalaci použijte [instalační ZIP](https://github.com/79thales/mnd-tariff-accounting/releases/download/v1.0.1-rc.1/mnd_tariff_accounting.zip).
 
 Quality, HACS a Hassfest se ověřují pro každý tag. Skutečné HA testy používají
 minimum 2026.3.1 a aktuální stabilní verzi s přesně odpovídajícím pluginem.
@@ -133,9 +142,12 @@ nezíská automatický offset. [Účetní model](docs/UCETNI_A_DATOVY_MODEL.md).
 
 ## Licence
 
-Integrace používá [licenci MIT](LICENSE), stejně jako ČEZ Dynamic Tariff
-& Accounting. Úplný text licence a copyright jsou přibalené také
-v integračním adresáři a instalačním ZIPu.
+Integrace je od verze 1.0.1-rc.1 poskytována pod
+[GNU GPL, verze 3 (GPL-3.0-only)](LICENSE). Úplný text licence je přibalený
+také v integračním adresáři a instalačním ZIPu. Původní MIT oznámení
+převzatých částí ČEZ zachovává
+[přehled licencí](custom_components/mnd_tariff_accounting/THIRD_PARTY_NOTICES.md).
+Licence dříve vydaných verzí se tímto nemění.
 
 ## Vývoj a vydání
 
