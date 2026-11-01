@@ -42,9 +42,11 @@ omezený sandbox; tam skončily úspěšně. Aktuální metadata PyPI při kontr
 určila stable HA 2026.10.4 / plugin 0.13.375 / Python 3.14; minimum v CI je
 HA 2026.3.1 / plugin 0.13.317. V obou verzích zdroj HA obsahuje použité
 rozhraní zdrojů. Nové skutečné HA testy kontrolují storage registraci,
-opakování, aktualizaci hashované URL a nedotčený YAML režim. V této relaci
-nebyly spuštěny: místní WSL nemá žádnou distribuci a není dostupný Docker.
-Starší zelené CI běhy nejsou ověřením nynější změny.
+opakování, aktualizaci hashované URL a nedotčený YAML režim. Místní WSL
+nemá žádnou distribuci a není dostupný Docker; obě skutečná prostředí HA
+proto ověřilo [Quality nad opravou rc.2](https://github.com/79thales/mnd-tariff-accounting/actions/runs/41308645949).
+Prošly také [HACS](https://github.com/79thales/mnd-tariff-accounting/actions/runs/41308645691)
+a [Hassfest](https://github.com/79thales/mnd-tariff-accounting/actions/runs/41308645701).
 
 Generátor používá přibalenou JSON šablonu. Náhled rozbalí jediného potomka
 obalu a aktualizace umí převést starší přímou kartu i opakovaně aktualizovat
