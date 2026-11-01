@@ -2,6 +2,14 @@
 
 Datum auditu: 15. 10. 2026. Tento dokument je zadání budoucího postupu, ne potvrzení provedeného založení/publikace repozitáře.
 
+Aktualizace 1. 11. 2026: uživatel určil pro MND licenci **GPL-3.0-only**
+a verzi **1.0.1-rc.1** pro přihlášení do katalogu HACS. Licence referenčního
+ČEZ zůstává MIT; jeho původní oznámení je zachované v přibaleném
+`THIRD_PARTY_NOTICES.md`. Reference vydávání v `scripts/README.md` a úspěšný
+PR [hacs/default#10242](https://github.com/hacs/default/pull/10242) byly
+znovu ověřené. Přihláška MND musí splnit aktuální podmínky HACS, zejména
+úspěšné HACS/Hassfest bez vypnutých kontrol a následné veřejné vydání.
+
 ## Ověřená reference
 
 - Zdroj: `H:\01.programovani\cez-dynamic-tariff\`.
