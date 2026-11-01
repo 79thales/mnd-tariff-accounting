@@ -22,6 +22,10 @@ def build_views(title, path, entities, entry_id, place_id):
     Vzhled vlastní karty sdílí hlavní panel i náhled; entity jsou odkazy na
     skutečný registr, takže přejmenování senzoru nemění účetní identitu.
     JSON je současně platný YAML. Chybějící entity dovolují export, ne zápis.
+    Každý panel obsahuje nativní vertical-stack s jednou účetní kartou.
+    Jeho hui-card obnoví obsah po opožděné registraci vlastního elementu;
+    přímá karta v panelu HA může jinak zůstat v chybě až do načtení stránky.
+    Obal nemění zdroje dat, navigaci ani účetní operace a nemá časový limit.
     Prokliky do editoru nesou explicitní účet a místo v URL s bezpečně
     zakódovanými parametry; otevření odkazu nemění účetní data ani dashboard.
     """

@@ -7,60 +7,65 @@
       "panel": true,
       "cards": [
         {
-          "type": "custom:mnd-accounting-card",
-          "entry_id": "{{ENTRY}}",
-          "place": "{{PLACE}}",
-          "title": "{{TITLE}}",
-          "tab": "overview",
-          "entities": {
-            "latest_mnd": "{{entity:latest_mnd}}",
-            "latest_mnd_date": "{{entity:latest_mnd_date}}",
-            "current_meter": "{{entity:current_meter}}",
-            "status": "{{entity:status}}",
-            "volume_m3": "{{entity:volume_m3}}",
-            "known_cost_czk": "{{entity:known_cost_czk}}",
-            "paid_czk": "{{entity:paid_czk}}",
-            "balance_czk": "{{entity:balance_czk}}",
-            "current_flow_m3h": "{{entity:current_flow_m3h}}",
-            "current_deposit_czk": "{{entity:current_deposit_czk}}",
-            "billing_paid_czk": "{{entity:billing_paid_czk}}",
-            "billing_plan_czk": "{{entity:billing_plan_czk}}",
-            "billing_cost_czk": "{{entity:billing_cost_czk}}",
-            "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
-            "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
-            "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
-            "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
-            "billing_volume_m3": "{{entity:billing_volume_m3}}",
-            "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
-            "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
-            "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
-            "own_actual_mwh": "{{entity:own_actual_mwh}}"
-          },
-          "navigation": [
+          "type": "vertical-stack",
+          "cards": [
             {
+              "type": "custom:mnd-accounting-card",
+              "entry_id": "{{ENTRY}}",
+              "place": "{{PLACE}}",
+              "title": "{{TITLE}}",
               "tab": "overview",
-              "path": "/lovelace/{{PATH}}"
-            },
-            {
-              "tab": "readings",
-              "path": "/lovelace/{{PATH}}-spotreba"
-            },
-            {
-              "tab": "accounting",
-              "path": "/lovelace/{{PATH}}-ucetnictvi"
-            },
-            {
-              "tab": "forecasts",
-              "path": "/lovelace/{{PATH}}-prognozy"
-            },
-            {
-              "tab": "history",
-              "path": "/lovelace/{{PATH}}-historie"
+              "entities": {
+                "latest_mnd": "{{entity:latest_mnd}}",
+                "latest_mnd_date": "{{entity:latest_mnd_date}}",
+                "current_meter": "{{entity:current_meter}}",
+                "status": "{{entity:status}}",
+                "volume_m3": "{{entity:volume_m3}}",
+                "known_cost_czk": "{{entity:known_cost_czk}}",
+                "paid_czk": "{{entity:paid_czk}}",
+                "balance_czk": "{{entity:balance_czk}}",
+                "current_flow_m3h": "{{entity:current_flow_m3h}}",
+                "current_deposit_czk": "{{entity:current_deposit_czk}}",
+                "billing_paid_czk": "{{entity:billing_paid_czk}}",
+                "billing_plan_czk": "{{entity:billing_plan_czk}}",
+                "billing_cost_czk": "{{entity:billing_cost_czk}}",
+                "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
+                "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
+                "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
+                "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
+                "billing_volume_m3": "{{entity:billing_volume_m3}}",
+                "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
+                "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
+                "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
+                "own_actual_mwh": "{{entity:own_actual_mwh}}"
+              },
+              "navigation": [
+                {
+                  "tab": "overview",
+                  "path": "/lovelace/{{PATH}}"
+                },
+                {
+                  "tab": "readings",
+                  "path": "/lovelace/{{PATH}}-spotreba"
+                },
+                {
+                  "tab": "accounting",
+                  "path": "/lovelace/{{PATH}}-ucetnictvi"
+                },
+                {
+                  "tab": "forecasts",
+                  "path": "/lovelace/{{PATH}}-prognozy"
+                },
+                {
+                  "tab": "history",
+                  "path": "/lovelace/{{PATH}}-historie"
+                }
+              ],
+              "layout_version": 8,
+              "billing_mode": "supplier",
+              "editor_url": "{{EDITOR_URL}}"
             }
-          ],
-          "layout_version": 8,
-          "billing_mode": "supplier",
-          "editor_url": "{{EDITOR_URL}}"
+          ]
         }
       ],
       "subview": false
@@ -74,60 +79,65 @@
       "back_path": "/lovelace/{{PATH}}",
       "cards": [
         {
-          "type": "custom:mnd-accounting-card",
-          "entry_id": "{{ENTRY}}",
-          "place": "{{PLACE}}",
-          "title": "{{TITLE}}",
-          "tab": "readings",
-          "entities": {
-            "latest_mnd": "{{entity:latest_mnd}}",
-            "latest_mnd_date": "{{entity:latest_mnd_date}}",
-            "current_meter": "{{entity:current_meter}}",
-            "status": "{{entity:status}}",
-            "volume_m3": "{{entity:volume_m3}}",
-            "known_cost_czk": "{{entity:known_cost_czk}}",
-            "paid_czk": "{{entity:paid_czk}}",
-            "balance_czk": "{{entity:balance_czk}}",
-            "current_flow_m3h": "{{entity:current_flow_m3h}}",
-            "current_deposit_czk": "{{entity:current_deposit_czk}}",
-            "billing_paid_czk": "{{entity:billing_paid_czk}}",
-            "billing_plan_czk": "{{entity:billing_plan_czk}}",
-            "billing_cost_czk": "{{entity:billing_cost_czk}}",
-            "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
-            "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
-            "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
-            "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
-            "billing_volume_m3": "{{entity:billing_volume_m3}}",
-            "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
-            "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
-            "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
-            "own_actual_mwh": "{{entity:own_actual_mwh}}"
-          },
-          "navigation": [
+          "type": "vertical-stack",
+          "cards": [
             {
-              "tab": "overview",
-              "path": "/lovelace/{{PATH}}"
-            },
-            {
+              "type": "custom:mnd-accounting-card",
+              "entry_id": "{{ENTRY}}",
+              "place": "{{PLACE}}",
+              "title": "{{TITLE}}",
               "tab": "readings",
-              "path": "/lovelace/{{PATH}}-spotreba"
-            },
-            {
-              "tab": "accounting",
-              "path": "/lovelace/{{PATH}}-ucetnictvi"
-            },
-            {
-              "tab": "forecasts",
-              "path": "/lovelace/{{PATH}}-prognozy"
-            },
-            {
-              "tab": "history",
-              "path": "/lovelace/{{PATH}}-historie"
+              "entities": {
+                "latest_mnd": "{{entity:latest_mnd}}",
+                "latest_mnd_date": "{{entity:latest_mnd_date}}",
+                "current_meter": "{{entity:current_meter}}",
+                "status": "{{entity:status}}",
+                "volume_m3": "{{entity:volume_m3}}",
+                "known_cost_czk": "{{entity:known_cost_czk}}",
+                "paid_czk": "{{entity:paid_czk}}",
+                "balance_czk": "{{entity:balance_czk}}",
+                "current_flow_m3h": "{{entity:current_flow_m3h}}",
+                "current_deposit_czk": "{{entity:current_deposit_czk}}",
+                "billing_paid_czk": "{{entity:billing_paid_czk}}",
+                "billing_plan_czk": "{{entity:billing_plan_czk}}",
+                "billing_cost_czk": "{{entity:billing_cost_czk}}",
+                "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
+                "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
+                "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
+                "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
+                "billing_volume_m3": "{{entity:billing_volume_m3}}",
+                "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
+                "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
+                "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
+                "own_actual_mwh": "{{entity:own_actual_mwh}}"
+              },
+              "navigation": [
+                {
+                  "tab": "overview",
+                  "path": "/lovelace/{{PATH}}"
+                },
+                {
+                  "tab": "readings",
+                  "path": "/lovelace/{{PATH}}-spotreba"
+                },
+                {
+                  "tab": "accounting",
+                  "path": "/lovelace/{{PATH}}-ucetnictvi"
+                },
+                {
+                  "tab": "forecasts",
+                  "path": "/lovelace/{{PATH}}-prognozy"
+                },
+                {
+                  "tab": "history",
+                  "path": "/lovelace/{{PATH}}-historie"
+                }
+              ],
+              "layout_version": 8,
+              "billing_mode": "supplier",
+              "editor_url": "{{EDITOR_URL}}"
             }
-          ],
-          "layout_version": 8,
-          "billing_mode": "supplier",
-          "editor_url": "{{EDITOR_URL}}"
+          ]
         }
       ]
     },
@@ -140,60 +150,65 @@
       "back_path": "/lovelace/{{PATH}}",
       "cards": [
         {
-          "type": "custom:mnd-accounting-card",
-          "entry_id": "{{ENTRY}}",
-          "place": "{{PLACE}}",
-          "title": "{{TITLE}}",
-          "tab": "accounting",
-          "entities": {
-            "latest_mnd": "{{entity:latest_mnd}}",
-            "latest_mnd_date": "{{entity:latest_mnd_date}}",
-            "current_meter": "{{entity:current_meter}}",
-            "status": "{{entity:status}}",
-            "volume_m3": "{{entity:volume_m3}}",
-            "known_cost_czk": "{{entity:known_cost_czk}}",
-            "paid_czk": "{{entity:paid_czk}}",
-            "balance_czk": "{{entity:balance_czk}}",
-            "current_flow_m3h": "{{entity:current_flow_m3h}}",
-            "current_deposit_czk": "{{entity:current_deposit_czk}}",
-            "billing_paid_czk": "{{entity:billing_paid_czk}}",
-            "billing_plan_czk": "{{entity:billing_plan_czk}}",
-            "billing_cost_czk": "{{entity:billing_cost_czk}}",
-            "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
-            "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
-            "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
-            "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
-            "billing_volume_m3": "{{entity:billing_volume_m3}}",
-            "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
-            "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
-            "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
-            "own_actual_mwh": "{{entity:own_actual_mwh}}"
-          },
-          "navigation": [
+          "type": "vertical-stack",
+          "cards": [
             {
-              "tab": "overview",
-              "path": "/lovelace/{{PATH}}"
-            },
-            {
-              "tab": "readings",
-              "path": "/lovelace/{{PATH}}-spotreba"
-            },
-            {
+              "type": "custom:mnd-accounting-card",
+              "entry_id": "{{ENTRY}}",
+              "place": "{{PLACE}}",
+              "title": "{{TITLE}}",
               "tab": "accounting",
-              "path": "/lovelace/{{PATH}}-ucetnictvi"
-            },
-            {
-              "tab": "forecasts",
-              "path": "/lovelace/{{PATH}}-prognozy"
-            },
-            {
-              "tab": "history",
-              "path": "/lovelace/{{PATH}}-historie"
+              "entities": {
+                "latest_mnd": "{{entity:latest_mnd}}",
+                "latest_mnd_date": "{{entity:latest_mnd_date}}",
+                "current_meter": "{{entity:current_meter}}",
+                "status": "{{entity:status}}",
+                "volume_m3": "{{entity:volume_m3}}",
+                "known_cost_czk": "{{entity:known_cost_czk}}",
+                "paid_czk": "{{entity:paid_czk}}",
+                "balance_czk": "{{entity:balance_czk}}",
+                "current_flow_m3h": "{{entity:current_flow_m3h}}",
+                "current_deposit_czk": "{{entity:current_deposit_czk}}",
+                "billing_paid_czk": "{{entity:billing_paid_czk}}",
+                "billing_plan_czk": "{{entity:billing_plan_czk}}",
+                "billing_cost_czk": "{{entity:billing_cost_czk}}",
+                "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
+                "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
+                "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
+                "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
+                "billing_volume_m3": "{{entity:billing_volume_m3}}",
+                "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
+                "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
+                "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
+                "own_actual_mwh": "{{entity:own_actual_mwh}}"
+              },
+              "navigation": [
+                {
+                  "tab": "overview",
+                  "path": "/lovelace/{{PATH}}"
+                },
+                {
+                  "tab": "readings",
+                  "path": "/lovelace/{{PATH}}-spotreba"
+                },
+                {
+                  "tab": "accounting",
+                  "path": "/lovelace/{{PATH}}-ucetnictvi"
+                },
+                {
+                  "tab": "forecasts",
+                  "path": "/lovelace/{{PATH}}-prognozy"
+                },
+                {
+                  "tab": "history",
+                  "path": "/lovelace/{{PATH}}-historie"
+                }
+              ],
+              "layout_version": 8,
+              "billing_mode": "supplier",
+              "editor_url": "{{EDITOR_URL}}"
             }
-          ],
-          "layout_version": 8,
-          "billing_mode": "supplier",
-          "editor_url": "{{EDITOR_URL}}"
+          ]
         }
       ]
     },
@@ -206,60 +221,65 @@
       "back_path": "/lovelace/{{PATH}}",
       "cards": [
         {
-          "type": "custom:mnd-accounting-card",
-          "entry_id": "{{ENTRY}}",
-          "place": "{{PLACE}}",
-          "title": "{{TITLE}}",
-          "tab": "forecasts",
-          "entities": {
-            "latest_mnd": "{{entity:latest_mnd}}",
-            "latest_mnd_date": "{{entity:latest_mnd_date}}",
-            "current_meter": "{{entity:current_meter}}",
-            "status": "{{entity:status}}",
-            "volume_m3": "{{entity:volume_m3}}",
-            "known_cost_czk": "{{entity:known_cost_czk}}",
-            "paid_czk": "{{entity:paid_czk}}",
-            "balance_czk": "{{entity:balance_czk}}",
-            "current_flow_m3h": "{{entity:current_flow_m3h}}",
-            "current_deposit_czk": "{{entity:current_deposit_czk}}",
-            "billing_paid_czk": "{{entity:billing_paid_czk}}",
-            "billing_plan_czk": "{{entity:billing_plan_czk}}",
-            "billing_cost_czk": "{{entity:billing_cost_czk}}",
-            "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
-            "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
-            "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
-            "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
-            "billing_volume_m3": "{{entity:billing_volume_m3}}",
-            "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
-            "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
-            "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
-            "own_actual_mwh": "{{entity:own_actual_mwh}}"
-          },
-          "navigation": [
+          "type": "vertical-stack",
+          "cards": [
             {
-              "tab": "overview",
-              "path": "/lovelace/{{PATH}}"
-            },
-            {
-              "tab": "readings",
-              "path": "/lovelace/{{PATH}}-spotreba"
-            },
-            {
-              "tab": "accounting",
-              "path": "/lovelace/{{PATH}}-ucetnictvi"
-            },
-            {
+              "type": "custom:mnd-accounting-card",
+              "entry_id": "{{ENTRY}}",
+              "place": "{{PLACE}}",
+              "title": "{{TITLE}}",
               "tab": "forecasts",
-              "path": "/lovelace/{{PATH}}-prognozy"
-            },
-            {
-              "tab": "history",
-              "path": "/lovelace/{{PATH}}-historie"
+              "entities": {
+                "latest_mnd": "{{entity:latest_mnd}}",
+                "latest_mnd_date": "{{entity:latest_mnd_date}}",
+                "current_meter": "{{entity:current_meter}}",
+                "status": "{{entity:status}}",
+                "volume_m3": "{{entity:volume_m3}}",
+                "known_cost_czk": "{{entity:known_cost_czk}}",
+                "paid_czk": "{{entity:paid_czk}}",
+                "balance_czk": "{{entity:balance_czk}}",
+                "current_flow_m3h": "{{entity:current_flow_m3h}}",
+                "current_deposit_czk": "{{entity:current_deposit_czk}}",
+                "billing_paid_czk": "{{entity:billing_paid_czk}}",
+                "billing_plan_czk": "{{entity:billing_plan_czk}}",
+                "billing_cost_czk": "{{entity:billing_cost_czk}}",
+                "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
+                "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
+                "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
+                "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
+                "billing_volume_m3": "{{entity:billing_volume_m3}}",
+                "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
+                "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
+                "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
+                "own_actual_mwh": "{{entity:own_actual_mwh}}"
+              },
+              "navigation": [
+                {
+                  "tab": "overview",
+                  "path": "/lovelace/{{PATH}}"
+                },
+                {
+                  "tab": "readings",
+                  "path": "/lovelace/{{PATH}}-spotreba"
+                },
+                {
+                  "tab": "accounting",
+                  "path": "/lovelace/{{PATH}}-ucetnictvi"
+                },
+                {
+                  "tab": "forecasts",
+                  "path": "/lovelace/{{PATH}}-prognozy"
+                },
+                {
+                  "tab": "history",
+                  "path": "/lovelace/{{PATH}}-historie"
+                }
+              ],
+              "layout_version": 8,
+              "billing_mode": "supplier",
+              "editor_url": "{{EDITOR_URL}}"
             }
-          ],
-          "layout_version": 8,
-          "billing_mode": "supplier",
-          "editor_url": "{{EDITOR_URL}}"
+          ]
         }
       ]
     },
@@ -272,61 +292,66 @@
       "back_path": "/lovelace/{{PATH}}",
       "cards": [
         {
-          "type": "custom:mnd-accounting-card",
-          "entry_id": "{{ENTRY}}",
-          "place": "{{PLACE}}",
-          "title": "{{TITLE}}",
-          "tab": "editor",
-          "entities": {
-            "latest_mnd": "{{entity:latest_mnd}}",
-            "latest_mnd_date": "{{entity:latest_mnd_date}}",
-            "current_meter": "{{entity:current_meter}}",
-            "status": "{{entity:status}}",
-            "volume_m3": "{{entity:volume_m3}}",
-            "known_cost_czk": "{{entity:known_cost_czk}}",
-            "paid_czk": "{{entity:paid_czk}}",
-            "balance_czk": "{{entity:balance_czk}}",
-            "current_flow_m3h": "{{entity:current_flow_m3h}}",
-            "current_deposit_czk": "{{entity:current_deposit_czk}}",
-            "billing_paid_czk": "{{entity:billing_paid_czk}}",
-            "billing_plan_czk": "{{entity:billing_plan_czk}}",
-            "billing_cost_czk": "{{entity:billing_cost_czk}}",
-            "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
-            "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
-            "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
-            "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
-            "billing_volume_m3": "{{entity:billing_volume_m3}}",
-            "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
-            "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
-            "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
-            "own_actual_mwh": "{{entity:own_actual_mwh}}"
-          },
-          "navigation": [
+          "type": "vertical-stack",
+          "cards": [
             {
-              "tab": "overview",
-              "path": "/lovelace/{{PATH}}"
-            },
-            {
-              "tab": "readings",
-              "path": "/lovelace/{{PATH}}-spotreba"
-            },
-            {
-              "tab": "accounting",
-              "path": "/lovelace/{{PATH}}-ucetnictvi"
-            },
-            {
-              "tab": "forecasts",
-              "path": "/lovelace/{{PATH}}-prognozy"
-            },
-            {
-              "tab": "history",
-              "path": "/lovelace/{{PATH}}-historie"
+              "type": "custom:mnd-accounting-card",
+              "entry_id": "{{ENTRY}}",
+              "place": "{{PLACE}}",
+              "title": "{{TITLE}}",
+              "tab": "editor",
+              "entities": {
+                "latest_mnd": "{{entity:latest_mnd}}",
+                "latest_mnd_date": "{{entity:latest_mnd_date}}",
+                "current_meter": "{{entity:current_meter}}",
+                "status": "{{entity:status}}",
+                "volume_m3": "{{entity:volume_m3}}",
+                "known_cost_czk": "{{entity:known_cost_czk}}",
+                "paid_czk": "{{entity:paid_czk}}",
+                "balance_czk": "{{entity:balance_czk}}",
+                "current_flow_m3h": "{{entity:current_flow_m3h}}",
+                "current_deposit_czk": "{{entity:current_deposit_czk}}",
+                "billing_paid_czk": "{{entity:billing_paid_czk}}",
+                "billing_plan_czk": "{{entity:billing_plan_czk}}",
+                "billing_cost_czk": "{{entity:billing_cost_czk}}",
+                "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
+                "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
+                "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
+                "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
+                "billing_volume_m3": "{{entity:billing_volume_m3}}",
+                "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
+                "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
+                "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
+                "own_actual_mwh": "{{entity:own_actual_mwh}}"
+              },
+              "navigation": [
+                {
+                  "tab": "overview",
+                  "path": "/lovelace/{{PATH}}"
+                },
+                {
+                  "tab": "readings",
+                  "path": "/lovelace/{{PATH}}-spotreba"
+                },
+                {
+                  "tab": "accounting",
+                  "path": "/lovelace/{{PATH}}-ucetnictvi"
+                },
+                {
+                  "tab": "forecasts",
+                  "path": "/lovelace/{{PATH}}-prognozy"
+                },
+                {
+                  "tab": "history",
+                  "path": "/lovelace/{{PATH}}-historie"
+                }
+              ],
+              "layout_version": 8,
+              "admin_link": true,
+              "billing_mode": "supplier",
+              "editor_url": "{{EDITOR_URL}}"
             }
-          ],
-          "layout_version": 8,
-          "admin_link": true,
-          "billing_mode": "supplier",
-          "editor_url": "{{EDITOR_URL}}"
+          ]
         }
       ]
     },
@@ -339,60 +364,65 @@
       "back_path": "/lovelace/{{PATH}}",
       "cards": [
         {
-          "type": "custom:mnd-accounting-card",
-          "entry_id": "{{ENTRY}}",
-          "place": "{{PLACE}}",
-          "title": "{{TITLE}}",
-          "tab": "history",
-          "entities": {
-            "latest_mnd": "{{entity:latest_mnd}}",
-            "latest_mnd_date": "{{entity:latest_mnd_date}}",
-            "current_meter": "{{entity:current_meter}}",
-            "status": "{{entity:status}}",
-            "volume_m3": "{{entity:volume_m3}}",
-            "known_cost_czk": "{{entity:known_cost_czk}}",
-            "paid_czk": "{{entity:paid_czk}}",
-            "balance_czk": "{{entity:balance_czk}}",
-            "current_flow_m3h": "{{entity:current_flow_m3h}}",
-            "current_deposit_czk": "{{entity:current_deposit_czk}}",
-            "billing_paid_czk": "{{entity:billing_paid_czk}}",
-            "billing_plan_czk": "{{entity:billing_plan_czk}}",
-            "billing_cost_czk": "{{entity:billing_cost_czk}}",
-            "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
-            "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
-            "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
-            "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
-            "billing_volume_m3": "{{entity:billing_volume_m3}}",
-            "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
-            "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
-            "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
-            "own_actual_mwh": "{{entity:own_actual_mwh}}"
-          },
-          "navigation": [
+          "type": "vertical-stack",
+          "cards": [
             {
-              "tab": "overview",
-              "path": "/lovelace/{{PATH}}"
-            },
-            {
-              "tab": "readings",
-              "path": "/lovelace/{{PATH}}-spotreba"
-            },
-            {
-              "tab": "accounting",
-              "path": "/lovelace/{{PATH}}-ucetnictvi"
-            },
-            {
-              "tab": "forecasts",
-              "path": "/lovelace/{{PATH}}-prognozy"
-            },
-            {
+              "type": "custom:mnd-accounting-card",
+              "entry_id": "{{ENTRY}}",
+              "place": "{{PLACE}}",
+              "title": "{{TITLE}}",
               "tab": "history",
-              "path": "/lovelace/{{PATH}}-historie"
+              "entities": {
+                "latest_mnd": "{{entity:latest_mnd}}",
+                "latest_mnd_date": "{{entity:latest_mnd_date}}",
+                "current_meter": "{{entity:current_meter}}",
+                "status": "{{entity:status}}",
+                "volume_m3": "{{entity:volume_m3}}",
+                "known_cost_czk": "{{entity:known_cost_czk}}",
+                "paid_czk": "{{entity:paid_czk}}",
+                "balance_czk": "{{entity:balance_czk}}",
+                "current_flow_m3h": "{{entity:current_flow_m3h}}",
+                "current_deposit_czk": "{{entity:current_deposit_czk}}",
+                "billing_paid_czk": "{{entity:billing_paid_czk}}",
+                "billing_plan_czk": "{{entity:billing_plan_czk}}",
+                "billing_cost_czk": "{{entity:billing_cost_czk}}",
+                "billing_forecast_cost_czk": "{{entity:billing_forecast_cost_czk}}",
+                "billing_forecast_balance_czk": "{{entity:billing_forecast_balance_czk}}",
+                "billing_actual_mwh": "{{entity:billing_actual_mwh}}",
+                "billing_forecast_mwh": "{{entity:billing_forecast_mwh}}",
+                "billing_volume_m3": "{{entity:billing_volume_m3}}",
+                "own_forecast_balance_czk": "{{entity:own_forecast_balance_czk}}",
+                "own_forecast_cost_czk": "{{entity:own_forecast_cost_czk}}",
+                "own_forecast_mwh": "{{entity:own_forecast_mwh}}",
+                "own_actual_mwh": "{{entity:own_actual_mwh}}"
+              },
+              "navigation": [
+                {
+                  "tab": "overview",
+                  "path": "/lovelace/{{PATH}}"
+                },
+                {
+                  "tab": "readings",
+                  "path": "/lovelace/{{PATH}}-spotreba"
+                },
+                {
+                  "tab": "accounting",
+                  "path": "/lovelace/{{PATH}}-ucetnictvi"
+                },
+                {
+                  "tab": "forecasts",
+                  "path": "/lovelace/{{PATH}}-prognozy"
+                },
+                {
+                  "tab": "history",
+                  "path": "/lovelace/{{PATH}}-historie"
+                }
+              ],
+              "layout_version": 8,
+              "billing_mode": "supplier",
+              "editor_url": "{{EDITOR_URL}}"
             }
-          ],
-          "layout_version": 8,
-          "billing_mode": "supplier",
-          "editor_url": "{{EDITOR_URL}}"
+          ]
         }
       ]
     }

@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import copy
 import hashlib
+import logging
 from decimal import Decimal
 from pathlib import Path
 
@@ -17,6 +18,7 @@ import voluptuous as vol
 from aiohttp import web
 from homeassistant.components import websocket_api
 from homeassistant.components.http import HomeAssistantView, StaticPathConfig
+from homeassistant.components.lovelace import LOVELACE_DATA
 from homeassistant.components.panel_custom import async_register_panel
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr
@@ -32,7 +34,10 @@ from .core.forecast import compare_forecast, project_outcome, seasonal_forecast
 from .core.importer import export_csv
 from .core.portal_mapping import technical_details
 from .dashboard import build_views
+from .frontend_resource import ensure_resource
 from .storage import get_artifact, put_artifact
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def _coordinator(hass, entry_id):
@@ -87,6 +92,21 @@ async def async_setup_api(hass):
         if "resource" not in stages:
             add_extra_js_url(hass, f"{url}?v={digest}")
             stages.add("resource")
+        if "lovelace_resource" not in stages:
+            # Extra modul samotného panelu není spolehlivým zdrojem pro přímé
+            # otevření dashboardu z mobilní cache. Lovelace proto eviduje
+            # stejnou URL také jako vlastní module resource; shodnou URL
+            # prohlížeč vyhodnotí jen jednou. YAML konfiguraci nepřepisujeme.
+            lovelace = hass.data[LOVELACE_DATA]
+            if lovelace.resource_mode == "storage":
+                await ensure_resource(lovelace.resources, f"{url}?v={digest}")
+            else:
+                _LOGGER.warning(
+                    "MND: do YAML resources přidejte url %s?v=%s s type: module",
+                    url,
+                    digest,
+                )
+            stages.add("lovelace_resource")
         await async_register_panel(
             hass,
             frontend_url_path=PANEL_PATH,

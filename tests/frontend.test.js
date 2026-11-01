@@ -37,7 +37,7 @@ test("šest generovaných pohledů sdílí MND kartu, vazby entit a úplnou navi
   assert.equal(template.views.length,6);
   for(const view of template.views){
     assert.equal(view.panel,true);assert.equal(view.cards.length,1);
-    const config=view.cards[0];assert.equal(config.type,"custom:mnd-accounting-card");assert.equal(config.navigation.length,5);
+    assert.equal(view.cards[0].type,"vertical-stack");const config=view.cards[0].cards[0];assert.equal(config.type,"custom:mnd-accounting-card");assert.equal(config.navigation.length,5);
     const {element}=await surface({config:{...config,entry_id:"account-a",place:PLACE,entities:{current_flow_m3h:"sensor.renamed_flow"}}});
     assert.equal(element.shadowRoot.querySelectorAll("nav a").length,5);
     assert.equal(element.shadowRoot.querySelectorAll("nav [aria-current=page]").length,config.tab==="editor"?0:1);
