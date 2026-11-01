@@ -26,6 +26,9 @@
 
 ## Git a vydání
 
+- Podle pokynu uživatele z 1. 11. 2026 verzuj stejně jako ČEZ: běžná
+  vydání `major.minor.patch`, oprava zvyšuje patch. MND má vlastní řadu;
+  přípony alpha/beta/rc používej jen na výslovný pokyn pro dané vydání.
 - Převzatá pravidla z ČEZ jsou v `GIT_POLITIKY_CEZ.md`. Před releasem ověř, zda reference neobsahuje novější pokyny.
 - Žádné přepisování existujících tagů a publikovaných assetů. ZIP vzniká z ověřeného Git tagu, nejprve jako součást draftu.
 - Zkontroluj staged diff a obsah balíčku. Testy a šablony používají syntetická data.

@@ -1,5 +1,12 @@
 # Testování a vydání
 
+Aktuální verzování podle uživatele (1. 11. 2026) odpovídá ČEZ:
+`major.minor.patch`, vlastní číselná řada MND, opravy zvyšují patch.
+Nynější oprava dashboardu je stabilní **1.0.1**; původní pracovní označení
+rc.2 nebylo tagováno ani publikováno. Přípony alpha/beta/rc vyžadují
+výslovný pokyn uživatele pro konkrétní vydání. Následující popis rc.1 je
+historie již zveřejněného kandidáta, nikoli pokyn pokračovat řadou rc.
+
 Závazný zdroj pravidel: [GIT_POLITIKY_CEZ.md](../GIT_POLITIKY_CEZ.md).
 Nový projekt má vlastní historii a větev `master_HA`; reference se nemění.
 

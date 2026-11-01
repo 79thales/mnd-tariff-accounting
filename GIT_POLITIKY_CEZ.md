@@ -1,5 +1,12 @@
 # Git a vydávání MND — převzetí pravidel projektu ČEZ
 
+Aktuální pokyn uživatele z 1. 11. 2026: MND se verzují stejně jako ČEZ,
+tedy běžnými verzemi `major.minor.patch` ve vlastní číselné řadě. Opravy
+zvyšují patch; přípony alpha/beta/rc se použijí jen na výslovný pokyn pro
+konkrétní vydání. Oprava načítání dashboardu se vydává jako **1.0.1**.
+Tento pokyn nahrazuje volbu rc pro nynější vydání. Historický publikovaný
+tag `v1.0.1-rc.1` i jeho asset zůstávají neměnné.
+
 Datum auditu: 15. 10. 2026. Tento dokument je zadání budoucího postupu, ne potvrzení provedeného založení/publikace repozitáře.
 
 Aktualizace 1. 11. 2026: uživatel určil pro MND licenci **GPL-3.0-only**
