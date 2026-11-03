@@ -328,15 +328,20 @@ async def websocket_command(hass, connection, msg):
 
                 from .core.common import local_day
                 from .core.finance import accept_advances
+                from .time_zone import async_configured_time_zone
 
                 if payload.get("confirm") is not True:
                     raise DataError("finance_allocation_confirmation_required")
+
+                # Pásmo načteme před zámkem; datum se nadále určuje uvnitř
+                # transakce, aby odpovídalo okamžiku přijetí záloh.
+                zone = await async_configured_time_zone(hass)
 
                 def accept(data):
                     accept_advances(
                         place_id,
                         data["places"][place_id],
-                        local_day(dt_util.utcnow(), hass.config.time_zone),
+                        local_day(dt_util.utcnow(), zone),
                     )
 
                 result = await repo.transact(accept, expected_revision=payload.get("revision"))
@@ -349,12 +354,14 @@ async def websocket_command(hass, connection, msg):
                 from homeassistant.util import dt as dt_util
 
                 from .core.common import day, local_day
+                from .time_zone import async_configured_time_zone
 
                 source = repo.data["places"][place_id]["settings"].get("portal")
                 if not source:
                     raise DataError("cloud_place_not_connected")
                 left, right = day(payload["start"]), day(payload["end"])
-                if right > local_day(dt_util.utcnow(), hass.config.time_zone):
+                zone = await async_configured_time_zone(hass)
+                if right > local_day(dt_util.utcnow(), zone):
                     raise DataError("future_export_period")
                 content, filename = await coordinator.portal.export_readings(
                     source["cp_id"], source["contract_id"], left, right
@@ -387,8 +394,10 @@ async def websocket_command(hass, connection, msg):
                 from homeassistant.util import dt as dt_util
 
                 from .core.common import day, local_day
+                from .time_zone import async_configured_time_zone
 
-                if day(payload["start"]) < local_day(dt_util.utcnow(), hass.config.time_zone):
+                zone = await async_configured_time_zone(hass)
+                if day(payload["start"]) < local_day(dt_util.utcnow(), zone):
                     raise DataError("forecast_requires_future_period")
                 selected_settings = place["settings"]
                 profile = [
@@ -516,8 +525,10 @@ async def websocket_command(hass, connection, msg):
                 ):
                     raise DataError("comparable_invoice_required")
                 from .core.common import day, instant, local_day
+                from .time_zone import async_configured_time_zone
 
-                if local_day(instant(snapshot["retrieved_at"]), hass.config.time_zone) >= day(
+                zone = await async_configured_time_zone(hass)
+                if local_day(instant(snapshot["retrieved_at"]), zone) >= day(
                     invoice["to"]
                 ):
                     raise DataError("snapshot_not_before_actual_period_end")

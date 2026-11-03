@@ -113,7 +113,7 @@ def consumption_summary(place, now, zone):
             "today": period(today, today + timedelta(days=1)),
             "month": period(today.replace(day=1), today + timedelta(days=1)),
             "days": days,
-            "time_zone": zone,
+            "time_zone": str(zone),
         }
     )
 

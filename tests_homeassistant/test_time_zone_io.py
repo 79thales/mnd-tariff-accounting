@@ -9,9 +9,25 @@ import pytest
 from homeassistant.util import dt as dt_util
 
 from custom_components.mnd_tariff_accounting.boiler import async_energy_summary
+from custom_components.mnd_tariff_accounting.core.common import local_day
 from custom_components.mnd_tariff_accounting.recorder import async_read_history
+from custom_components.mnd_tariff_accounting.time_zone import async_configured_time_zone
 
 PREFIX = "custom_components.mnd_tariff_accounting."
+
+
+async def test_configured_zone_supports_local_day_without_loading_again(hass):
+    """Předané pásmo zachová datum na hranici dne a chybějící pásmo odmítne."""
+    hass.config.time_zone = "Europe/Prague"
+    zone = await async_configured_time_zone(hass)
+    assert local_day(datetime(2026, 3, 28, 23, 30, tzinfo=timezone.utc), zone).isoformat() == (
+        "2026-03-29"
+    )
+    lookup = AsyncMock(return_value=None)
+    with patch(PREFIX + "time_zone.dt_util.async_get_time_zone", lookup):
+        with pytest.raises(ZoneInfoNotFoundError):
+            await async_configured_time_zone(hass)
+    lookup.assert_awaited_once_with("Europe/Prague")
 
 
 @pytest.mark.parametrize(

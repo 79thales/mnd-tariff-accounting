@@ -46,6 +46,7 @@ from .core.xlsx import parse_workbook
 from .history import HistoryRunner
 from .portal import AuthenticationRequired, PortalClient, PortalError
 from .storage import ConfirmedStore, put_artifact
+from .time_zone import async_configured_time_zone
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -469,7 +470,8 @@ class MndCoordinator(DataUpdateCoordinator):
         if not invoices:
             return []
         latest = max(invoices, key=lambda r: r["to_inclusive"])
-        period = select_period(place, local_day(dt_util.utcnow(), self.hass.config.time_zone))
+        zone = await async_configured_time_zone(self.hass)
+        period = select_period(place, local_day(dt_util.utcnow(), zone))
         selected = [latest] + [
             r
             for r in invoices
@@ -737,8 +739,9 @@ class MndCoordinator(DataUpdateCoordinator):
                     )
                     results[place_id]["boiler"] = boiler_live_values(self.hass, settings)
                     try:
+                        zone = await async_configured_time_zone(self.hass)
                         results[place_id]["consumption"] = consumption_summary(
-                            place, dt_util.utcnow(), self.hass.config.time_zone
+                            place, dt_util.utcnow(), zone
                         )
                     except DataError as err:
                         # Konfliktní starý profil nesmí odstavit živé W/průtok.
@@ -849,13 +852,20 @@ class MndCoordinator(DataUpdateCoordinator):
             record = validated_boiler_settings(
                 self.hass, self.repository.data["places"][place_id]["settings"], record
             )
+        # Mutátor běží synchronně pod transakčním zámkem, proto potřebuje již
+        # načtené pásmo; jeho použití nemění pořadí ani atomicitu samotného zápisu.
+        zone = (
+            await async_configured_time_zone(self.hass)
+            if section in ("transfer", "advance_grid", "readings", "events")
+            else self.hass.config.time_zone
+        )
         mutate = partial(
             edit_place,
             place_id=place_id,
             section=section,
             record=record,
             now=dt_util.utcnow(),
-            zone=self.hass.config.time_zone,
+            zone=zone,
         )
         result = await self.repository.transact(mutate, expected_revision=expected_revision)
         if section in ("settings", "boiler"):
