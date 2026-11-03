@@ -71,9 +71,9 @@ def instant(value: Any) -> datetime:
         raise DataError("invalid_instant") from err
 
 
-def local_day(value: datetime, zone: str) -> date:
-    """Datum podle konfigurace HA, nikoli časového pásma vývojového počítače."""
-    return instant(value).astimezone(ZoneInfo(zone)).date()
+def local_day(value: datetime, zone: str | ZoneInfo) -> date:
+    """Místní datum; již načtené pásmo dovoluje volání bez diskového I/O."""
+    return instant(value).astimezone(ZoneInfo(zone) if isinstance(zone, str) else zone).date()
 
 
 def period(left: Any, right: Any) -> tuple[date, date]:
