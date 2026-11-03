@@ -4,12 +4,13 @@ from __future__ import annotations
 
 from datetime import datetime, time, timedelta
 from functools import partial
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfoNotFoundError
 
 from homeassistant.components.recorder import get_instance
 from homeassistant.components.recorder.history import get_significant_states
 from homeassistant.components.recorder.statistics import get_metadata, statistics_during_period
 from homeassistant.helpers import entity_registry as er
+from homeassistant.util import dt as dt_util
 
 from .core.common import DataError, day, decimal, fingerprint, wire
 from .core.statistics import daily_profile
@@ -32,7 +33,11 @@ async def async_read_history(coordinator, place_id, start, end, job_cursor=None)
     first, last = day(start), day(end)
     if not 0 < (last - first).days <= 7:
         raise DataError("history_block_limit")
-    zone = ZoneInfo(hass.config.time_zone)
+    # Nedostupné pásmo odmítneme před čtením a transakcí stejně jako dříve;
+    # použití None by jinak vytvořilo hranice bez časového pásma.
+    zone = await dt_util.async_get_time_zone(hass.config.time_zone)
+    if zone is None:
+        raise ZoneInfoNotFoundError(hass.config.time_zone)
     left = datetime.combine(first, time.min, zone)
     right = datetime.combine(last, time.min, zone)
 

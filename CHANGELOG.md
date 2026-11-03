@@ -21,6 +21,18 @@
   the MND integration and open its HACS repository, with installation and
   restart prerequisites. The existing alpha tag and installer are unchanged.
 
+## 1.0.2 — asynchronní načítání časového pásma
+
+### Čeština
+
+- Čtení historie Recorderu a spotřeby kotle načítá časové pásmo asynchronně,
+  aby případný přístup k souborům neblokoval Home Assistant.
+
+### English
+
+- Recorder history and boiler energy summaries load the time zone asynchronously,
+  avoiding potentially blocking file access in the Home Assistant event loop.
+
 ## 1.0.1 — oprava načítání dashboardu
 
 ### Čeština

@@ -7,7 +7,7 @@ stavy se čtou z hass, účet MND a archiv finančních transakcí se nemění.
 import asyncio
 from datetime import datetime, time, timedelta
 from functools import partial
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfoNotFoundError
 
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
@@ -126,7 +126,11 @@ async def async_energy_summary(coordinator, settings):
     if "recorder" not in hass.config.components:
         return {"quality": "recorder_unavailable", "today": None, "month": None}
     now = dt_util.utcnow()
-    zone = ZoneInfo(hass.config.time_zone)
+    # HA načte případná data pásma mimo event loop. None nesmí znamenat
+    # místní pásmo systému: původní ZoneInfo při neznámém pásmu selhalo.
+    zone = await dt_util.async_get_time_zone(hass.config.time_zone)
+    if zone is None:
+        raise ZoneInfoNotFoundError(hass.config.time_zone)
     today = now.astimezone(zone).date()
     key = (settings.get("boiler_energy_registry_id"), entity, today, str(zone))
     if not hasattr(coordinator, "_boiler_energy_lock"):
